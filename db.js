@@ -1,24 +1,33 @@
 /* ==========================================================================
-   VELOURA DOTS - Pure PostgreSQL Database Layer
+   VELOURA DOTS - Vercel-Optimized PostgreSQL Database Layer
    Pure PostgreSQL database interface for commissions and product showcases.
-   All methods are async — use with await in server.js
+   Supports automatic lazy table initialization for Vercel serverless cold starts.
    ========================================================================== */
 
 const { Pool } = require('pg');
 
-// Connection pool (reads DATABASE_URL from .env)
-const connectionString = process.env.DATABASE_URL || 'postgresql://postgres:veloura_admin@localhost:5432/veloura_dots';
+// Read DATABASE_URL or Vercel's auto-injected POSTGRES_URL
+const connectionString = process.env.DATABASE_URL || process.env.POSTGRES_URL || 'postgresql://postgres:veloura_admin@localhost:5432/veloura_dots';
+
+const isCloudDb = !!(
+    process.env.DATABASE_URL ||
+    process.env.POSTGRES_URL ||
+    connectionString.includes('sslmode=require') ||
+    connectionString.includes('neon.tech') ||
+    connectionString.includes('vercel-storage.com') ||
+    connectionString.includes('render.com') ||
+    connectionString.includes('supabase.co')
+);
 
 const pool = new Pool({
     connectionString: connectionString,
-    ssl: (process.env.DATABASE_URL || connectionString.includes('sslmode=require') || connectionString.includes('neon.tech') || connectionString.includes('vercel-storage.com'))
-        ? { rejectUnauthorized: false }
-        : false
+    ssl: isCloudDb ? { rejectUnauthorized: false } : false
 });
 
 let isPgConnected = false;
+let initPromise = null;
 
-// Auto-initialize PostgreSQL tables, indexes, and seed default showcase items on connection
+// Auto-initialize PostgreSQL tables, indexes, and seed default showcase items
 async function initTables(client) {
     await client.query(`
         CREATE TABLE IF NOT EXISTS commissions (
@@ -79,23 +88,32 @@ async function initTables(client) {
     }
 }
 
-// Test connection on startup
-pool.connect(async (err, client, release) => {
-    if (err) {
-        isPgConnected = false;
-        console.error('❌ PostgreSQL connection error:', err.message);
-    } else {
-        isPgConnected = true;
-        console.log('✅ PostgreSQL connected successfully');
-        try {
-            await initTables(client);
-            console.log('✅ PostgreSQL tables & indexes verified/initialized');
-        } catch (initErr) {
-            console.error('⚠️ Error initializing PostgreSQL tables:', initErr.message);
-        }
-        release();
+// Lazy initialization wrapper for Vercel serverless cold starts
+async function ensureInit() {
+    if (isPgConnected) return true;
+    if (!initPromise) {
+        initPromise = (async () => {
+            let client;
+            try {
+                client = await pool.connect();
+                await initTables(client);
+                isPgConnected = true;
+                return true;
+            } catch (err) {
+                initPromise = null;
+                isPgConnected = false;
+                console.error('⚠️ Database connection error:', err.message);
+                return false;
+            } finally {
+                if (client) client.release();
+            }
+        })();
     }
-});
+    return initPromise;
+}
+
+// Eager trigger on startup
+ensureInit().catch(() => {});
 
 function generateRefId() {
     const num = Math.floor(1000 + Math.random() * 9000);
@@ -148,6 +166,7 @@ const db = {
     // =========================================================================
 
     async saveCommission(data) {
+        await ensureInit();
         const refId = generateRefId();
         const id = `comm-${Date.now()}`;
 
@@ -177,6 +196,7 @@ const db = {
     },
 
     async getCommissionByRef(refId) {
+        await ensureInit();
         const result = await pool.query(
             'SELECT * FROM commissions WHERE LOWER(ref_id) = LOWER($1)',
             [refId]
@@ -185,6 +205,7 @@ const db = {
     },
 
     async getCommissionById(id) {
+        await ensureInit();
         const result = await pool.query(
             'SELECT * FROM commissions WHERE id = $1',
             [id]
@@ -193,6 +214,7 @@ const db = {
     },
 
     async getAllCommissions() {
+        await ensureInit();
         const result = await pool.query(
             'SELECT * FROM commissions ORDER BY created_at DESC'
         );
@@ -200,6 +222,7 @@ const db = {
     },
 
     async updateCommissionStatus(id, newStatus) {
+        await ensureInit();
         const result = await pool.query(
             `UPDATE commissions
              SET status = $1, updated_at = NOW()
@@ -215,6 +238,7 @@ const db = {
     // =========================================================================
 
     async getAllProducts(category) {
+        await ensureInit();
         let result;
         if (!category || category === 'all') {
             result = await pool.query('SELECT * FROM products ORDER BY created_at ASC');
@@ -228,6 +252,7 @@ const db = {
     },
 
     async addProduct(prodData) {
+        await ensureInit();
         const id = `prod-${Date.now()}`;
 
         const result = await pool.query(
@@ -252,6 +277,7 @@ const db = {
     },
 
     async deleteProduct(id) {
+        await ensureInit();
         const result = await pool.query(
             'DELETE FROM products WHERE id = $1 RETURNING id',
             [id]
