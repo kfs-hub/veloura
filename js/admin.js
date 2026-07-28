@@ -270,79 +270,13 @@ document.addEventListener('DOMContentLoaded', function () {
         moodboardGrid.innerHTML = '';
 
         if (item.uploadedFiles && item.uploadedFiles.length > 0) {
-            item.uploadedFiles.forEach((file, index) => {
-                let filePath = typeof file === 'string' ? file : (file.path || file.url || file.filename || '');
-                let fileName = (typeof file === 'object' && (file.originalName || file.name)) ? (file.originalName || file.name) : `Attachment ${index + 1}`;
-
-                if (!filePath) return;
-
-                // Normalize path to ensure leading slash if local relative route (skips http, https, and data: URIs)
-                if (!filePath.startsWith('/') && !filePath.startsWith('http://') && !filePath.startsWith('https://') && !filePath.startsWith('data:')) {
-                    filePath = '/' + filePath;
-                }
-
-                const card = document.createElement('div');
-                card.className = 'attachment-card';
-                card.style.cssText = 'display: inline-flex; flex-direction: column; align-items: center; padding: 8px; background: #FAF8F5; border: 1px solid var(--border-gold); border-radius: 8px; text-align: center; gap: 6px;';
-
-                const viewHandler = () => {
-                    if (filePath.startsWith('data:')) {
-                        const win = window.open();
-                        if (win) {
-                            win.document.write(`
-                                <!DOCTYPE html>
-                                <html>
-                                <head>
-                                    <title>${escapeHtml(fileName)} - Veloura Attachment</title>
-                                    <style>
-                                        body { margin: 0; background: #FAF8F5; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; font-family: sans-serif; }
-                                        img { max-width: 90vw; max-height: 85vh; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); border: 1px solid #C5A059; }
-                                        .title { margin-bottom: 16px; color: #1A1A1E; font-weight: 700; font-size: 1.1rem; }
-                                    </style>
-                                </head>
-                                <body>
-                                    <div class="title">📷 ${escapeHtml(fileName)}</div>
-                                    <img src="${filePath}" alt="${escapeHtml(fileName)}">
-                                </body>
-                                </html>
-                            `);
-                        }
-                    } else {
-                        window.open(filePath, '_blank');
-                    }
-                };
-
+            item.uploadedFiles.forEach(file => {
                 const img = document.createElement('img');
-                img.src = filePath;
+                img.src = file.path;
                 img.className = 'moodboard-thumb';
-                img.alt = fileName;
-                img.title = `Click to view full ${fileName}`;
-                img.onclick = viewHandler;
-
-                const link = document.createElement('a');
-                link.href = filePath.startsWith('data:') ? '#' : filePath;
-                if (!filePath.startsWith('data:')) {
-                    link.target = '_blank';
-                    link.rel = 'noopener noreferrer';
-                } else {
-                    link.onclick = (e) => { e.preventDefault(); viewHandler(); };
-                }
-                link.style.cssText = 'font-size: 0.75rem; color: var(--gold-dark); font-weight: 600; text-decoration: underline; word-break: break-all; max-width: 120px; display: inline-block; cursor: pointer;';
-                link.textContent = fileName;
-
-                // Handle image load failure (e.g. non-image or missing file)
-                img.onerror = () => {
-                    img.style.display = 'none';
-                    const icon = document.createElement('div');
-                    icon.style.cssText = 'width: 90px; height: 90px; display: flex; align-items: center; justify-content: center; background: #EFEBE4; border-radius: 8px; font-size: 1.5rem; cursor: pointer;';
-                    icon.innerHTML = '📄';
-                    icon.onclick = viewHandler;
-                    card.insertBefore(icon, link);
-                };
-
-                card.appendChild(img);
-                card.appendChild(link);
-                moodboardGrid.appendChild(card);
+                img.alt = file.originalName;
+                img.onclick = () => window.open(file.path, '_blank');
+                moodboardGrid.appendChild(img);
             });
         } else {
             moodboardGrid.innerHTML = `<span style="font-size: 0.85rem; color: var(--text-muted);">No reference files attached.</span>`;
@@ -497,4 +431,35 @@ document.addEventListener('DOMContentLoaded', function () {
             .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;');
     }
+});
+category,
+    surfaceType,
+    spec,
+    blurb,
+    imageUrl,
+    readyToShip: true
+                })
+            });
+
+const data = await res.json();
+
+if (data.success) {
+    addProductForm.reset();
+    loadProducts();
+} else {
+    alert(data.message || 'Error adding product.');
+}
+        } catch (err) {
+    console.error('Error adding product:', err);
+}
+    });
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
 });
