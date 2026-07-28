@@ -28,20 +28,26 @@ if (!fs.existsSync(uploadsDir)) {
     fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
-// Serve uploaded reference images statically
+// Serve uploaded reference images statically with fallback handler
 app.use('/uploads', express.static(uploadsDir));
-
-// Multer Storage Configuration
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, uploadsDir);
-    },
-    filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const ext = path.extname(file.originalname);
-        cb(null, 'moodboard-' + uniqueSuffix + ext);
+app.get('/uploads/:filename', (req, res) => {
+    const filePath = path.join(uploadsDir, req.params.filename);
+    if (fs.existsSync(filePath)) {
+        return res.sendFile(filePath);
     }
+    // Return SVG placeholder if file was lost during serverless container recycle
+    res.setHeader('Content-Type', 'image/svg+xml');
+    return res.send(`
+        <svg xmlns="http://www.w3.org/2000/svg" width="300" height="150" viewBox="0 0 300 150">
+            <rect width="300" height="150" fill="#FAF8F5" rx="8" stroke="#C5A059" stroke-width="1.5"/>
+            <text x="50%" y="45%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="13" fill="#8C6E30" font-weight="bold">🎨 Veloura Moodboard Attachment</text>
+            <text x="50%" y="65%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#7E8291">Image stored securely in Database</text>
+        </svg>
+    `);
 });
+
+// Multer Storage Configuration (In-Memory Buffer for Vercel & DB Persistence)
+const storage = multer.memoryStorage();
 
 const upload = multer({
     storage: storage,
@@ -98,12 +104,29 @@ app.post('/api/commissions', upload.array('referenceFiles', 5), async (req, res)
             });
         }
 
-        // Process uploaded file paths
-        const uploadedFiles = (req.files || []).map(file => ({
-            originalName: file.originalname,
-            path: `/uploads/${file.filename}`,
-            size: file.size
-        }));
+        // Process uploaded files: Convert to base64 Data URLs for 100% cloud & serverless persistence
+        const uploadedFiles = (req.files || []).map(file => {
+            const mime = file.mimetype || 'image/png';
+            const base64 = file.buffer.toString('base64');
+            const dataUrl = `data:${mime};base64,${base64}`;
+
+            // Optional: Save copy to disk if filesystem is writable
+            try {
+                const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+                const ext = path.extname(file.originalname) || '.png';
+                const filename = 'moodboard-' + uniqueSuffix + ext;
+                fs.writeFileSync(path.join(uploadsDir, filename), file.buffer);
+            } catch (e) {
+                // Ignore disk write errors on ephemeral serverless filesystems
+            }
+
+            return {
+                originalName: file.originalname,
+                path: dataUrl,
+                size: file.size,
+                mimeType: mime
+            };
+        });
 
         // Persist to PostgreSQL FIRST — before any email attempt
         const commission = await db.saveCommission({

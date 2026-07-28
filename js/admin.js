@@ -276,8 +276,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 if (!filePath) return;
 
-                // Normalize path to ensure leading slash if local relative route
-                if (!filePath.startsWith('/') && !filePath.startsWith('http://') && !filePath.startsWith('https://')) {
+                // Normalize path to ensure leading slash if local relative route (skips http, https, and data: URIs)
+                if (!filePath.startsWith('/') && !filePath.startsWith('http://') && !filePath.startsWith('https://') && !filePath.startsWith('data:')) {
                     filePath = '/' + filePath;
                 }
 
@@ -285,27 +285,58 @@ document.addEventListener('DOMContentLoaded', function () {
                 card.className = 'attachment-card';
                 card.style.cssText = 'display: inline-flex; flex-direction: column; align-items: center; padding: 8px; background: #FAF8F5; border: 1px solid var(--border-gold); border-radius: 8px; text-align: center; gap: 6px;';
 
+                const viewHandler = () => {
+                    if (filePath.startsWith('data:')) {
+                        const win = window.open();
+                        if (win) {
+                            win.document.write(`
+                                <!DOCTYPE html>
+                                <html>
+                                <head>
+                                    <title>${escapeHtml(fileName)} - Veloura Attachment</title>
+                                    <style>
+                                        body { margin: 0; background: #FAF8F5; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; font-family: sans-serif; }
+                                        img { max-width: 90vw; max-height: 85vh; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); border: 1px solid #C5A059; }
+                                        .title { margin-bottom: 16px; color: #1A1A1E; font-weight: 700; font-size: 1.1rem; }
+                                    </style>
+                                </head>
+                                <body>
+                                    <div class="title">📷 ${escapeHtml(fileName)}</div>
+                                    <img src="${filePath}" alt="${escapeHtml(fileName)}">
+                                </body>
+                                </html>
+                            `);
+                        }
+                    } else {
+                        window.open(filePath, '_blank');
+                    }
+                };
+
                 const img = document.createElement('img');
                 img.src = filePath;
                 img.className = 'moodboard-thumb';
                 img.alt = fileName;
                 img.title = `Click to view full ${fileName}`;
-                img.onclick = () => window.open(filePath, '_blank');
+                img.onclick = viewHandler;
 
                 const link = document.createElement('a');
-                link.href = filePath;
-                link.target = '_blank';
-                link.rel = 'noopener noreferrer';
-                link.style.cssText = 'font-size: 0.75rem; color: var(--gold-dark); font-weight: 600; text-decoration: underline; word-break: break-all; max-width: 120px; display: inline-block;';
+                link.href = filePath.startsWith('data:') ? '#' : filePath;
+                if (!filePath.startsWith('data:')) {
+                    link.target = '_blank';
+                    link.rel = 'noopener noreferrer';
+                } else {
+                    link.onclick = (e) => { e.preventDefault(); viewHandler(); };
+                }
+                link.style.cssText = 'font-size: 0.75rem; color: var(--gold-dark); font-weight: 600; text-decoration: underline; word-break: break-all; max-width: 120px; display: inline-block; cursor: pointer;';
                 link.textContent = fileName;
 
-                // Handle image load failure (e.g. non-image or deleted file)
+                // Handle image load failure (e.g. non-image or missing file)
                 img.onerror = () => {
                     img.style.display = 'none';
                     const icon = document.createElement('div');
                     icon.style.cssText = 'width: 90px; height: 90px; display: flex; align-items: center; justify-content: center; background: #EFEBE4; border-radius: 8px; font-size: 1.5rem; cursor: pointer;';
                     icon.innerHTML = '📄';
-                    icon.onclick = () => window.open(filePath, '_blank');
+                    icon.onclick = viewHandler;
                     card.insertBefore(icon, link);
                 };
 
