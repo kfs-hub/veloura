@@ -22,8 +22,8 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Configure Uploads directory for reference images
-const uploadsDir = path.join(__dirname, 'uploads');
+// Configure Uploads directory for reference images (supports Vercel /tmp)
+const uploadsDir = process.env.VERCEL ? path.join('/tmp', 'uploads') : path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadsDir)) {
     fs.mkdirSync(uploadsDir, { recursive: true });
 }
@@ -285,10 +285,14 @@ app.get('/api/health', (req, res) => {
     res.json({ status: 'OK', studio: 'Veloura Dots Boutique Server' });
 });
 
-// Start Express Server
-app.listen(PORT, () => {
-    console.log(`\n======================================================`);
-    console.log(`✨ Veloura Dots Server running on http://localhost:${PORT}`);
-    console.log(`👑 Studio Admin Portal live at http://localhost:${PORT}/admin.html`);
-    console.log(`======================================================\n`);
-});
+module.exports = app;
+
+// Start Express Server (local / container mode)
+if (!process.env.VERCEL) {
+    app.listen(PORT, () => {
+        console.log(`\n======================================================`);
+        console.log(`✨ Veloura Dots Server running on http://localhost:${PORT}`);
+        console.log(`👑 Studio Admin Portal live at http://localhost:${PORT}/admin.html`);
+        console.log(`======================================================\n`);
+    });
+}

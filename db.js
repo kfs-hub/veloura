@@ -16,7 +16,7 @@ const connectionString = process.env.DATABASE_URL || 'postgresql://postgres:velo
 
 const pool = new Pool({
     connectionString: connectionString,
-    ssl: connectionString.includes('render.com') || connectionString.includes('neon.tech') || connectionString.includes('supabase.co')
+    ssl: (process.env.DATABASE_URL || connectionString.includes('sslmode=require') || connectionString.includes('neon.tech') || connectionString.includes('vercel-storage.com'))
         ? { rejectUnauthorized: false }
         : false
 });
