@@ -28,6 +28,9 @@ if (!fs.existsSync(uploadsDir)) {
     fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
+// Serve uploaded reference images statically
+app.use('/uploads', express.static(uploadsDir));
+
 // Multer Storage Configuration
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {

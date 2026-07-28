@@ -270,13 +270,48 @@ document.addEventListener('DOMContentLoaded', function () {
         moodboardGrid.innerHTML = '';
 
         if (item.uploadedFiles && item.uploadedFiles.length > 0) {
-            item.uploadedFiles.forEach(file => {
+            item.uploadedFiles.forEach((file, index) => {
+                let filePath = typeof file === 'string' ? file : (file.path || file.url || file.filename || '');
+                let fileName = (typeof file === 'object' && (file.originalName || file.name)) ? (file.originalName || file.name) : `Attachment ${index + 1}`;
+
+                if (!filePath) return;
+
+                // Normalize path to ensure leading slash if local relative route
+                if (!filePath.startsWith('/') && !filePath.startsWith('http://') && !filePath.startsWith('https://')) {
+                    filePath = '/' + filePath;
+                }
+
+                const card = document.createElement('div');
+                card.className = 'attachment-card';
+                card.style.cssText = 'display: inline-flex; flex-direction: column; align-items: center; padding: 8px; background: #FAF8F5; border: 1px solid var(--border-gold); border-radius: 8px; text-align: center; gap: 6px;';
+
                 const img = document.createElement('img');
-                img.src = file.path;
+                img.src = filePath;
                 img.className = 'moodboard-thumb';
-                img.alt = file.originalName;
-                img.onclick = () => window.open(file.path, '_blank');
-                moodboardGrid.appendChild(img);
+                img.alt = fileName;
+                img.title = `Click to view full ${fileName}`;
+                img.onclick = () => window.open(filePath, '_blank');
+
+                const link = document.createElement('a');
+                link.href = filePath;
+                link.target = '_blank';
+                link.rel = 'noopener noreferrer';
+                link.style.cssText = 'font-size: 0.75rem; color: var(--gold-dark); font-weight: 600; text-decoration: underline; word-break: break-all; max-width: 120px; display: inline-block;';
+                link.textContent = fileName;
+
+                // Handle image load failure (e.g. non-image or deleted file)
+                img.onerror = () => {
+                    img.style.display = 'none';
+                    const icon = document.createElement('div');
+                    icon.style.cssText = 'width: 90px; height: 90px; display: flex; align-items: center; justify-content: center; background: #EFEBE4; border-radius: 8px; font-size: 1.5rem; cursor: pointer;';
+                    icon.innerHTML = '📄';
+                    icon.onclick = () => window.open(filePath, '_blank');
+                    card.insertBefore(icon, link);
+                };
+
+                card.appendChild(img);
+                card.appendChild(link);
+                moodboardGrid.appendChild(card);
             });
         } else {
             moodboardGrid.innerHTML = `<span style="font-size: 0.85rem; color: var(--text-muted);">No reference files attached.</span>`;
