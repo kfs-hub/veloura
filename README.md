@@ -6,7 +6,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-v8.22-4169E1?style=flat&logo=postgresql)](https://www.postgresql.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-gold.svg)](LICENSE)
 
-**Veloura Dots** is a full-stack boutique art studio web application designed for artisanal hand-painted dot mandalas. The application features a client-facing interactive commission builder, real-time reference ID tracking, showcase product catalog, automated transactional email alerts, and a password-protected studio admin portal with multi-format storage (PostgreSQL with local JSON fallback).
+**Veloura Dots** is a full-stack boutique art studio web application designed for artisanal hand-painted dot mandalas. The application features a client-facing interactive commission builder, real-time reference ID tracking, showcase product catalog, automated transactional email alerts, and a password-protected studio admin portal backed by PostgreSQL.
 
 ---
 
@@ -16,7 +16,7 @@
 - 🔍 **Real-Time Ref ID Lookup**: Client lookup system using unique reference numbers (`VEL-XXXXXX`) to instantly check order status and details.
 - 📦 **Dynamic Showcase Catalog**: Categorized product gallery showcasing ready-to-ship and custom mandala art objects.
 - 🛡️ **Studio Admin Portal**: Password-protected admin dashboard (`admin.html`) with passcode verification (`x-admin-passcode`), allowing studio artists to review pending inquiries, inspect reference attachments, update status workflows (`PENDING_REVIEW` → `IN_PROGRESS` → `COMPLETED`), and filter/search clients.
-- 🗄️ **Hybrid Database Architecture**: Built with native PostgreSQL persistence and automatic local JSON database fallback (`data/db.json`) if PostgreSQL is offline or unconfigured.
+- 🗄️ **PostgreSQL Database**: Built with native PostgreSQL persistence for commission orders and showcase items.
 - 📧 **Automated Transactional Emails**: Asynchronous dual notification system (client receipt + studio alert) powered by Nodemailer.
 
 ---
@@ -28,7 +28,7 @@ veloura/
 ├── admin.html              # Studio Admin Portal Interface
 ├── index.html              # Main Client Portfolio & Commission Portal
 ├── server.js               # Main Express HTTP & REST API Server
-├── db.js                   # PostgreSQL & JSON Fallback Database Layer
+├── db.js                   # PostgreSQL Database Layer
 ├── .env.example            # Environment Configuration Template
 ├── .gitignore              # Git Ignore Rules
 ├── LICENSE                 # MIT License
@@ -38,11 +38,9 @@ veloura/
 ├── services/
 │   └── email.js            # Nodemailer Email Service Module
 ├── scripts/
-│   ├── setup-db.js         # Database Table Initialization & Seed Script
-│   └── migrate-json-to-pg.js # JSON DB to PostgreSQL Migration Utility
+│   └── setup-db.js         # Database Table Initialization & Seed Script
 ├── showcase images/        # Catalog Showcase High-Res Media
-├── uploads/                # Dynamic Storage for Client Reference Images
-└── data/                   # Local Dev JSON DB Fallback Storage
+└── uploads/                # Dynamic Storage for Client Reference Images
 ```
 
 ---
@@ -77,14 +75,12 @@ ADMIN_PASSCODE=veloura2026
 DATABASE_URL=postgresql://postgres:postgres@localhost:5432/veloura_dots
 ```
 
-### 3. Database Setup (Optional for PostgreSQL)
-If using PostgreSQL, initialize the database tables and seed sample showcase products:
+### 3. Database Setup
+Initialize the database tables and seed sample showcase products:
 
 ```bash
 npm run db:setup
 ```
-
-*(If PostgreSQL is not configured, the app will auto-create and run seamlessly on `data/db.json`.)*
 
 ### 4. Run Development Server
 Start the Express server with live reload:

@@ -1,15 +1,10 @@
 /* ==========================================================================
-   VELOURA DOTS - PostgreSQL Database Layer with Fallback Support
+   VELOURA DOTS - Pure PostgreSQL Database Layer
    Pure PostgreSQL database interface for commissions and product showcases.
-   Supports local JSON database fallback if PostgreSQL service is offline.
    All methods are async — use with await in server.js
    ========================================================================== */
 
 const { Pool } = require('pg');
-const fs = require('fs');
-const path = require('path');
-
-const dbPath = path.join(__dirname, 'data', 'db.json');
 
 // Connection pool (reads DATABASE_URL from .env)
 const connectionString = process.env.DATABASE_URL || 'postgresql://postgres:veloura_admin@localhost:5432/veloura_dots';
@@ -23,34 +18,7 @@ const pool = new Pool({
 
 let isPgConnected = false;
 
-// Helper JSON DB operations for dev fallback
-function readJsonDb() {
-    try {
-        if (!fs.existsSync(dbPath)) {
-            const initial = { commissions: [], products: [] };
-            fs.mkdirSync(path.dirname(dbPath), { recursive: true });
-            fs.writeFileSync(dbPath, JSON.stringify(initial, null, 2));
-            return initial;
-        }
-        const data = JSON.parse(fs.readFileSync(dbPath, 'utf8'));
-        if (!data.commissions) data.commissions = [];
-        if (!data.products) data.products = [];
-        return data;
-    } catch (e) {
-        return { commissions: [], products: [] };
-    }
-}
-
-function writeJsonDb(data) {
-    try {
-        fs.mkdirSync(path.dirname(dbPath), { recursive: true });
-        fs.writeFileSync(dbPath, JSON.stringify(data, null, 2));
-    } catch (e) {
-        console.error('Error writing fallback DB:', e.message);
-    }
-}
-
-// Auto-initialize PostgreSQL tables and indexes on connection
+// Auto-initialize PostgreSQL tables, indexes, and seed default showcase items on connection
 async function initTables(client) {
     await client.query(`
         CREATE TABLE IF NOT EXISTS commissions (
@@ -87,13 +55,35 @@ async function initTables(client) {
         CREATE INDEX IF NOT EXISTS idx_commissions_status ON commissions (status);
         CREATE INDEX IF NOT EXISTS idx_products_category ON products (category);
     `);
+
+    // Seed default showcase items if products table is empty
+    const countRes = await client.query('SELECT COUNT(*) FROM products');
+    if (parseInt(countRes.rows[0].count, 10) === 0) {
+        const seedProducts = [
+            { id: 'prod-1', title: 'Cosmic Sanctuary Mandala', category: 'canvas', categoryLabel: 'Canvases & Wall Art', blurb: 'Meditative focal points for modern spaces. Multi-layered acrylic dot mandalas painted on gallery-wrapped stretched canvas with liquid gold highlights.', spec: '12" x 12" Gallery Canvas', surfaceType: 'Canvas Art', palette: 'Veloura Classic', imageUrl: 'showcase images/canvas.png', readyToShip: true },
+            { id: 'prod-2', title: 'Golden Solstice Coffee Mug', category: 'drinkware', categoryLabel: 'Mugs & Drinkware', blurb: 'Elevate your daily ritual. Custom hand-painted ceramic mugs featuring dense gold and ruby mandala dots, double-sealed with dishwasher-safe crystal gloss varnish.', spec: '15 oz Ceramic Drinkware', surfaceType: 'Ceramic Mug', palette: 'Veloura Classic', imageUrl: 'showcase images/mug.png', readyToShip: true },
+            { id: 'prod-3', title: 'Ivory & Emerald Stainless Flask', category: 'drinkware', categoryLabel: 'Mugs & Drinkware', blurb: 'Tactile art on the go. Double-walled insulated stainless steel travel bottle adorned with high-precision vertical mandala dot columns.', spec: '750ml Vacuum Bottle', surfaceType: 'Stainless Bottle', palette: 'Emerald Sanctuary', imageUrl: 'showcase images/flask.png', readyToShip: true },
+            { id: 'prod-4', title: 'Heirloom Jewelry Box', category: 'boxes', categoryLabel: 'Keepsake Boxes & Decor', blurb: "Treasured storage for life's sacred items. Hand-carved solid mahogany wooden box with a central multi-ring ruby and gold dot mandala lid design.", spec: '8" Wood Box with Velvet Lining', surfaceType: 'Wooden Box', palette: 'Veloura Classic', imageUrl: 'showcase images/jewelry_box.jpeg', readyToShip: true },
+            { id: 'prod-5', title: 'Celestial Quartz Coaster Quad', category: 'boxes', categoryLabel: 'Keepsake Boxes & Decor', blurb: 'Functional table art. Set of 4 natural stone or acacia wood coasters painted with vibrant concentric metallic dot starbursts and heat-resistant resin topcoat.', spec: 'Set of 4 Stone/Wood Coasters', surfaceType: 'Coasters & Trays', palette: 'Celestial Moonlight', imageUrl: 'showcase images/coasters.png', readyToShip: true },
+            { id: 'prod-6', title: 'Bespoke Client Objects', category: 'custom', categoryLabel: 'Custom Items', blurb: '"Have a specific object in mind? We can dot it." From acoustic guitars and leather journals to phone cases, candleholders, and keepsake decor.', spec: 'Client Provided Surface', surfaceType: 'Custom Object', palette: 'Custom Palette', imageUrl: 'showcase images/custom_item.png', readyToShip: false }
+        ];
+
+        for (const p of seedProducts) {
+            await client.query(
+                `INSERT INTO products (id, title, category, category_label, blurb, spec, surface_type, palette, image_url, ready_to_ship)
+                 VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
+                 ON CONFLICT (id) DO NOTHING`,
+                [p.id, p.title, p.category, p.categoryLabel, p.blurb, p.spec, p.surfaceType, p.palette, p.imageUrl, p.readyToShip]
+            );
+        }
+    }
 }
 
 // Test connection on startup
 pool.connect(async (err, client, release) => {
     if (err) {
         isPgConnected = false;
-        console.log('💡 PostgreSQL not running locally — using JSON fallback (data/db.json)');
+        console.error('❌ PostgreSQL connection error:', err.message);
     } else {
         isPgConnected = true;
         console.log('✅ PostgreSQL connected successfully');
@@ -161,133 +151,63 @@ const db = {
         const refId = generateRefId();
         const id = `comm-${Date.now()}`;
 
-        if (isPgConnected) {
-            try {
-                const result = await pool.query(
-                    `INSERT INTO commissions
-                     (id, ref_id, status, surface_type, surface_size, color_palette, vision_text,
-                      budget_range, timeline_select, client_name, client_email, client_ig, uploaded_files, created_at)
-                     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,NOW())
-                     RETURNING *`,
-                    [
-                        id,
-                        refId,
-                        'PENDING_REVIEW',
-                        data.surfaceType || 'Canvas Art',
-                        data.surfaceSize || 'Medium',
-                        data.colorPalette || 'Veloura Classic',
-                        data.visionText || '',
-                        data.budgetRange || '$150 - $300',
-                        data.timelineSelect || 'Standard 3-4 Weeks',
-                        data.clientName || 'Valued Collector',
-                        data.clientEmail,
-                        data.clientIg || '',
-                        JSON.stringify(data.uploadedFiles || [])
-                    ]
-                );
-                return mapCommission(result.rows[0]);
-            } catch (err) {
-                console.error('PostgreSQL save error, using fallback:', err.message);
-            }
-        }
-
-        // Fallback: save to JSON file
-        const store = readJsonDb();
-        const newComm = {
-            id,
-            refId,
-            status: 'PENDING_REVIEW',
-            surfaceType: data.surfaceType || 'Canvas Art',
-            surfaceSize: data.surfaceSize || 'Medium',
-            colorPalette: data.colorPalette || 'Veloura Classic',
-            visionText: data.visionText || '',
-            budgetRange: data.budgetRange || '$150 - $300',
-            timelineSelect: data.timelineSelect || 'Standard 3-4 Weeks',
-            clientName: data.clientName || 'Valued Collector',
-            clientEmail: data.clientEmail,
-            clientIg: data.clientIg || '',
-            uploadedFiles: data.uploadedFiles || [],
-            createdAt: new Date().toISOString(),
-            updatedAt: null
-        };
-        store.commissions.push(newComm);
-        writeJsonDb(store);
-        return newComm;
+        const result = await pool.query(
+            `INSERT INTO commissions
+             (id, ref_id, status, surface_type, surface_size, color_palette, vision_text,
+              budget_range, timeline_select, client_name, client_email, client_ig, uploaded_files, created_at)
+             VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,NOW())
+             RETURNING *`,
+            [
+                id,
+                refId,
+                'PENDING_REVIEW',
+                data.surfaceType || 'Canvas Art',
+                data.surfaceSize || 'Medium',
+                data.colorPalette || 'Veloura Classic',
+                data.visionText || '',
+                data.budgetRange || '$150 - $300',
+                data.timelineSelect || 'Standard 3-4 Weeks',
+                data.clientName || 'Valued Collector',
+                data.clientEmail,
+                data.clientIg || '',
+                JSON.stringify(data.uploadedFiles || [])
+            ]
+        );
+        return mapCommission(result.rows[0]);
     },
 
     async getCommissionByRef(refId) {
-        if (isPgConnected) {
-            try {
-                const result = await pool.query(
-                    'SELECT * FROM commissions WHERE LOWER(ref_id) = LOWER($1)',
-                    [refId]
-                );
-                if (result.rows[0]) return mapCommission(result.rows[0]);
-            } catch (err) {
-                console.error('PostgreSQL query error, using fallback:', err.message);
-            }
-        }
-
-        const store = readJsonDb();
-        return store.commissions.find(c => c.refId.toLowerCase() === refId.toLowerCase()) || null;
+        const result = await pool.query(
+            'SELECT * FROM commissions WHERE LOWER(ref_id) = LOWER($1)',
+            [refId]
+        );
+        return mapCommission(result.rows[0]);
     },
 
     async getCommissionById(id) {
-        if (isPgConnected) {
-            try {
-                const result = await pool.query(
-                    'SELECT * FROM commissions WHERE id = $1',
-                    [id]
-                );
-                if (result.rows[0]) return mapCommission(result.rows[0]);
-            } catch (err) {
-                console.error('PostgreSQL query error, using fallback:', err.message);
-            }
-        }
-
-        const store = readJsonDb();
-        return store.commissions.find(c => c.id === id) || null;
+        const result = await pool.query(
+            'SELECT * FROM commissions WHERE id = $1',
+            [id]
+        );
+        return mapCommission(result.rows[0]);
     },
 
     async getAllCommissions() {
-        if (isPgConnected) {
-            try {
-                const result = await pool.query(
-                    'SELECT * FROM commissions ORDER BY created_at DESC'
-                );
-                return result.rows.map(mapCommission);
-            } catch (err) {
-                console.error('PostgreSQL query error, using fallback:', err.message);
-            }
-        }
-
-        const store = readJsonDb();
-        return store.commissions.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        const result = await pool.query(
+            'SELECT * FROM commissions ORDER BY created_at DESC'
+        );
+        return result.rows.map(mapCommission);
     },
 
     async updateCommissionStatus(id, newStatus) {
-        if (isPgConnected) {
-            try {
-                const result = await pool.query(
-                    `UPDATE commissions
-                     SET status = $1, updated_at = NOW()
-                     WHERE id = $2 OR ref_id = $2
-                     RETURNING *`,
-                    [newStatus, id]
-                );
-                if (result.rows[0]) return mapCommission(result.rows[0]);
-            } catch (err) {
-                console.error('PostgreSQL update error, using fallback:', err.message);
-            }
-        }
-
-        const store = readJsonDb();
-        const item = store.commissions.find(c => c.id === id || c.refId === id);
-        if (!item) return null;
-        item.status = newStatus;
-        item.updatedAt = new Date().toISOString();
-        writeJsonDb(store);
-        return item;
+        const result = await pool.query(
+            `UPDATE commissions
+             SET status = $1, updated_at = NOW()
+             WHERE id = $2 OR ref_id = $2
+             RETURNING *`,
+            [newStatus, id]
+        );
+        return mapCommission(result.rows[0]);
     },
 
     // =========================================================================
@@ -295,109 +215,48 @@ const db = {
     // =========================================================================
 
     async getAllProducts(category) {
-        if (isPgConnected) {
-            try {
-                let result;
-                if (!category || category === 'all') {
-                    result = await pool.query('SELECT * FROM products ORDER BY created_at ASC');
-                } else {
-                    result = await pool.query(
-                        'SELECT * FROM products WHERE category = $1 ORDER BY created_at ASC',
-                        [category]
-                    );
-                }
-                return result.rows.map(mapProduct);
-            } catch (err) {
-                console.error('PostgreSQL product query error, using fallback:', err.message);
-            }
+        let result;
+        if (!category || category === 'all') {
+            result = await pool.query('SELECT * FROM products ORDER BY created_at ASC');
+        } else {
+            result = await pool.query(
+                'SELECT * FROM products WHERE category = $1 ORDER BY created_at ASC',
+                [category]
+            );
         }
-
-        const store = readJsonDb();
-        const defaultProducts = [
-            { id: 'prod-1', title: 'Cosmic Sanctuary Mandala', category: 'canvas', categoryLabel: 'Canvases & Wall Art', blurb: 'Meditative focal points for modern spaces. Multi-layered acrylic dot mandalas painted on gallery-wrapped stretched canvas with liquid gold highlights.', spec: '12" x 12" Gallery Canvas', surfaceType: 'Canvas Art', palette: 'Veloura Classic', imageUrl: 'showcase images/canvas.png', readyToShip: true },
-            { id: 'prod-2', title: 'Golden Solstice Coffee Mug', category: 'drinkware', categoryLabel: 'Mugs & Drinkware', blurb: 'Elevate your daily ritual. Custom hand-painted ceramic mugs featuring dense gold and ruby mandala dots, double-sealed with dishwasher-safe crystal gloss varnish.', spec: '15 oz Ceramic Drinkware', surfaceType: 'Ceramic Mug', palette: 'Veloura Classic', imageUrl: 'showcase images/mug.png', readyToShip: true },
-            { id: 'prod-3', title: 'Ivory & Emerald Stainless Flask', category: 'drinkware', categoryLabel: 'Mugs & Drinkware', blurb: 'Tactile art on the go. Double-walled insulated stainless steel travel bottle adorned with high-precision vertical mandala dot columns.', spec: '750ml Vacuum Bottle', surfaceType: 'Stainless Bottle', palette: 'Emerald Sanctuary', imageUrl: 'showcase images/flask.png', readyToShip: true },
-            { id: 'prod-4', title: 'Heirloom Jewelry Box', category: 'boxes', categoryLabel: 'Keepsake Boxes & Decor', blurb: "Treasured storage for life's sacred items. Hand-carved solid mahogany wooden box with a central multi-ring ruby and gold dot mandala lid design.", spec: '8" Wood Box with Velvet Lining', surfaceType: 'Wooden Box', palette: 'Veloura Classic', imageUrl: 'showcase images/jewelry_box.jpeg', readyToShip: true },
-            { id: 'prod-5', title: 'Celestial Quartz Coaster Quad', category: 'boxes', categoryLabel: 'Keepsake Boxes & Decor', blurb: 'Functional table art. Set of 4 natural stone or acacia wood coasters painted with vibrant concentric metallic dot starbursts and heat-resistant resin topcoat.', spec: 'Set of 4 Stone/Wood Coasters', surfaceType: 'Coasters & Trays', palette: 'Celestial Moonlight', imageUrl: 'showcase images/coasters.png', readyToShip: true },
-            { id: 'prod-6', title: 'Bespoke Client Objects', category: 'custom', categoryLabel: 'Custom Items', blurb: '"Have a specific object in mind? We can dot it." From acoustic guitars and leather journals to phone cases, candleholders, and keepsake decor.', spec: 'Client Provided Surface', surfaceType: 'Custom Object', palette: 'Custom Palette', imageUrl: 'showcase images/custom_item.png', readyToShip: false }
-        ];
-
-        let list = store.products.length > 0 ? store.products : defaultProducts;
-        if (category && category !== 'all') {
-            list = list.filter(p => p.category === category);
-        }
-        return list;
+        return result.rows.map(mapProduct);
     },
 
     async addProduct(prodData) {
         const id = `prod-${Date.now()}`;
 
-        if (isPgConnected) {
-            try {
-                const result = await pool.query(
-                    `INSERT INTO products
-                     (id, title, category, category_label, blurb, spec, surface_type, palette, image_url, ready_to_ship, created_at)
-                     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,NOW())
-                     RETURNING *`,
-                    [
-                        id,
-                        prodData.title,
-                        prodData.category || 'canvas',
-                        prodData.categoryLabel || 'Canvases & Wall Art',
-                        prodData.blurb || '',
-                        prodData.spec || '',
-                        prodData.surfaceType || 'Canvas Art',
-                        prodData.palette || 'Veloura Classic',
-                        prodData.imageUrl || 'showcase images/canvas.png',
-                        prodData.readyToShip === true || prodData.readyToShip === 'true'
-                    ]
-                );
-                return mapProduct(result.rows[0]);
-            } catch (err) {
-                console.error('PostgreSQL product add error, using fallback:', err.message);
-            }
-        }
-
-        const store = readJsonDb();
-        const newProd = {
-            id,
-            title: prodData.title,
-            category: prodData.category || 'canvas',
-            categoryLabel: prodData.categoryLabel || 'Canvases & Wall Art',
-            blurb: prodData.blurb || '',
-            spec: prodData.spec || '',
-            surfaceType: prodData.surfaceType || 'Canvas Art',
-            palette: prodData.palette || 'Veloura Classic',
-            imageUrl: prodData.imageUrl || 'showcase images/canvas.png',
-            readyToShip: prodData.readyToShip === true || prodData.readyToShip === 'true',
-            createdAt: new Date().toISOString()
-        };
-        store.products.push(newProd);
-        writeJsonDb(store);
-        return newProd;
+        const result = await pool.query(
+            `INSERT INTO products
+             (id, title, category, category_label, blurb, spec, surface_type, palette, image_url, ready_to_ship, created_at)
+             VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,NOW())
+             RETURNING *`,
+            [
+                id,
+                prodData.title,
+                prodData.category || 'canvas',
+                prodData.categoryLabel || 'Canvases & Wall Art',
+                prodData.blurb || '',
+                prodData.spec || '',
+                prodData.surfaceType || 'Canvas Art',
+                prodData.palette || 'Veloura Classic',
+                prodData.imageUrl || 'showcase images/canvas.png',
+                prodData.readyToShip === true || prodData.readyToShip === 'true'
+            ]
+        );
+        return mapProduct(result.rows[0]);
     },
 
     async deleteProduct(id) {
-        if (isPgConnected) {
-            try {
-                const result = await pool.query(
-                    'DELETE FROM products WHERE id = $1 RETURNING id',
-                    [id]
-                );
-                return result.rowCount > 0;
-            } catch (err) {
-                console.error('PostgreSQL product delete error, using fallback:', err.message);
-            }
-        }
-
-        const store = readJsonDb();
-        const initialLength = store.products.length;
-        store.products = store.products.filter(p => p.id !== id);
-        if (store.products.length !== initialLength) {
-            writeJsonDb(store);
-            return true;
-        }
-        return false;
+        const result = await pool.query(
+            'DELETE FROM products WHERE id = $1 RETURNING id',
+            [id]
+        );
+        return result.rowCount > 0;
     },
 
     // Expose pool and connection state
@@ -406,4 +265,3 @@ const db = {
 };
 
 module.exports = db;
-
