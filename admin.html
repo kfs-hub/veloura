@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Veloura Dots | Studio Owner Admin Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+
+<body>
+
+    <!-- Passcode Authentication Gate -->
+    <div class="auth-gate" id="authGate">
+        <div class="auth-card">
+            <img src="logo.png" alt="Veloura Dots Logo" class="auth-logo">
+            <h2 class="auth-title">Studio Admin Access</h2>
+            <p class="auth-sub">Enter the studio passkey to unlock your dashboard.</p>
+
+            <form id="authForm" onsubmit="return false;">
+                <input type="password" id="passcodeInput" class="auth-input" placeholder="••••••••" required
+                    autocomplete="current-password">
+                <button type="submit" class="auth-btn" id="authSubmitBtn">Unlock Dashboard</button>
+                <div class="auth-error" id="authError">Incorrect Passkey. Please try again.</div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Header Bar -->
+    <header class="admin-header">
+        <div class="admin-container">
+            <div class="header-flex">
+                <div class="brand-block">
+                    <img src="logo.png" alt="Logo" class="brand-avatar">
+                    <div>
+                        <h1 class="brand-title">Veloura Dots</h1>
+                        <span class="brand-subtitle">Studio Owner Dashboard</span>
+                    </div>
+                </div>
+
+                <div class="admin-actions">
+                    <div class="live-badge">
+                        <span class="live-dot"></span>
+                        <span>API Server Live</span>
+                    </div>
+                    <a href="index.html" target="_blank" class="btn-logout" style="text-decoration:none;">View Site
+                        &rarr;</a>
+                    <button class="btn-logout" id="logoutBtn">Lock & Exit</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Dashboard Container -->
+    <main class="admin-container">
+
+        <!-- Overview Metrics Grid -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div>
+                    <div class="metric-label">Total Inquiries</div>
+                    <div class="metric-value" id="metricTotal">0</div>
+                </div>
+                <div class="metric-icon">🎨</div>
+            </div>
+
+            <div class="metric-card">
+                <div>
+                    <div class="metric-label">Pending Review</div>
+                    <div class="metric-value" id="metricPending" style="color: #D97706;">0</div>
+                </div>
+                <div class="metric-icon">⏳</div>
+            </div>
+
+            <div class="metric-card">
+                <div>
+                    <div class="metric-label">In Creation</div>
+                    <div class="metric-value" id="metricInProgress" style="color: #059669;">0</div>
+                </div>
+                <div class="metric-icon">✨</div>
+            </div>
+
+            <div class="metric-card">
+                <div>
+                    <div class="metric-label">Completed Art</div>
+                    <div class="metric-value" id="metricCompleted" style="color: #7C3AED;">0</div>
+                </div>
+                <div class="metric-icon">🖼️</div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="tabs-bar">
+            <button class="tab-btn active" data-tab="commissionsTab">Commission Inquiries</button>
+            <button class="tab-btn" data-tab="productsTab">Showcase Inventory</button>
+        </div>
+
+        <!-- TAB 1: COMMISSIONS TABLE -->
+        <div class="tab-content active" id="commissionsTab">
+            <div class="table-card">
+                <div class="table-toolbar">
+                    <input type="text" id="searchFilter" class="search-box"
+                        placeholder="Search client, email, ref ID...">
+
+                    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                        <select id="statusFilter" class="search-box" style="width: auto;">
+                            <option value="ALL">All Statuses</option>
+                            <option value="PENDING_REVIEW">Pending Review</option>
+                            <option value="PROOF_SENT">Proof Sent</option>
+                            <option value="IN_PROGRESS">In Progress</option>
+                            <option value="COMPLETED">Completed</option>
+                            <option value="ARCHIVED">Archived</option>
+                        </select>
+                        <button id="refreshBtn" style="
+                            background: #FAF5EC;
+                            border: 1px solid rgba(197,160,89,0.4);
+                            color: #8C6E30;
+                            font-weight: 700;
+                            font-size: 0.82rem;
+                            padding: 8px 16px;
+                            border-radius: 8px;
+                            cursor: pointer;
+                            display: flex;
+                            align-items: center;
+                            gap: 6px;
+                        ">&#8635; Refresh</button>
+                        <span id="lastRefreshed" style="font-size: 0.78rem; color: #7E8291;"></span>
+                    </div>
+                </div>
+
+                <div style="overflow-x: auto;">
+                    <table class="commissions-table">
+                        <thead>
+                            <tr>
+                                <th>Ref ID</th>
+                                <th>Date</th>
+                                <th>Client Name</th>
+                                <th>Contact Details</th>
+                                <th>Surface Item</th>
+                                <th>Budget</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="commissionsTbody">
+                            <!-- Populated dynamically via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: PRODUCTS SHOWCASE MANAGER -->
+        <div class="tab-content" id="productsTab">
+
+            <!-- Add Product Form Card -->
+            <div class="product-form-card">
+                <h3 style="margin-bottom: 16px; font-family: 'Playfair Display', serif;">Add New Showcase Artwork</h3>
+
+                <form id="addProductForm" onsubmit="return false;">
+                    <div class="form-grid">
+                        <div class="admin-form-group">
+                            <label>Artwork Title *</label>
+                            <input type="text" id="prodTitle" placeholder="e.g. Celestial Quartz Coasters" required>
+                        </div>
+
+                        <div class="admin-form-group">
+                            <label>Category *</label>
+                            <select id="prodCategory">
+                                <option value="canvas">Canvases & Wall Art</option>
+                                <option value="drinkware">Mugs & Drinkware</option>
+                                <option value="boxes">Keepsake Boxes</option>
+                                <option value="custom">Custom Objects</option>
+                            </select>
+                        </div>
+
+                        <div class="admin-form-group">
+                            <label>Surface Type</label>
+                            <input type="text" id="prodSurface" placeholder="e.g. Canvas Art, Ceramic Mug">
+                        </div>
+
+                        <div class="admin-form-group">
+                            <label>Spec / Size</label>
+                            <input type="text" id="prodSpec" placeholder="e.g. 12 x 12 Gallery Canvas">
+                        </div>
+
+                        <div class="admin-form-group" style="grid-column: span 2;">
+                            <label>Short Description Blurb</label>
+                            <input type="text" id="prodBlurb" placeholder="Describe materials, paint colors, sealant...">
+                        </div>
+
+                        <div class="admin-form-group">
+                            <label>Image URL (or select file)</label>
+                            <input type="text" id="prodImgUrl" placeholder="showcase images/canvas.png">
+                        </div>
+
+                        <div class="admin-form-group" style="justify-content: flex-end;">
+                            <button type="submit" class="auth-btn" id="saveProdBtn">Publish Artwork</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Existing Products List -->
+            <h3 style="margin-bottom: 16px; font-family: 'Playfair Display', serif;">Current Showcase Items</h3>
+            <div class="products-grid" id="productsGrid">
+                <!-- Populated dynamically via JS -->
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Detail Inspection Modal Drawer -->
+    <div class="detail-modal" id="detailModal">
+        <div class="detail-card">
+            <div class="modal-header-flex">
+                <div>
+                    <span class="brand-subtitle" id="detailRef">#VD-8942</span>
+                    <h2 id="detailClientName" style="font-family: 'Playfair Display', serif; margin-top: 4px;">Sophia
+                        Loren</h2>
+                </div>
+                <button class="modal-close-btn" id="modalCloseBtn">&times;</button>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+                <div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">EMAIL ADDRESS</div>
+                    <div id="detailEmail" style="font-weight: 600;">sophia@example.com</div>
+                </div>
+                <div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">INSTAGRAM HANDLE</div>
+                    <div id="detailIg" style="font-weight: 600;">@sophialoren</div>
+                </div>
+                <div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">SURFACE & SIZE</div>
+                    <div id="detailSurface" style="font-weight: 600;">Canvas Art (10x10")</div>
+                </div>
+                <div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted);">PALETTE & BUDGET</div>
+                    <div id="detailPalette" style="font-weight: 600;">Veloura Classic ($150-$300)</div>
+                </div>
+            </div>
+
+            <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 700;">CLIENT VISION DESCRIPTION</div>
+            <div class="vision-box" id="detailVision">
+                No custom description provided.
+            </div>
+
+            <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 700; margin-top: 16px;">ATTACHED
+                MOODBOARD FILES</div>
+            <div class="moodboard-grid" id="detailMoodboard">
+                <!-- Image thumbnails -->
+            </div>
+
+            <div
+                style="margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                    <label style="font-size: 0.85rem; font-weight: 700; margin-right: 10px;">Update Order Status:</label>
+                    <select id="modalStatusSelect" class="search-box" style="width: auto;">
+                        <option value="PENDING_REVIEW">Pending Review</option>
+                        <option value="PROOF_SENT">Proof Sent</option>
+                        <option value="IN_PROGRESS">In Progress</option>
+                        <option value="COMPLETED">Completed</option>
+                        <option value="ARCHIVED">Archived</option>
+                    </select>
+                </div>
+                <button class="auth-btn" id="updateStatusBtn" style="width: auto; padding: 10px 24px;">Save Status</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin JS -->
+    <script src="js/admin.js"></script>
+</body>
+
+</html>

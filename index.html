@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Veloura Dots | Handmade Dot Mandala Art & Custom Commissions</title>
+    <meta name="description"
+        content="Bespoke hand-painted dot mandala artwork on canvas, mugs, travel bottles, keepsake boxes, and custom decor. Crafted with precision and patience. Handmade with Care.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/components.css">
+</head>
+
+<body class="light-theme">
+
+    <!-- Floating Minimal Navbar (AICM Style) -->
+    <header class="site-header" id="siteHeader">
+        <div class="header-container">
+            <a href="#" class="brand-logo-left">
+                <img src="logo.png" alt="Veloura Dots Logo" class="brand-logo-icon">
+                <span class="brand-name-text">veloura dots</span>
+            </a>
+
+            <nav class="nav-menu" id="navMenu">
+                <a href="#showcase" class="nav-link">Showcase</a>
+                <a href="#how-it-works" class="nav-link">Workshops</a>
+                <a href="#commission" class="nav-link">Custom Orders</a>
+                <a href="#about" class="nav-link">About</a>
+            </nav>
+
+            <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle Navigation">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-section" id="hero">
+        <video class="hero-video" autoplay muted loop playsinline>
+            <source src="videos/background.mp4" type="video/mp4">
+        </video>
+        <div class="hero-overlay"></div>
+        <div class="container hero-content">
+            <div class="hero-eyebrow-pill">
+                <span class="pill-dot"></span>
+                <span>HANDMADE DOT MANDALA ART</span>
+            </div>
+            <h1 class="hero-title">
+                Precision in <span class="gold-gradient-text">Every Dot.</span><br>
+                <span class="hero-title-sub">Harmony on Every Surface.</span>
+            </h1>
+            <ul class="hero-bullets">
+                <li>Reinventing tradition,</li>
+                <li>Shaping the future through art</li>
+            </ul>
+            <a href="#showcase" class="btn btn-hero-outline">EXPLORE ARTWORK</a>
+        </div>
+
+        <!-- Floating Scroll Cue -->
+        <a href="#showcase" class="hero-scroll-cue" aria-label="Scroll to Showcase">
+            <span class="scroll-mouse">
+                <span class="scroll-dot"></span>
+            </span>
+            <span class="scroll-label">SCROLL</span>
+        </a>
+    </section>
+
+    <!-- Showcase Section -->
+    <section class="showcase-section" id="showcase">
+        <div class="container">
+            <div class="section-header text-center reveal">
+                <span class="section-tag">Artistic Portfolio</span>
+                <h2 class="section-title">Interactive Object Showcase</h2>
+                <p class="section-description">
+                    Explore our hand-painted creations across varied functional and decorative surfaces. Each piece
+                    features custom acrylics, metallic golds, and protective sealing.
+                </p>
+            </div>
+
+            <!-- Filter Controls -->
+            <div class="filter-bar reveal">
+                <button class="filter-btn active" data-filter="all">All Surfaces</button>
+                <button class="filter-btn" data-filter="canvas">Canvases & Wall Art</button>
+                <button class="filter-btn" data-filter="drinkware">Mugs & Drinkware</button>
+                <button class="filter-btn" data-filter="boxes">Keepsake Boxes</button>
+                <button class="filter-btn" data-filter="custom">Custom Objects</button>
+            </div>
+
+            <!-- Showcase Grid -->
+            <div class="showcase-grid reveal-stagger" id="showcaseGrid">
+                <!-- Canvas Art Card -->
+                <div class="art-card" data-category="canvas">
+                    <div class="art-card-image">
+                        <img src="showcase images/canvas.png" alt="Hand-painted dot mandala canvas art" class="art-img">
+                        <span class="surface-badge">Canvas Art</span>
+                    </div>
+                    <div class="art-card-body">
+                        <span class="art-category">Canvases & Wall Art</span>
+                        <h3 class="art-title">Cosmic Sanctuary Mandala</h3>
+                        <p class="art-blurb">
+                            Meditative focal points for modern spaces. Multi-layered acrylic dot mandalas painted on
+                            gallery-wrapped stretched canvas with liquid gold highlights.
+                        </p>
+                        <div class="art-card-footer">
+                            <span class="art-spec">12" x 12" Gallery Canvas</span>
+                            <button class="btn-link open-commission-item" data-surface="Canvas Art"
+                                data-palette="Veloura Classic">Order Similar &rarr;</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mug Card -->
+                <div class="art-card" data-category="drinkware">
+                    <div class="art-card-image">
+                        <img src="showcase images/mug.png" alt="Hand-painted dot mandala ceramic mug" class="art-img">
+                        <span class="surface-badge">Ceramic Mug</span>
+                    </div>
+                    <div class="art-card-body">
+                        <span class="art-category">Mugs & Drinkware</span>
+                        <h3 class="art-title">Golden Solstice Coffee Mug</h3>
+                        <p class="art-blurb">
+                            Elevate your daily ritual. Custom hand-painted ceramic mugs featuring dense gold and ruby
+                            mandala dots, double-sealed with dishwasher-safe crystal gloss varnish.
+                        </p>
+                        <div class="art-card-footer">
+                            <span class="art-spec">15 oz Ceramic Drinkware</span>
+                            <button class="btn-link open-commission-item" data-surface="Ceramic Mug"
+                                data-palette="Veloura Classic">Order Similar &rarr;</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottle Card -->
+                <div class="art-card" data-category="drinkware">
+                    <div class="art-card-image">
+                        <img src="showcase images/flask.png" alt="Hand-painted dot mandala travel flask"
+                            class="art-img">
+                        <span class="surface-badge">Travel Bottle</span>
+                    </div>
+                    <div class="art-card-body">
+                        <span class="art-category">Mugs & Drinkware</span>
+                        <h3 class="art-title">Ivory & Emerald Stainless Flask</h3>
+                        <p class="art-blurb">
+                            Tactile art on the go. Double-walled insulated stainless steel travel bottle adorned with
+                            high-precision vertical mandala dot columns.
+                        </p>
+                        <div class="art-card-footer">
+                            <span class="art-spec">750ml Vacuum Bottle</span>
+                            <button class="btn-link open-commission-item" data-surface="Stainless Bottle"
+                                data-palette="Emerald Sanctuary">Order Similar &rarr;</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Wooden Box Card -->
+                <div class="art-card" data-category="boxes">
+                    <div class="art-card-image">
+                        <img src="showcase images/jewelry_box.jpeg" alt="Hand-painted dot mandala jewelry keepsake box"
+                            class="art-img">
+                        <span class="surface-badge">Keepsake Box</span>
+                    </div>
+                    <div class="art-card-body">
+                        <span class="art-category">Keepsake Boxes & Decor</span>
+                        <h3 class="art-title">Heirloom Jewelry Box</h3>
+                        <p class="art-blurb">
+                            Treasured storage for life’s sacred items. Hand-carved solid mahogany wooden box with a
+                            central multi-ring ruby and gold dot mandala lid design.
+                        </p>
+                        <div class="art-card-footer">
+                            <span class="art-spec">8" Wood Box with Velvet Lining</span>
+                            <button class="btn-link open-commission-item" data-surface="Wooden Box"
+                                data-palette="Veloura Classic">Order Similar &rarr;</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Coasters Card -->
+                <div class="art-card" data-category="boxes">
+                    <div class="art-card-image">
+                        <img src="showcase images/coasters.png" alt="Hand-painted dot mandala coasters" class="art-img">
+                        <span class="surface-badge">Coasters & Trays</span>
+                    </div>
+                    <div class="art-card-body">
+                        <span class="art-category">Keepsake Boxes & Decor</span>
+                        <h3 class="art-title">Celestial Quartz Coaster Quad</h3>
+                        <p class="art-blurb">
+                            Functional table art. Set of 4 natural stone or acacia wood coasters painted with vibrant
+                            concentric metallic dot starbursts and heat-resistant resin topcoat.
+                        </p>
+                        <div class="art-card-footer">
+                            <span class="art-spec">Set of 4 Stone/Wood Coasters</span>
+                            <button class="btn-link open-commission-item" data-surface="Coasters & Trays"
+                                data-palette="Celestial Moonlight">Order Similar &rarr;</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Custom Object Card -->
+                <div class="art-card" data-category="custom">
+                    <div class="art-card-image">
+                        <img src="showcase images/custom_item.png" alt="Bespoke custom dot mandala object"
+                            class="art-img">
+                        <span class="surface-badge">Custom Object</span>
+                    </div>
+                    <div class="art-card-body">
+                        <span class="art-category">Custom Items</span>
+                        <h3 class="art-title">Bespoke Client Objects</h3>
+                        <p class="art-blurb">
+                            <em>"Have a specific object in mind? We can dot it."</em> From acoustic guitars and leather
+                            journals to phone cases, candleholders, and keepsake decor.
+                        </p>
+                        <div class="art-card-footer">
+                            <span class="art-spec">Client Provided Surface</span>
+                            <button class="btn-link open-commission-item" data-surface="Custom Object"
+                                data-palette="Custom Palette">Commission Object &rarr;</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="how-section" id="how-it-works">
+        <div class="container">
+            <div class="section-header text-center reveal">
+                <span class="section-tag">Step-by-Step Experience</span>
+                <h2 class="section-title">How Your Custom Art Is Created</h2>
+                <p class="section-description">
+                    From your initial idea to white-glove packaging, our commission process ensures seamless
+                    collaboration and exceptional quality.
+                </p>
+            </div>
+
+            <div class="steps-grid reveal-stagger">
+                <!-- Step 1 -->
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">01</span>
+                        <div class="step-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path
+                                    d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+                                </path>
+                            </svg>
+                        </div>
+                    </div>
+                    <h3 class="step-title">Select Item & Surface</h3>
+                    <p class="step-text">
+                        Choose your canvas, drinkware, wooden keepsake box, or send in your own meaningful personal item
+                        for customization.
+                    </p>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">02</span>
+                        <div class="step-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 19l7-7 3 3-7 7-3-3z"></path>
+                                <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path>
+                                <path d="M2 2l7.586 7.586"></path>
+                                <circle cx="11" cy="11" r="2"></circle>
+                            </svg>
+                        </div>
+                    </div>
+                    <h3 class="step-title">Describe Vision & Palette</h3>
+                    <p class="step-text">
+                        Share your color preferences, mood, room aesthetic, or upload reference images, mood boards, and
+                        color swatches.
+                    </p>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">03</span>
+                        <div class="step-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="3" y1="9" x2="21" y2="9"></line>
+                                <line x1="9" y1="21" x2="9" y2="9"></line>
+                            </svg>
+                        </div>
+                    </div>
+                    <h3 class="step-title">Digital Proof & Transparent Quote</h3>
+                    <p class="step-text">
+                        Receive a customized digital mockup and clear cost breakdown tailored to your chosen surface
+                        size and dot pattern density.
+                    </p>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="step-card">
+                    <div class="step-header">
+                        <span class="step-number">04</span>
+                        <div class="step-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                        </div>
+                    </div>
+                    <h3 class="step-title">Handcrafted & Shipped</h3>
+                    <p class="step-text">
+                        Painted dot-by-dot with infinite patience, protective gloss sealed, and delivered directly to
+                        your door in luxury gift packaging.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Custom Commission Request Form Section -->
+    <section class="commission-section" id="commission">
+        <div class="container">
+            <div class="section-header text-center reveal">
+                <span class="section-tag">Bespoke Ordering Workflow</span>
+                <h2 class="section-title">Request a Custom Mandala Commission</h2>
+                <p class="section-description">
+                    Fill out your artistic preferences below. Our studio will review your request and reply within 24
+                    hours with a custom layout proof & quote.
+                </p>
+            </div>
+
+            <div class="commission-wrapper">
+                <!-- Form Container -->
+                <form id="commissionForm" class="commission-form">
+
+                    <!-- Step 1: Surface Selection -->
+                    <div class="form-group">
+                        <label class="form-label">1. Choose Surface / Item Category</label>
+                        <div class="surface-radio-grid">
+                            <label class="surface-radio-card active">
+                                <input type="radio" name="surfaceType" value="Canvas Art" checked>
+                                <div class="card-content">
+                                    <div class="card-icon">🎨</div>
+                                    <span class="card-title">Canvas Art</span>
+                                    <span class="card-sub">Gallery Stretched</span>
+                                </div>
+                            </label>
+
+                            <label class="surface-radio-card">
+                                <input type="radio" name="surfaceType" value="Ceramic Mug">
+                                <div class="card-content">
+                                    <div class="card-icon">☕</div>
+                                    <span class="card-title">Ceramic Mug</span>
+                                    <span class="card-sub">Dishwasher Safe</span>
+                                </div>
+                            </label>
+
+                            <label class="surface-radio-card">
+                                <input type="radio" name="surfaceType" value="Stainless Bottle">
+                                <div class="card-content">
+                                    <div class="card-icon">🍾</div>
+                                    <span class="card-title">Travel Bottle</span>
+                                    <span class="card-sub">Double Insulated</span>
+                                </div>
+                            </label>
+
+                            <label class="surface-radio-card">
+                                <input type="radio" name="surfaceType" value="Wooden Box">
+                                <div class="card-content">
+                                    <div class="card-icon">📦</div>
+                                    <span class="card-title">Wooden Box</span>
+                                    <span class="card-sub">Heirloom Finish</span>
+                                </div>
+                            </label>
+
+                            <label class="surface-radio-card">
+                                <input type="radio" name="surfaceType" value="Custom Object">
+                                <div class="card-content">
+                                    <div class="card-icon">✨</div>
+                                    <span class="card-title">Custom Object</span>
+                                    <span class="card-sub">Send Your Item</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Dimensions & Palette -->
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label class="form-label" for="surfaceSize">2. Surface Size / Dimensions</label>
+                            <select id="surfaceSize" class="form-control">
+                                <option value="Small (6x6 in / 12 oz)">Small (6x6" Canvas / 12 oz Mug)</option>
+                                <option value="Medium (10x10 in / 16 oz)" selected>Medium (10x10" Canvas / 16 oz Mug /
+                                    750ml Bottle)</option>
+                                <option value="Large (16x16 in / Large Box)">Large (16x16" Canvas / Large Keepsake
+                                    Chest)</option>
+                                <option value="Statement (24x24 in+)">Statement Wall Piece (24x24"+ Canvas)</option>
+                                <option value="Custom Dimensions">Custom Object Dimensions</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group half">
+                            <label class="form-label">3. Signature Color Palette</label>
+                            <div class="palette-picker">
+                                <label class="palette-option active" data-palette="Veloura Classic">
+                                    <input type="radio" name="colorPalette" value="Veloura Classic" checked>
+                                    <span class="palette-swatches">
+                                        <span class="swatch" style="background: #C5A059;"></span>
+                                        <span class="swatch" style="background: #B81D24;"></span>
+                                        <span class="swatch" style="background: #1A1A1E;"></span>
+                                        <span class="swatch" style="background: #FAF8F5;"></span>
+                                    </span>
+                                    <span class="palette-name">Veloura Classic (Gold/Ruby/Ivory)</span>
+                                </label>
+
+                                <label class="palette-option" data-palette="Celestial Moonlight">
+                                    <input type="radio" name="colorPalette" value="Celestial Moonlight">
+                                    <span class="palette-swatches">
+                                        <span class="swatch" style="background: #E2E8F0;"></span>
+                                        <span class="swatch" style="background: #3B82F6;"></span>
+                                        <span class="swatch" style="background: #1E1B4B;"></span>
+                                        <span class="swatch" style="background: #94A3B8;"></span>
+                                    </span>
+                                    <span class="palette-name">Celestial Moonlight (Silver/Sapphire)</span>
+                                </label>
+
+                                <label class="palette-option" data-palette="Emerald Sanctuary">
+                                    <input type="radio" name="colorPalette" value="Emerald Sanctuary">
+                                    <span class="palette-swatches">
+                                        <span class="swatch" style="background: #D4AF37;"></span>
+                                        <span class="swatch" style="background: #059669;"></span>
+                                        <span class="swatch" style="background: #064E3B;"></span>
+                                        <span class="swatch" style="background: #F59E0B;"></span>
+                                    </span>
+                                    <span class="palette-name">Emerald Sanctuary (Gold/Emerald)</span>
+                                </label>
+
+                                <label class="palette-option" data-palette="Custom Palette">
+                                    <input type="radio" name="colorPalette" value="Custom Palette">
+                                    <span class="palette-swatches">
+                                        <span class="swatch rainbow"></span>
+                                    </span>
+                                    <span class="palette-name">Custom Client Colors (Describe Below)</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Describe Vision -->
+                    <div class="form-group">
+                        <label class="form-label" for="visionText">4. Describe Your Vision & Meaningful Details</label>
+                        <textarea id="visionText" class="form-control" rows="4"
+                            placeholder="Tell us about the mood, room setting, sacred symbols, gift recipient, or special colors you would love to feature..."></textarea>
+                    </div>
+
+                    <!-- Step 4: File Upload -->
+                    <div class="form-group">
+                        <label class="form-label">5. Reference Pictures / Inspiration Ideas (Optional)</label>
+                        <div class="upload-dropzone" id="dropzone">
+                            <input type="file" id="fileInput" multiple accept="image/*" class="file-input">
+                            <div class="dropzone-content">
+                                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#C5A059"
+                                    stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="17 8 12 3 7 8"></polyline>
+                                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                                </svg>
+                                <p class="dropzone-text">Drag & drop your reference images here or <span
+                                        class="gold-link">browse files</span></p>
+                                <span class="dropzone-hint">Supports PNG, JPG, WEBP (Max 5MB)</span>
+                            </div>
+                            <div class="file-preview-list" id="filePreviewList"></div>
+                        </div>
+                    </div>
+
+                    <!-- Step 5: Budget & Timeline -->
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label class="form-label" for="budgetRange">6. Target Budget Range</label>
+                            <select id="budgetRange" class="form-control">
+                                <option value="$75 - $150">$75 – $150 (Mugs / Coasters / Small Art)</option>
+                                <option value="$150 - $300" selected>$150 – $300 (Medium Canvases / Flasks / Boxes)
+                                </option>
+                                <option value="$300 - $500">$300 – $500 (Large Statement Canvas / Complex Boxes)
+                                </option>
+                                <option value="$500+">$500+ (Masterpiece Multi-Piece Set)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group half">
+                            <label class="form-label" for="timelineSelect">7. Delivery Timeline</label>
+                            <select id="timelineSelect" class="form-control">
+                                <option value="Standard 3-4 Weeks">Standard Creation (3–4 Weeks)</option>
+                                <option value="Express Gift 2 Weeks">Express Gift Priority (2 Weeks)</option>
+                                <option value="Flexible Schedule">Flexible / Future Date</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Step 6: Contact Information -->
+                    <div class="form-row">
+                        <div class="form-group third">
+                            <label class="form-label" for="clientName">Your Name *</label>
+                            <input type="text" id="clientName" class="form-control" placeholder="e.g. Sophia Loren"
+                                required>
+                        </div>
+
+                        <div class="form-group third">
+                            <label class="form-label" for="clientEmail">Email Address *</label>
+                            <input type="email" id="clientEmail" class="form-control" placeholder="sophia@example.com"
+                                required>
+                        </div>
+
+                        <div class="form-group third">
+                            <label class="form-label" for="clientIg">Instagram Handle (Optional)</label>
+                            <input type="text" id="clientIg" class="form-control"
+                                placeholder="@username for fast DM quote">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-gold btn-block btn-lg" id="submitCommission">
+                        <span>Submit Commission Request</span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    </button>
+                </form>
+
+                <!-- Live Summary Preview Card -->
+                <div class="commission-summary-card">
+                    <div class="summary-header">
+                        <span class="summary-badge">Live Quote Estimator</span>
+                        <h3>Order Summary Proof</h3>
+                    </div>
+
+                    <div class="summary-canvas-preview">
+                        <div class="preview-mandala-graphic" id="previewGraphic">
+                            <!-- Dynamic SVG mandala preview rendered via JS -->
+                        </div>
+                    </div>
+
+                    <div class="summary-details">
+                        <div class="summary-row">
+                            <span class="summary-label">Selected Surface:</span>
+                            <span class="summary-val" id="summarySurface">Canvas Art</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="summary-label">Dimensions:</span>
+                            <span class="summary-val" id="summarySize">Medium (10x10")</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="summary-label">Palette Theme:</span>
+                            <span class="summary-val" id="summaryPalette">Veloura Classic</span>
+                        </div>
+                        <div class="summary-row">
+                            <span class="summary-label">Timeline:</span>
+                            <span class="summary-val" id="summaryTimeline">Standard 3-4 Weeks</span>
+                        </div>
+
+                        <div class="summary-divider"></div>
+
+                        <div class="summary-price-box">
+                            <span class="price-title">Estimated Investment</span>
+                            <span class="price-amount" id="estimatedPrice">$185 – $240</span>
+                            <span class="price-note">Final quote confirmed after vision review. No payment charged
+                                today.</span>
+                        </div>
+                    </div>
+
+                    <div class="studio-guarantee">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C5A059" stroke-width="2">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                        </svg>
+                        <span>Protected by Veloura Artisan Craftsmanship Guarantee. Food-safe, non-fading
+                            pigments.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About the Craft Section -->
+    <section class="about-section" id="about">
+        <div class="container">
+            <div class="about-grid">
+                <div class="about-content">
+                    <span class="section-tag">Artisan Philosophy</span>
+                    <h2 class="section-title">The Ritual & Mindfulness of Dot Art</h2>
+                    <p class="about-lead">
+                        At <strong>Veloura Dots</strong>, dot mandala art is a deliberate ritual of patience,
+                        geometry, and presence. Every single point of paint is applied by hand using specialized
+                        precision tools—building multi-dimensional layers of vibrant acrylic and shimmering metallic
+                        accents.
+                    </p>
+                    <p class="about-body">
+                        No stencils, no printing, no shortcut machinery—just thousands of intentional placements
+                        creating geometric symmetry that resonates both visually and tactilely. Whether applied to
+                        sanctuary canvas walls or functional daily objects like mugs and wooden boxes, each piece
+                        carries an energy of quiet elegance and devotion.
+                    </p>
+
+                    <div class="craft-highlights">
+                        <div class="craft-feature">
+                            <div class="craft-icon">✨</div>
+                            <div>
+                                <h4>Pure Manual Precision</h4>
+                                <p>Applied dot-by-dot with acrylic styluses and metallic leaf paints.</p>
+                            </div>
+                        </div>
+                        <div class="craft-feature">
+                            <div class="craft-icon">🛡️</div>
+                            <div>
+                                <h4>Durable Sealed Finish</h4>
+                                <p>Coated in high-clarity resin or dishwasher-safe protective sealants.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="about-visual">
+                    <div class="emblem-card">
+                        <div class="emblem-mandala">
+                            <img src="logo.png" alt="Veloura Dots Mandala Logo" class="about-logo-img">
+                        </div>
+                        <div class="emblem-text">
+                            <h3>VELOURA DOTS</h3>
+                            <p>••• Handmade with Care •••</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Instagram Section -->
+    <section class="instagram-section">
+        <div class="container">
+            <div class="section-header text-center">
+                <span class="section-tag">Follow Our Journey</span>
+                <h2 class="section-title">Studio Instagram Highlights</h2>
+                <p class="section-description">
+                    Follow <a href="https://www.instagram.com/veloura_dots/" target="_blank" rel="noopener"
+                        class="gold-link">@veloura_dots</a> for behind-the-scenes painting videos, progress shots, and
+                    newly completed custom commissions.
+                </p>
+            </div>
+
+            <div class="ig-grid">
+                <a href="https://www.instagram.com/veloura_dots/" target="_blank" rel="noopener" class="ig-card">
+                    <div class="ig-image ig-bg-1"></div>
+                    <div class="ig-overlay">
+                        <span>@veloura_dots</span>
+                        <span>View Reel &rarr;</span>
+                    </div>
+                </a>
+                <a href="https://www.instagram.com/veloura_dots/" target="_blank" rel="noopener" class="ig-card">
+                    <div class="ig-image ig-bg-2"></div>
+                    <div class="ig-overlay">
+                        <span>@veloura_dots</span>
+                        <span>View Reel &rarr;</span>
+                    </div>
+                </a>
+                <a href="https://www.instagram.com/veloura_dots/" target="_blank" rel="noopener" class="ig-card">
+                    <div class="ig-image ig-bg-3"></div>
+                    <div class="ig-overlay">
+                        <span>@veloura_dots</span>
+                        <span>View Reel &rarr;</span>
+                    </div>
+                </a>
+                <a href="https://www.instagram.com/veloura_dots/" target="_blank" rel="noopener" class="ig-card">
+                    <div class="ig-image ig-bg-4"></div>
+                    <div class="ig-overlay">
+                        <span>@veloura_dots</span>
+                        <span>View Reel &rarr;</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-top">
+                <div class="footer-brand">
+                    <div class="footer-logo">VELOURA DOTS</div>
+                    <p class="footer-tag">Handmade with Care • Custom Dot Mandala Art</p>
+                    <p class="footer-desc">Crafted with precision acrylics, metallic golds, and patient geometry for
+                        discerning collectors worldwide.</p>
+                </div>
+
+                <div class="footer-links">
+                    <h4>Navigation</h4>
+                    <ul>
+                        <li><a href="#showcase">Object Showcase</a></li>
+                        <li><a href="#how-it-works">Custom Process</a></li>
+                        <li><a href="#commission">Order Commission</a></li>
+                        <li><a href="#about">About the Studio</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-social">
+                    <h4>Connect & Follow</h4>
+                    <a href="https://www.instagram.com/veloura_dots/" target="_blank" rel="noopener"
+                        class="footer-ig-btn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                        </svg>
+                        <span>@veloura_dots</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2026 Veloura Dots Studio. All rights reserved. Precision Mandala Art.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Confirmation Modal -->
+    <div class="modal-backdrop" id="confirmationModal">
+        <div class="modal-dialog">
+            <button class="modal-close" id="modalClose">&times;</button>
+            <div class="modal-header">
+                <div class="success-icon">✓</div>
+                <h2>Commission Inquiry Received!</h2>
+                <p>Thank you for sharing your artistic vision with Veloura Dots.</p>
+            </div>
+            <div class="modal-body">
+                <div class="inquiry-ref">Reference ID: <strong id="refId">#VD-8942</strong></div>
+                <p class="modal-msg">
+                    We have received your custom order inquiry. Our studio artist will review your surface selection,
+                    vision details, and inspiration files.
+                </p>
+                <div class="next-steps-box">
+                    <h4>What Happens Next?</h4>
+                    <ol>
+                        <li>We will send a personalized digital proof & final pricing quote to your email (<span
+                                id="modalEmail"></span>) within 24 hours.</li>
+                        <li>If you provided an Instagram handle (<span id="modalIg"></span>), we may send a quick DM
+                            preview!</li>
+                        <li>Once you approve the design proof, work begins on your handcrafted mandala.</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-gold btn-block" id="modalDoneBtn">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/commission-form.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>

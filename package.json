@@ -1,0 +1,31 @@
+{
+  "name": "veloura",
+  "version": "1.0.0",
+  "description": "Artisanal Hand-Painted Mandala Studio Website & Custom Commission Management System",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "db:setup": "node scripts/setup-db.js",
+    "db:migrate": "node scripts/migrate-json-to-pg.js"
+  },
+  "keywords": [
+    "mandala-art",
+    "art-studio",
+    "express",
+    "postgresql",
+    "commission-management",
+    "portfolio-website",
+    "hand-painted-art"
+  ],
+  "author": "Veloura Dots Studio",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.9.13",
+    "pg": "^8.22.0"
+  }
+}
