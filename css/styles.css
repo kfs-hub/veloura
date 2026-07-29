@@ -695,7 +695,11 @@ section {
     }
 
     section {
-        padding: 60px 0;
+        padding: 72px 0;
+    }
+
+    .section-header {
+        margin-bottom: 40px;
     }
 
     .section-title {
@@ -704,6 +708,7 @@ section {
 
     .section-description {
         font-size: 0.98rem;
+        line-height: 1.7;
     }
 }
 
@@ -746,14 +751,24 @@ section {
     }
 
     section {
-        padding: 48px 0;
+        padding: 56px 0;
+    }
+
+    .section-header {
+        margin-bottom: 36px;
     }
 
     .section-title {
         font-size: 1.65rem;
+        margin-bottom: 12px;
+    }
+
+    .section-description {
+        font-size: 0.92rem;
+        line-height: 1.7;
     }
 
     .container {
-        padding: 0 16px;
+        padding: 0 20px;
     }
 }

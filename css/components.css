@@ -1026,6 +1026,10 @@ textarea.form-control {
     .footer-top {
         grid-template-columns: 1fr;
     }
+    .commission-summary-card {
+        position: static;
+        margin-top: 24px;
+    }
 }
 
 @media (max-width: 768px) {
@@ -1034,7 +1038,7 @@ textarea.form-control {
         overflow-x: auto;
         flex-wrap: nowrap;
         padding-bottom: 12px;
-        margin-bottom: 28px;
+        margin-bottom: 36px;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
     }
@@ -1043,27 +1047,238 @@ textarea.form-control {
     }
     .filter-btn {
         flex-shrink: 0;
-        padding: 8px 18px;
+        padding: 10px 20px;
         font-size: 0.85rem;
     }
 
     .showcase-grid {
         grid-template-columns: 1fr;
-        gap: 20px;
+        gap: 24px;
     }
 
     .art-card-image {
-        height: 220px;
+        height: 180px;
+    }
+
+    .art-card-body {
+        padding: 18px 16px;
+    }
+
+    .art-blurb {
+        font-size: 0.85rem;
+        margin-bottom: 12px;
+        line-height: 1.55;
+    }
+
+    .art-title {
+        font-size: 1.08rem;
+        margin-bottom: 6px;
+    }
+
+    .art-card-footer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        padding-top: 14px;
     }
 
     .steps-grid {
         grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .step-card {
+        padding: 28px 22px;
+    }
+
+    .commission-section {
+        padding-top: 72px;
+        padding-bottom: 72px;
+    }
+
+    .commission-form {
+        padding: 28px 22px;
+        border-radius: var(--radius-md);
+    }
+
+    .commission-summary-card {
+        padding: 28px 22px;
+        margin-top: 32px;
+    }
+
+    .form-group {
+        margin-bottom: 32px;
+    }
+
+    .surface-radio-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px;
+    }
+
+    .surface-radio-card .card-content {
+        padding: 18px 12px;
+    }
+
+    .form-row {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .form-group.half,
+    .form-group.third {
+        width: 100%;
+    }
+
+    .palette-picker {
+        gap: 12px;
+    }
+
+    .palette-option {
+        padding: 14px 14px;
+        gap: 12px;
+    }
+
+    .palette-name {
+        font-size: 0.78rem;
+    }
+
+    .upload-dropzone {
+        padding: 28px 18px;
+    }
+
+    .dropzone-text {
+        font-size: 0.82rem;
+    }
+
+    .summary-details {
+        margin-bottom: 24px;
+    }
+
+    .summary-row {
+        margin-bottom: 14px;
+    }
+
+    .price-amount {
+        font-size: 1.5rem;
+    }
+
+    .summary-price-box {
+        padding: 20px;
+    }
+
+    .studio-guarantee {
+        font-size: 0.72rem;
+        gap: 10px;
+        padding-top: 18px;
+        margin-top: 8px;
+    }
+
+    .about-grid {
+        gap: 40px;
+    }
+
+    .craft-highlights {
+        gap: 24px;
+        margin-top: 8px;
+    }
+
+    .emblem-card {
+        padding: 36px 24px;
+    }
+
+    .emblem-mandala {
+        width: 160px;
+        height: 160px;
+        margin-bottom: 20px;
+    }
+
+    .about-lead {
+        font-size: 1.05rem;
+        margin-bottom: 20px;
+    }
+
+    .about-body {
+        font-size: 0.92rem;
+        margin-bottom: 32px;
+    }
+
+    .ig-grid {
+        grid-template-columns: repeat(2, 1fr);
         gap: 16px;
+    }
+
+    .ig-card {
+        height: 190px;
+    }
+
+    .footer-top {
+        gap: 32px;
+        margin-bottom: 32px;
+    }
+
+    .footer-links ul {
+        gap: 12px;
+    }
+
+    .site-footer {
+        padding: 48px 0 28px 0;
+    }
+
+    .modal-dialog {
+        width: 94%;
+        padding: 28px 22px;
+        max-height: 88vh;
+        overflow-y: auto;
+        border-radius: var(--radius-md);
+    }
+
+    .modal-header {
+        margin-bottom: 24px;
+    }
+
+    .modal-header h2 {
+        font-size: 1.25rem;
+    }
+
+    .next-steps-box {
+        padding: 20px;
+        margin-top: 20px;
+    }
+
+    .next-steps-box ol {
+        font-size: 0.82rem;
+    }
+
+    .next-steps-box li {
+        margin-bottom: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .showcase-grid {
+        gap: 24px;
     }
 
     .commission-form {
         padding: 24px 18px;
-        border-radius: var(--radius-md);
+    }
+
+    .commission-summary-card {
+        padding: 24px 18px;
+    }
+
+    .form-group {
+        margin-bottom: 28px;
+    }
+
+    .form-label {
+        font-size: 0.85rem;
+        margin-bottom: 12px;
+    }
+
+    .form-control {
+        padding: 12px 14px;
+        font-size: 0.88rem;
     }
 
     .surface-radio-grid {
@@ -1071,78 +1286,283 @@ textarea.form-control {
         gap: 10px;
     }
 
-    .emblem-card {
+    .surface-radio-card .card-content {
+        padding: 16px 10px;
+        gap: 8px;
+    }
+
+    .card-icon {
+        font-size: 1.3rem;
+    }
+
+    .card-title {
+        font-size: 0.78rem;
+    }
+
+    .card-sub {
+        font-size: 0.64rem;
+    }
+
+    .palette-picker {
+        gap: 10px;
+    }
+
+    .palette-option {
+        padding: 12px 12px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .palette-name {
+        font-size: 0.74rem;
+    }
+
+    .swatch {
+        width: 14px;
+        height: 14px;
+    }
+
+    .upload-dropzone {
+        padding: 24px 16px;
+    }
+
+    .art-card-image {
+        height: 160px;
+    }
+
+    .art-card-body {
+        padding: 14px 14px;
+    }
+
+    .art-title {
+        font-size: 1rem;
+        margin-bottom: 4px;
+    }
+
+    .art-blurb {
+        font-size: 0.82rem;
+        margin-bottom: 12px;
+        line-height: 1.5;
+    }
+
+    .art-card-footer {
+        padding-top: 12px;
+    }
+
+    .art-spec {
+        font-size: 0.76rem;
+    }
+
+    .btn-link {
+        font-size: 0.8rem;
+    }
+
+    .step-card {
         padding: 28px 20px;
     }
 
+    .step-header {
+        margin-bottom: 18px;
+    }
+
+    .step-number {
+        font-size: 1.8rem;
+    }
+
+    .step-title {
+        font-size: 1.08rem;
+        margin-bottom: 10px;
+    }
+
+    .step-text {
+        font-size: 0.88rem;
+        line-height: 1.6;
+    }
+
+    .steps-grid {
+        gap: 18px;
+    }
+
+    .summary-canvas-preview {
+        height: 170px;
+        margin-bottom: 24px;
+    }
+
+    .preview-mandala-graphic {
+        width: 140px;
+        height: 140px;
+    }
+
+    .summary-row {
+        font-size: 0.84rem;
+        margin-bottom: 12px;
+    }
+
+    .summary-divider {
+        margin: 20px 0;
+    }
+
+    .price-amount {
+        font-size: 1.4rem;
+    }
+
+    .price-note {
+        font-size: 0.7rem;
+        line-height: 1.5;
+    }
+
+    .summary-price-box {
+        padding: 18px;
+    }
+
+    .studio-guarantee {
+        flex-direction: column;
+        text-align: center;
+        gap: 8px;
+        font-size: 0.72rem;
+        padding-top: 18px;
+    }
+
+    .about-lead {
+        font-size: 1rem;
+        margin-bottom: 18px;
+        line-height: 1.65;
+    }
+
+    .about-body {
+        font-size: 0.9rem;
+        margin-bottom: 28px;
+        line-height: 1.65;
+    }
+
+    .craft-highlights {
+        gap: 22px;
+    }
+
+    .craft-feature {
+        gap: 14px;
+    }
+
+    .craft-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+    }
+
+    .craft-feature h4 {
+        font-size: 0.95rem;
+        margin-bottom: 6px;
+    }
+
+    .craft-feature p {
+        font-size: 0.82rem;
+        line-height: 1.55;
+    }
+
+    .emblem-card {
+        padding: 32px 20px;
+    }
+
     .emblem-mandala {
-        width: 160px;
-        height: 160px;
-        margin-bottom: 16px;
+        width: 140px;
+        height: 140px;
+        margin-bottom: 20px;
+    }
+
+    .emblem-text h3 {
+        font-size: 1.3rem;
+        margin-bottom: 8px;
+    }
+
+    .emblem-text p {
+        font-size: 0.82rem;
     }
 
     .ig-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
+        grid-template-columns: 1fr;
+        gap: 16px;
     }
 
     .ig-card {
-        height: 180px;
+        height: 210px;
+    }
+
+    .footer-top {
+        gap: 28px;
+    }
+
+    .footer-logo {
+        font-size: 1.2rem;
+        margin-bottom: 8px;
+    }
+
+    .footer-tag {
+        margin-bottom: 14px;
+    }
+
+    .footer-desc {
+        font-size: 0.85rem;
+        line-height: 1.6;
+    }
+
+    .footer-links h4,
+    .footer-social h4 {
+        margin-bottom: 14px;
+    }
+
+    .footer-links ul {
+        gap: 10px;
+    }
+
+    .footer-ig-btn {
+        padding: 10px 16px;
+        font-size: 0.88rem;
+    }
+
+    .footer-bottom {
+        font-size: 0.74rem;
+        padding-top: 20px;
+    }
+
+    .btn-gold.btn-lg {
+        padding: 16px 24px;
+        font-size: 0.94rem;
     }
 
     .modal-dialog {
         width: 94%;
         padding: 24px 18px;
-        max-height: 88vh;
-        overflow-y: auto;
-        border-radius: var(--radius-md);
-    }
-}
-
-@media (max-width: 480px) {
-    .commission-form {
-        padding: 20px 14px;
     }
 
-    .form-label {
-        font-size: 0.85rem;
+    .modal-header {
+        margin-bottom: 20px;
     }
 
-    .form-control {
-        padding: 10px 12px;
-        font-size: 0.9rem;
+    .modal-header h2 {
+        font-size: 1.18rem;
     }
 
-    .surface-radio-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
+    .modal-body {
+        margin-bottom: 20px;
     }
 
-    .surface-radio-box {
-        padding: 10px 8px;
+    .success-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
+        margin-bottom: 18px;
     }
 
-    .surface-radio-box span {
-        font-size: 0.78rem;
+    .inquiry-ref {
+        padding: 10px 16px;
+        margin-bottom: 18px;
     }
 
-    .art-card-body {
-        padding: 18px 14px;
+    .next-steps-box {
+        padding: 18px;
     }
 
-    .art-title {
-        font-size: 1.15rem;
-    }
-
-    .art-blurb {
-        font-size: 0.88rem;
-    }
-
-    .ig-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .ig-card {
-        height: 200px;
+    .next-steps-box li {
+        margin-bottom: 10px;
     }
 }

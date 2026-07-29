@@ -432,34 +432,4 @@ document.addEventListener('DOMContentLoaded', function () {
             .replace(/"/g, '&quot;');
     }
 });
-category,
-    surfaceType,
-    spec,
-    blurb,
-    imageUrl,
-    readyToShip: true
-                })
-            });
 
-const data = await res.json();
-
-if (data.success) {
-    addProductForm.reset();
-    loadProducts();
-} else {
-    alert(data.message || 'Error adding product.');
-}
-        } catch (err) {
-    console.error('Error adding product:', err);
-}
-    });
-
-function escapeHtml(str) {
-    if (!str) return '';
-    return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
-}
-});
