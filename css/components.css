@@ -802,8 +802,9 @@ textarea.form-control {
 
 .ig-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(2, minmax(260px, 420px));
+    justify-content: center;
+    gap: 24px;
 }
 
 .ig-card {
@@ -818,22 +819,11 @@ textarea.form-control {
 .ig-image {
     width: 100%;
     height: 100%;
-    background-size: cover;
-    background-position: center;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+    background: #FAF8F5;
     transition: transform 0.5s ease;
-}
-
-.ig-bg-1 {
-    background-image: radial-gradient(circle, #FFF 10%, #FAF5EC 50%, #E5C890 90%);
-}
-.ig-bg-2 {
-    background-image: radial-gradient(circle, #FFF 10%, #FCE8E8 50%, #B81D24 90%);
-}
-.ig-bg-3 {
-    background-image: radial-gradient(circle, #FFF 10%, #E6F4EA 50%, #059669 90%);
-}
-.ig-bg-4 {
-    background-image: radial-gradient(circle, #FFF 10%, #EEF2FF 50%, #3B82F6 90%);
 }
 
 .ig-overlay {
