@@ -14,14 +14,14 @@ document.addEventListener('DOMContentLoaded', function () {
     const paletteOptions = document.querySelectorAll('.palette-option');
     const timelineSelect = document.getElementById('timelineSelect');
     const budgetSelect = document.getElementById('budgetRange');
-    
+
     // Live Summary Elements
     const summarySurface = document.getElementById('summarySurface');
     const summarySize = document.getElementById('summarySize');
     const summaryPalette = document.getElementById('summaryPalette');
     const summaryTimeline = document.getElementById('summaryTimeline');
     const estimatedPrice = document.getElementById('estimatedPrice');
-    const previewGraphic = document.getElementById('previewGraphic');
+    const previewImage = document.getElementById('previewImage');
 
     // File Upload Elements
     const dropzone = document.getElementById('dropzone');
@@ -37,13 +37,35 @@ document.addEventListener('DOMContentLoaded', function () {
     const modalEmail = document.getElementById('modalEmail');
     const modalIg = document.getElementById('modalIg');
 
-    // Color definitions for SVG live render (Light Theme Friendly)
-    const paletteColors = {
-        'Veloura Classic': { primary: '#C5A059', secondary: '#B81D24', bg: '#FAF8F5', dot: '#1A1A1E' },
-        'Celestial Moonlight': { primary: '#3B82F6', secondary: '#1E1B4B', bg: '#F8FAFC', dot: '#64748B' },
-        'Emerald Sanctuary': { primary: '#059669', secondary: '#D4AF37', bg: '#F0FDF4', dot: '#064E3B' },
-        'Custom Palette': { primary: '#E0A98B', secondary: '#B81D24', bg: '#FAF5EC', dot: '#C5A059' }
+    // Preview image per color palette — paste your image paths here.
+    // Recommended source aspect ratio close to 4:3 (matches the preview box);
+    // anything else will still display correctly since it's cropped with
+    // object-fit: cover, but a 4:3-ish source will crop the least.
+    const paletteImages = {
+        'Veloura Classic': '/color palette/cropped_circle_image (4).png',
+        'Celestial Moonlight': '/color palette/cropped_circle_image (3).png',
+        'Emerald Sanctuary': '/color palette/cropped_circle_image (5).png',
+        'Custom Palette': ''
     };
+
+    // Update Live Preview Image
+    function renderPreviewImage(paletteName) {
+        const src = paletteImages[paletteName];
+        if (src) {
+            previewImage.src = src;
+            previewImage.alt = `${paletteName} palette preview`;
+            previewImage.style.opacity = '1';
+        } else {
+            // No path set yet for this palette — keep the box empty rather
+            // than showing a broken image icon.
+            previewImage.removeAttribute('src');
+            previewImage.alt = `${paletteName} palette preview coming soon`;
+            previewImage.style.opacity = '0';
+        }
+    }
+    previewImage.addEventListener('error', () => {
+        previewImage.style.opacity = '0';
+    });
 
     // Estimated Pricing Table
     const priceMatrix = {
@@ -84,36 +106,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     };
 
-    // Update Live Preview Graphic SVG
-    function renderPreviewSVG(paletteName) {
-        const theme = paletteColors[paletteName] || paletteColors['Veloura Classic'];
-        previewGraphic.innerHTML = `
-            <svg viewBox="0 0 160 160" width="100%" height="100%">
-                <rect width="160" height="160" rx="12" fill="${theme.bg}" stroke="#C5A059" stroke-width="1" />
-                <circle cx="80" cy="80" r="70" fill="none" stroke="${theme.primary}" stroke-width="1" stroke-dasharray="3 3"/>
-                <circle cx="80" cy="80" r="50" fill="none" stroke="${theme.secondary}" stroke-width="1.5"/>
-                <circle cx="80" cy="80" r="12" fill="${theme.primary}"/>
-                
-                <!-- Inner Ring -->
-                <circle cx="80" cy="52" r="4.5" fill="${theme.secondary}"/>
-                <circle cx="108" cy="80" r="4.5" fill="${theme.secondary}"/>
-                <circle cx="80" cy="108" r="4.5" fill="${theme.secondary}"/>
-                <circle cx="52" cy="80" r="4.5" fill="${theme.secondary}"/>
-
-                <!-- Outer Petals -->
-                <circle cx="100" cy="60" r="3.5" fill="${theme.dot}"/>
-                <circle cx="100" cy="100" r="3.5" fill="${theme.dot}"/>
-                <circle cx="60" cy="100" r="3.5" fill="${theme.dot}"/>
-                <circle cx="60" cy="60" r="3.5" fill="${theme.dot}"/>
-
-                <circle cx="80" cy="24" r="5.5" fill="${theme.primary}"/>
-                <circle cx="136" cy="80" r="5.5" fill="${theme.primary}"/>
-                <circle cx="80" cy="136" r="5.5" fill="${theme.primary}"/>
-                <circle cx="24" cy="80" r="5.5" fill="${theme.primary}"/>
-            </svg>
-        `;
-    }
-
     // Update Live Summary Text & Price
     function updateSummary() {
         const selectedSurface = document.querySelector('input[name="surfaceType"]:checked')?.value || 'Canvas Art';
@@ -130,7 +122,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const priceStr = priceMatrix[selectedSurface]?.[selectedSize] || '$150 – $300';
         estimatedPrice.textContent = priceStr;
 
-        renderPreviewSVG(selectedPalette);
+        renderPreviewImage(selectedPalette);
     }
 
     // Event Listeners for Controls
@@ -307,7 +299,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const submitBtnEl = document.getElementById('submitCommission');
     if (submitBtnEl) {
-        submitBtnEl.addEventListener('click', function(e) {
+        submitBtnEl.addEventListener('click', function (e) {
             if (form.checkValidity && !form.checkValidity()) {
                 form.reportValidity();
                 return;
