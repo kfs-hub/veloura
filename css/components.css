@@ -431,7 +431,21 @@ textarea.form-control {
 }
 
 .card-icon {
-    font-size: 1.5rem;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #FAF5EC;
+    color: var(--gold-dark);
+    transition: all var(--transition-fast);
+}
+
+.surface-radio-card:hover .card-icon,
+.surface-radio-card.active .card-icon {
+    background: var(--gold-primary);
+    color: #FFFFFF;
 }
 
 .card-title {
