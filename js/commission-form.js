@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', function () {
         'Veloura Classic': '/color palette/cropped_circle_image (4).png',
         'Celestial Moonlight': '/color palette/cropped_circle_image (3).png',
         'Emerald Sanctuary': '/color palette/cropped_circle_image (5).png',
-        'Custom Palette': ''
+        'Custom Palette': '/color palette/Gemini_Generated_Image_1dqwfz1dqwfz1dqw-removebg-preview.png'
     };
 
     // Update Live Preview Image
