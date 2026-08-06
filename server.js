@@ -60,22 +60,10 @@ if (!fs.existsSync(showcaseDir)) {
     fs.mkdirSync(showcaseDir, { recursive: true });
 }
 
-// Multer Storage Configuration for Showcase Images
-const showcaseStorage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, showcaseDir);
-    },
-    filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const ext = path.extname(file.originalname);
-        const safeName = path.basename(file.originalname, ext).toLowerCase().replace(/[^a-z0-9_-]/g, '_');
-        cb(null, safeName + '-' + uniqueSuffix + ext);
-    }
-});
-
+// Multer Storage Configuration for Showcase Images (Memory storage for Vercel/Neon DB persistence)
 const uploadShowcase = multer({
-    storage: showcaseStorage,
-    limits: { fileSize: 10 * 1024 * 1024 }, // 10MB per file limit
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 4.5 * 1024 * 1024 }, // 4.5MB limit (fits within Vercel serverless request body limit)
     fileFilter: function (req, file, cb) {
         const allowedTypes = /jpeg|jpg|png|webp/;
         const mimeValid = allowedTypes.test(file.mimetype);
@@ -83,7 +71,7 @@ const uploadShowcase = multer({
         if (mimeValid && extValid) {
             return cb(null, true);
         }
-        cb(new Error('Only image files (JPG, PNG, WEBP) under 10MB are allowed!'));
+        cb(new Error('Only image files (JPG, PNG, WEBP) under 4.5MB are allowed!'));
     }
 });
 
@@ -274,7 +262,9 @@ app.post('/api/admin/products', verifyAdmin, uploadShowcase.single('productImage
 
         let finalImgUrl = imageUrl || 'showcase images/canvas.png';
         if (req.file) {
-            finalImgUrl = `showcase images/${req.file.filename}`;
+            const mime = req.file.mimetype || 'image/png';
+            const base64 = req.file.buffer.toString('base64');
+            finalImgUrl = `data:${mime};base64,${base64}`;
         }
 
         const product = await db.addProduct({
@@ -301,7 +291,9 @@ app.put('/api/admin/products/:id', verifyAdmin, uploadShowcase.single('productIm
 
         let finalImgUrl = imageUrl || undefined;
         if (req.file) {
-            finalImgUrl = `showcase images/${req.file.filename}`;
+            const mime = req.file.mimetype || 'image/png';
+            const base64 = req.file.buffer.toString('base64');
+            finalImgUrl = `data:${mime};base64,${base64}`;
         }
 
         const updated = await db.updateProduct(id, {
