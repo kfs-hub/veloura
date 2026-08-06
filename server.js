@@ -358,6 +358,27 @@ app.delete('/api/admin/products/:id', verifyAdmin, async (req, res) => {
     }
 });
 
+// Express Error Handling Middleware (Catches Multer errors & server errors cleanly for Vercel)
+app.use((err, req, res, next) => {
+    console.error('Express App Error Handler:', err);
+    if (err instanceof multer.MulterError) {
+        if (err.code === 'LIMIT_FILE_SIZE') {
+            return res.status(413).json({
+                success: false,
+                message: 'Uploaded file exceeds size limit (4.5MB). Image will be auto-compressed.'
+            });
+        }
+        return res.status(400).json({
+            success: false,
+            message: `Upload error: ${err.message}`
+        });
+    }
+    return res.status(err.status || 500).json({
+        success: false,
+        message: err.message || 'An unexpected error occurred on the server.'
+    });
+});
+
 // Graceful shutdown — close PG pool on exit
 process.on('SIGTERM', async () => {
     await db.pool.end();

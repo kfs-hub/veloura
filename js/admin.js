@@ -557,6 +557,54 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // Client-side Image Compression Helper (Prevents Vercel 4.5MB payload limits)
+    function compressImageFile(file, maxWidth = 1600, maxHeight = 1600, quality = 0.85) {
+        return new Promise((resolve) => {
+            if (!file || !file.type.startsWith('image/') || file.size < 400 * 1024) {
+                return resolve(file);
+            }
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (e) => {
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = () => {
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > maxWidth || height > maxHeight) {
+                        if (width / height > maxWidth / maxHeight) {
+                            height = Math.round((height * maxWidth) / width);
+                            width = maxWidth;
+                        } else {
+                            width = Math.round((width * maxHeight) / height);
+                            height = maxHeight;
+                        }
+                    }
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    canvas.toBlob((blob) => {
+                        if (!blob || blob.size >= file.size) {
+                            return resolve(file);
+                        }
+                        const compressedFile = new File([blob], file.name, {
+                            type: 'image/jpeg',
+                            lastModified: Date.now()
+                        });
+                        resolve(compressedFile);
+                    }, 'image/jpeg', quality);
+                };
+                img.onerror = () => resolve(file);
+            };
+            reader.onerror = () => resolve(file);
+        });
+    }
+
     // Save Edit Form
     editProductForm.addEventListener('submit', async function (e) {
         e.preventDefault();
@@ -575,7 +623,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         const saveBtn = document.getElementById('saveEditBtn');
-        saveBtn.textContent = 'Saving...';
+        saveBtn.textContent = 'Optimizing & Saving...';
         saveBtn.disabled = true;
 
         try {
@@ -588,9 +636,10 @@ document.addEventListener('DOMContentLoaded', function () {
             if (imageUrl) formData.append('imageUrl', imageUrl);
             formData.append('existingImageUrls', JSON.stringify(existingEditUrls));
 
-            selectedEditFiles.forEach(file => {
-                formData.append('productImages', file);
-            });
+            for (const file of selectedEditFiles) {
+                const compressed = await compressImageFile(file);
+                formData.append('productImages', compressed);
+            }
 
             const res = await fetch(`/api/admin/products/${id}`, {
                 method: 'PUT',
@@ -600,18 +649,24 @@ document.addEventListener('DOMContentLoaded', function () {
                 body: formData
             });
 
-            const data = await res.json();
+            let data;
+            try {
+                data = await res.json();
+            } catch (jErr) {
+                const errText = await res.text().catch(() => '');
+                throw new Error(`Server returned HTTP ${res.status}: ${errText || 'Response parse error'}`);
+            }
 
-            if (data.success) {
+            if (res.ok && data.success) {
                 closeEditModal();
                 showToast('✨ Artwork updated successfully!');
                 loadProducts(); // refresh the grid
             } else {
-                alert(data.message || 'Error updating product.');
+                alert(data.message || `Error updating product (Status ${res.status}).`);
             }
         } catch (err) {
             console.error('Error updating product:', err);
-            alert('Network error. Please try again.');
+            alert(`Save failed: ${err.message || 'Network connection issue'}.`);
         } finally {
             saveBtn.textContent = 'Save Changes';
             saveBtn.disabled = false;
@@ -676,7 +731,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const saveBtn = document.getElementById('saveProdBtn');
         saveBtn.disabled = true;
-        saveBtn.textContent = 'Publishing...';
+        saveBtn.textContent = 'Optimizing & Publishing...';
 
         try {
             const formData = new FormData();
@@ -688,9 +743,10 @@ document.addEventListener('DOMContentLoaded', function () {
             if (imageUrl) formData.append('imageUrl', imageUrl);
             formData.append('readyToShip', 'true');
 
-            selectedAddFiles.forEach(file => {
-                formData.append('productImages', file);
-            });
+            for (const file of selectedAddFiles) {
+                const compressed = await compressImageFile(file);
+                formData.append('productImages', compressed);
+            }
 
             const res = await fetch('/api/admin/products', {
                 method: 'POST',
@@ -700,20 +756,26 @@ document.addEventListener('DOMContentLoaded', function () {
                 body: formData
             });
 
-            const data = await res.json();
+            let data;
+            try {
+                data = await res.json();
+            } catch (jErr) {
+                const errText = await res.text().catch(() => '');
+                throw new Error(`Server returned HTTP ${res.status}: ${errText || 'Response parse error'}`);
+            }
 
-            if (data.success) {
+            if (res.ok && data.success) {
                 addProductForm.reset();
                 selectedAddFiles = [];
                 renderAddFilePreviews();
                 showToast('✨ New artwork published to showcase!');
                 loadProducts();
             } else {
-                alert(data.message || 'Error adding product.');
+                alert(data.message || `Error adding product (Status ${res.status}).`);
             }
         } catch (err) {
             console.error('Error adding product:', err);
-            alert('Error publishing artwork.');
+            alert(`Publish failed: ${err.message || 'Network connection issue'}.`);
         } finally {
             saveBtn.disabled = false;
             saveBtn.textContent = 'Publish Artwork';
