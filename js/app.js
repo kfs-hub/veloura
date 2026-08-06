@@ -121,7 +121,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         <button class="carousel-nav prev-btn" aria-label="Previous image">&lsaquo;</button>
                         <button class="carousel-nav next-btn" aria-label="Next image">&rsaquo;</button>
                         <div class="art-card-side-thumbs">${sideThumbsHtml}</div>
-                        <div class="carousel-dots">${dotsHtml}</div>
                         <span class="surface-badge">${escapeHtml(p.surfaceType)}</span>
                         <span class="multi-photo-tag">📷 ${images.length} Photos</span>
                     </div>
@@ -163,13 +162,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 const imgEl = card.querySelector('.carousel-img');
                 const prevBtn = card.querySelector('.prev-btn');
                 const nextBtn = card.querySelector('.next-btn');
-                const dots = card.querySelectorAll('.carousel-dot');
                 const sideThumbs = card.querySelectorAll('.side-thumb-btn');
 
                 function updateCarousel(newIdx) {
                     currentIndex = (newIdx + images.length) % images.length;
                     imgEl.src = images[currentIndex];
-                    dots.forEach((d, i) => d.classList.toggle('active', i === currentIndex));
                     sideThumbs.forEach((t, i) => t.classList.toggle('active', i === currentIndex));
                 }
 
