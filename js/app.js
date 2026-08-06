@@ -61,6 +61,37 @@ document.addEventListener('DOMContentLoaded', function () {
             .replace(/"/g, '&quot;');
     }
 
+    // Lightbox Modal for Showcase Images on Main Website
+    const lightboxModal = document.getElementById('lightboxModal');
+    const lightboxImg = document.getElementById('lightboxImg');
+    const lightboxCaption = document.getElementById('lightboxCaption');
+    const lightboxCloseBtn = document.getElementById('lightboxCloseBtn');
+
+    function openLightbox(src, captionText = '') {
+        if (!lightboxModal || !lightboxImg) return;
+        lightboxImg.src = src;
+        if (lightboxCaption) lightboxCaption.textContent = captionText;
+        lightboxModal.classList.add('active');
+    }
+
+    function closeLightbox() {
+        if (lightboxModal) lightboxModal.classList.remove('active');
+    }
+
+    if (lightboxCloseBtn) lightboxCloseBtn.addEventListener('click', closeLightbox);
+    if (lightboxModal) {
+        lightboxModal.addEventListener('click', (e) => {
+            if (e.target === lightboxModal || e.target.classList.contains('lightbox-content')) {
+                closeLightbox();
+            }
+        });
+    }
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && lightboxModal && lightboxModal.classList.contains('active')) {
+            closeLightbox();
+        }
+    });
+
     function renderShowcaseCards(products) {
         showcaseGrid.innerHTML = '';
 
@@ -76,20 +107,29 @@ document.addEventListener('DOMContentLoaded', function () {
 
             let imageAreaHtml = '';
             if (hasMultiple) {
+                const sideThumbsHtml = images.map((url, idx) => `
+                    <button type="button" class="side-thumb-btn ${idx === 0 ? 'active' : ''}" data-index="${idx}" title="View photo ${idx + 1}">
+                        <img src="${escapeHtml(url)}" alt="${escapeHtml(p.title)} photo ${idx + 1}" class="side-thumb-img">
+                    </button>
+                `).join('');
+
                 const dotsHtml = images.map((_, idx) => `<span class="carousel-dot ${idx === 0 ? 'active' : ''}" data-index="${idx}"></span>`).join('');
+
                 imageAreaHtml = `
                     <div class="art-card-image carousel-container">
-                        <img src="${escapeHtml(images[0])}" alt="Hand-painted dot mandala ${escapeHtml(p.surfaceType)}" class="art-img carousel-img">
+                        <img src="${escapeHtml(images[0])}" alt="Hand-painted dot mandala ${escapeHtml(p.surfaceType)}" class="art-img carousel-img" style="cursor: pointer;" title="Click to view full screen">
                         <button class="carousel-nav prev-btn" aria-label="Previous image">&lsaquo;</button>
                         <button class="carousel-nav next-btn" aria-label="Next image">&rsaquo;</button>
+                        <div class="art-card-side-thumbs">${sideThumbsHtml}</div>
                         <div class="carousel-dots">${dotsHtml}</div>
                         <span class="surface-badge">${escapeHtml(p.surfaceType)}</span>
+                        <span class="multi-photo-tag">📷 ${images.length} Photos</span>
                     </div>
                 `;
             } else {
                 imageAreaHtml = `
                     <div class="art-card-image">
-                        <img src="${escapeHtml(images[0])}" alt="Hand-painted dot mandala ${escapeHtml(p.surfaceType)}" class="art-img">
+                        <img src="${escapeHtml(images[0])}" alt="Hand-painted dot mandala ${escapeHtml(p.surfaceType)}" class="art-img" style="cursor: pointer;" title="Click to view full screen">
                         <span class="surface-badge">${escapeHtml(p.surfaceType)}</span>
                     </div>
                 `;
@@ -109,31 +149,55 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
             `;
 
+            // Lightbox handler for clicking main photo
+            const mainImg = card.querySelector('.art-img');
+            if (mainImg) {
+                mainImg.addEventListener('click', () => {
+                    const currentSrc = mainImg.src;
+                    openLightbox(currentSrc, `${p.title} (${p.surfaceType})`);
+                });
+            }
+
             if (hasMultiple) {
                 let currentIndex = 0;
                 const imgEl = card.querySelector('.carousel-img');
                 const prevBtn = card.querySelector('.prev-btn');
                 const nextBtn = card.querySelector('.next-btn');
                 const dots = card.querySelectorAll('.carousel-dot');
+                const sideThumbs = card.querySelectorAll('.side-thumb-btn');
 
                 function updateCarousel(newIdx) {
                     currentIndex = (newIdx + images.length) % images.length;
                     imgEl.src = images[currentIndex];
                     dots.forEach((d, i) => d.classList.toggle('active', i === currentIndex));
+                    sideThumbs.forEach((t, i) => t.classList.toggle('active', i === currentIndex));
                 }
 
-                prevBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    updateCarousel(currentIndex - 1);
-                });
-                nextBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    updateCarousel(currentIndex + 1);
-                });
+                if (prevBtn) {
+                    prevBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        updateCarousel(currentIndex - 1);
+                    });
+                }
+                if (nextBtn) {
+                    nextBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        updateCarousel(currentIndex + 1);
+                    });
+                }
                 dots.forEach(d => {
                     d.addEventListener('click', (e) => {
                         e.stopPropagation();
                         updateCarousel(parseInt(d.getAttribute('data-index'), 10));
+                    });
+                });
+                sideThumbs.forEach(t => {
+                    t.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        updateCarousel(parseInt(t.getAttribute('data-index'), 10));
+                    });
+                    t.addEventListener('mouseenter', () => {
+                        updateCarousel(parseInt(t.getAttribute('data-index'), 10));
                     });
                 });
             }
