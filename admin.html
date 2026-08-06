@@ -274,6 +274,73 @@
         </div>
     </div>
 
+    <!-- Edit Product Modal -->
+    <div class="edit-modal" id="editProductModal">
+        <div class="detail-card edit-modal-card">
+            <div class="modal-header-flex">
+                <div>
+                    <span class="brand-subtitle">EDIT ARTWORK</span>
+                    <h2 id="editModalTitle" style="font-family: 'Playfair Display', serif; margin-top: 4px;">Edit
+                        Showcase Item</h2>
+                </div>
+                <button class="modal-close-btn" id="editModalCloseBtn">&times;</button>
+            </div>
+
+            <form id="editProductForm" onsubmit="return false;">
+                <input type="hidden" id="editProdId">
+
+                <!-- Image Preview -->
+                <div class="edit-img-preview-wrap">
+                    <img id="editImgPreview" class="edit-img-preview" src="" alt="Current artwork image">
+                </div>
+
+                <div class="form-grid">
+                    <div class="admin-form-group">
+                        <label>Artwork Title *</label>
+                        <input type="text" id="editProdTitle" placeholder="Artwork title" required>
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label>Category *</label>
+                        <select id="editProdCategory">
+                            <option value="canvas">Canvases & Wall Art</option>
+                            <option value="drinkware">Mugs & Drinkware</option>
+                            <option value="boxes">Keepsake Boxes</option>
+                            <option value="custom">Custom Objects</option>
+                        </select>
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label>Surface Type</label>
+                        <input type="text" id="editProdSurface" placeholder="e.g. Canvas Art, Ceramic Mug">
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label>Spec / Size</label>
+                        <input type="text" id="editProdSpec" placeholder="e.g. 12 x 12 Gallery Canvas">
+                    </div>
+
+                    <div class="admin-form-group" style="grid-column: span 2;">
+                        <label>Short Description Blurb</label>
+                        <textarea id="editProdBlurb" rows="3"
+                            placeholder="Describe materials, paint colors, sealant..."></textarea>
+                    </div>
+
+                    <div class="admin-form-group" style="grid-column: span 2;">
+                        <label>Image URL (or path)</label>
+                        <input type="text" id="editProdImgUrl" placeholder="showcase images/canvas.png">
+                    </div>
+                </div>
+
+                <div class="edit-modal-actions">
+                    <button type="button" class="btn-cancel-edit" id="editCancelBtn">Cancel</button>
+                    <button type="submit" class="auth-btn" id="saveEditBtn"
+                        style="width: auto; padding: 12px 28px;">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Admin JS -->
     <script src="js/admin.js"></script>
 </body>

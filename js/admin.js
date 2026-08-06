@@ -40,6 +40,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const addProductForm = document.getElementById('addProductForm');
     const productsGrid = document.getElementById('productsGrid');
 
+    // Edit modal elements
+    const editProductModal = document.getElementById('editProductModal');
+    const editProductForm = document.getElementById('editProductForm');
+    const editModalCloseBtn = document.getElementById('editModalCloseBtn');
+    const editCancelBtn = document.getElementById('editCancelBtn');
+
     // Init Auth
     if (currentPasscode) {
         verifyAndLoadData(currentPasscode);
@@ -327,6 +333,10 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    // =========================================================================
+    // PRODUCTS / SHOWCASE INVENTORY
+    // =========================================================================
+
     // Load Products
     async function loadProducts() {
         try {
@@ -354,10 +364,21 @@ document.addEventListener('DOMContentLoaded', function () {
                     <div class="admin-prod-title">${escapeHtml(p.title)}</div>
                     <div class="admin-prod-spec">${escapeHtml(p.surfaceType)} • ${escapeHtml(p.spec)}</div>
                     <p style="font-size:0.85rem; color: var(--text-secondary); margin-bottom: 16px;">${escapeHtml(p.blurb)}</p>
-                    <button class="btn-delete-prod" data-id="${p.id}">Delete Artwork</button>
+                    <div class="admin-prod-actions">
+                        <button class="btn-edit-prod" data-id="${p.id}">✏️ Edit</button>
+                        <button class="btn-delete-prod" data-id="${p.id}">Delete Artwork</button>
+                    </div>
                 </div>
             `;
             productsGrid.appendChild(card);
+        });
+
+        // Add Edit Listeners
+        productsGrid.querySelectorAll('.btn-edit-prod').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const id = this.getAttribute('data-id');
+                openEditModal(id);
+            });
         });
 
         // Add Delete Listeners
@@ -372,6 +393,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         });
                         const data = await res.json();
                         if (data.success) {
+                            showToast('🗑️ Artwork removed from showcase.');
                             loadProducts();
                         }
                     } catch (err) {
@@ -381,6 +403,117 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
     }
+
+    // =========================================================================
+    // EDIT PRODUCT MODAL
+    // =========================================================================
+
+    function openEditModal(id) {
+        const product = productsData.find(p => p.id === id);
+        if (!product) return;
+
+        // Populate form fields with current product data
+        document.getElementById('editProdId').value = product.id;
+        document.getElementById('editProdTitle').value = product.title || '';
+        document.getElementById('editProdCategory').value = product.category || 'canvas';
+        document.getElementById('editProdSurface').value = product.surfaceType || '';
+        document.getElementById('editProdSpec').value = product.spec || '';
+        document.getElementById('editProdBlurb').value = product.blurb || '';
+        document.getElementById('editProdImgUrl').value = product.imageUrl || '';
+
+        // Update image preview
+        const preview = document.getElementById('editImgPreview');
+        preview.src = product.imageUrl || 'showcase images/canvas.png';
+        preview.onerror = function () {
+            this.src = 'showcase images/canvas.png';
+        };
+
+        // Update modal title
+        document.getElementById('editModalTitle').textContent = product.title;
+
+        // Show modal
+        editProductModal.classList.add('active');
+    }
+
+    function closeEditModal() {
+        editProductModal.classList.remove('active');
+    }
+
+    // Close edit modal handlers
+    editModalCloseBtn.addEventListener('click', closeEditModal);
+    editCancelBtn.addEventListener('click', closeEditModal);
+    editProductModal.addEventListener('click', (e) => {
+        if (e.target === editProductModal) closeEditModal();
+    });
+
+    // Live image preview update when URL changes
+    document.getElementById('editProdImgUrl').addEventListener('input', function () {
+        const preview = document.getElementById('editImgPreview');
+        const url = this.value.trim();
+        if (url) {
+            preview.src = url;
+            preview.onerror = function () {
+                this.src = 'showcase images/canvas.png';
+            };
+        }
+    });
+
+    // Save Edit Form
+    editProductForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const id = document.getElementById('editProdId').value;
+        const title = document.getElementById('editProdTitle').value.trim();
+        const category = document.getElementById('editProdCategory').value;
+        const surfaceType = document.getElementById('editProdSurface').value.trim();
+        const spec = document.getElementById('editProdSpec').value.trim();
+        const blurb = document.getElementById('editProdBlurb').value.trim();
+        const imageUrl = document.getElementById('editProdImgUrl').value.trim();
+
+        if (!title) {
+            alert('Artwork title is required.');
+            return;
+        }
+
+        const saveBtn = document.getElementById('saveEditBtn');
+        saveBtn.textContent = 'Saving...';
+        saveBtn.disabled = true;
+
+        try {
+            const res = await fetch(`/api/admin/products/${id}`, {
+                method: 'PUT',
+                headers: getAdminHeaders(),
+                body: JSON.stringify({
+                    title,
+                    category,
+                    surfaceType,
+                    spec,
+                    blurb,
+                    imageUrl
+                })
+            });
+
+            const data = await res.json();
+
+            if (data.success) {
+                closeEditModal();
+                showToast('✨ Artwork updated successfully!');
+                loadProducts(); // refresh the grid
+            } else {
+                alert(data.message || 'Error updating product.');
+            }
+        } catch (err) {
+            console.error('Error updating product:', err);
+            alert('Network error. Please try again.');
+        } finally {
+            saveBtn.textContent = 'Save Changes';
+            saveBtn.disabled = false;
+        }
+    });
+
+    // =========================================================================
+    // ADD PRODUCT FORM
+    // =========================================================================
 
     // Add Product Form Submit
     addProductForm.addEventListener('submit', async function (e) {
@@ -414,6 +547,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (data.success) {
                 addProductForm.reset();
+                showToast('✨ New artwork published to showcase!');
                 loadProducts();
             } else {
                 alert(data.message || 'Error adding product.');
@@ -432,4 +566,3 @@ document.addEventListener('DOMContentLoaded', function () {
             .replace(/"/g, '&quot;');
     }
 });
-

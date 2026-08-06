@@ -581,6 +581,121 @@ body {
     color: #FFFFFF;
 }
 
+/* Edit Button for Product Cards */
+.admin-prod-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: auto;
+}
+
+.btn-edit-prod {
+    background: #FAF5EC;
+    border: 1px solid var(--border-gold);
+    color: var(--gold-dark);
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    flex: 1;
+    transition: var(--transition);
+}
+
+.btn-edit-prod:hover {
+    background: var(--gold-primary);
+    color: #FFFFFF;
+    border-color: var(--gold-primary);
+}
+
+.btn-delete-prod {
+    flex: 1;
+}
+
+/* Edit Product Modal Overlay */
+.edit-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(26, 26, 30, 0.6);
+    backdrop-filter: blur(6px);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+}
+
+.edit-modal.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.edit-modal-card {
+    max-width: 720px;
+}
+
+/* Image Preview in Edit Modal */
+.edit-img-preview-wrap {
+    margin-bottom: 20px;
+    text-align: center;
+    background: #FAF8F5;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 16px;
+}
+
+.edit-img-preview {
+    max-width: 100%;
+    max-height: 200px;
+    object-fit: contain;
+    border-radius: 8px;
+    transition: var(--transition);
+}
+
+/* Edit Modal Actions Bar */
+.edit-modal-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-subtle);
+}
+
+.btn-cancel-edit {
+    background: none;
+    border: 1px solid var(--border-subtle);
+    padding: 12px 24px;
+    border-radius: 8px;
+    color: var(--text-secondary);
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.btn-cancel-edit:hover {
+    background: #FEF2F2;
+    color: #DC2626;
+    border-color: #FCA5A5;
+}
+
+/* Textarea styling in edit form */
+.admin-form-group textarea {
+    padding: 10px 14px;
+    border: 1px solid var(--border-subtle);
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    resize: vertical;
+    min-height: 60px;
+}
+
 /* Responsive Media Queries for Studio Admin Portal */
 @media (max-width: 992px) {
     .admin-container {

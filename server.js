@@ -260,6 +260,38 @@ app.post('/api/admin/products', verifyAdmin, upload.single('productImage'), asyn
     }
 });
 
+// Update Existing Product Showcase Item (Admin)
+app.put('/api/admin/products/:id', verifyAdmin, upload.single('productImage'), async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { title, category, categoryLabel, blurb, spec, surfaceType, palette, imageUrl, readyToShip } = req.body;
+
+        let finalImgUrl = imageUrl || undefined;
+        if (req.file) {
+            finalImgUrl = `/uploads/${req.file.filename}`;
+        }
+
+        const updated = await db.updateProduct(id, {
+            title, category, categoryLabel, blurb, spec, surfaceType, palette,
+            imageUrl: finalImgUrl,
+            readyToShip: readyToShip !== undefined ? (readyToShip === true || readyToShip === 'true') : undefined
+        });
+
+        if (!updated) {
+            return res.status(404).json({ success: false, message: 'Product item not found.' });
+        }
+
+        res.json({
+            success: true,
+            message: 'Product updated successfully!',
+            product: updated
+        });
+    } catch (err) {
+        console.error('Error updating product:', err);
+        res.status(500).json({ success: false, message: 'Failed to update product item.' });
+    }
+});
+
 // Delete Product Showcase Item (Admin)
 app.delete('/api/admin/products/:id', verifyAdmin, async (req, res) => {
     try {

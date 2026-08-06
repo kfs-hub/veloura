@@ -113,7 +113,7 @@ async function ensureInit() {
 }
 
 // Eager trigger on startup
-ensureInit().catch(() => {});
+ensureInit().catch(() => { });
 
 function generateRefId() {
     const num = Math.floor(1000 + Math.random() * 9000);
@@ -283,6 +283,46 @@ const db = {
             [id]
         );
         return result.rowCount > 0;
+    },
+
+    async getProductById(id) {
+        await ensureInit();
+        const result = await pool.query(
+            'SELECT * FROM products WHERE id = $1',
+            [id]
+        );
+        return mapProduct(result.rows[0]);
+    },
+
+    async updateProduct(id, prodData) {
+        await ensureInit();
+        const result = await pool.query(
+            `UPDATE products
+             SET title = COALESCE($1, title),
+                 category = COALESCE($2, category),
+                 category_label = COALESCE($3, category_label),
+                 blurb = COALESCE($4, blurb),
+                 spec = COALESCE($5, spec),
+                 surface_type = COALESCE($6, surface_type),
+                 palette = COALESCE($7, palette),
+                 image_url = COALESCE($8, image_url),
+                 ready_to_ship = COALESCE($9, ready_to_ship)
+             WHERE id = $10
+             RETURNING *`,
+            [
+                prodData.title ?? null,
+                prodData.category ?? null,
+                prodData.categoryLabel ?? null,
+                prodData.blurb ?? null,
+                prodData.spec ?? null,
+                prodData.surfaceType ?? null,
+                prodData.palette ?? null,
+                (prodData.imageUrl !== undefined && prodData.imageUrl !== '') ? prodData.imageUrl : null,
+                prodData.readyToShip ?? null,
+                id
+            ]
+        );
+        return mapProduct(result.rows[0]);
     },
 
     // Expose pool and connection state
