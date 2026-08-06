@@ -18,16 +18,24 @@ const app = express();
 const PORT = process.env.PORT || 5500;
 const ADMIN_PASSCODE = process.env.ADMIN_PASSCODE || 'veloura2026';
 
-// Helper to upload showcase image to Vercel Blob (if configured) or Base64 fallback
-async function uploadImageToBlobOrBase64(file) {
+// Helper to upload image to Vercel Blob (if configured) or Base64 fallback
+async function uploadImageToBlobOrBase64(file, folder = 'showcase') {
     if (!file) return null;
     try {
         if (process.env.BLOB_READ_WRITE_TOKEN) {
             const ext = path.extname(file.originalname) || '.png';
             const safeName = path.basename(file.originalname, ext).toLowerCase().replace(/[^a-z0-9_-]/g, '_');
-            const blob = await put(`showcase/${safeName}-${Date.now()}${ext}`, file.buffer, {
-                access: 'public'
-            });
+            const blobPath = `${folder}/${safeName}-${Date.now()}${ext}`;
+            let blob;
+            try {
+                blob = await put(blobPath, file.buffer, { access: 'public' });
+            } catch (putErr) {
+                if (putErr.message && putErr.message.includes('private store')) {
+                    blob = await put(blobPath, file.buffer, { access: 'private' });
+                } else {
+                    throw putErr;
+                }
+            }
             return blob.url;
         }
     } catch (err) {
@@ -43,45 +51,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Configure Uploads directory for reference images (supports Vercel /tmp)
-const uploadsDir = process.env.VERCEL ? path.join('/tmp', 'uploads') : path.join(__dirname, 'uploads');
-if (!fs.existsSync(uploadsDir)) {
-    fs.mkdirSync(uploadsDir, { recursive: true });
-}
-
-// Multer Storage Configuration
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, uploadsDir);
-    },
-    filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const ext = path.extname(file.originalname);
-        cb(null, 'moodboard-' + uniqueSuffix + ext);
-    }
-});
-
-const upload = multer({
-    storage: storage,
-    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB per file limit
-    fileFilter: function (req, file, cb) {
-        const allowedTypes = /jpeg|jpg|png|webp/;
-        const mimeValid = allowedTypes.test(file.mimetype);
-        const extValid = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-        if (mimeValid && extValid) {
-            return cb(null, true);
-        }
-        cb(new Error('Only image files (JPG, PNG, WEBP) under 5MB are allowed!'));
-    }
-});
-
-// Configure Showcase Images directory for artwork catalog
-const showcaseDir = process.env.VERCEL ? path.join('/tmp', 'showcase images') : path.join(__dirname, 'showcase images');
-if (!fs.existsSync(showcaseDir)) {
-    fs.mkdirSync(showcaseDir, { recursive: true });
-}
-
-// Multer Storage Configuration for Showcase Images (Memory storage for Vercel/Neon DB persistence)
+// Memory Storage Multer Configuration for Vercel Serverless & Vercel Blob Storage
 const uploadShowcase = multer({
     storage: multer.memoryStorage(),
     limits: { fileSize: 4.5 * 1024 * 1024 }, // 4.5MB limit (fits within Vercel serverless request body limit)
@@ -95,6 +65,8 @@ const uploadShowcase = multer({
         cb(new Error('Only image files (JPG, PNG, WEBP) under 4.5MB are allowed!'));
     }
 });
+
+const upload = uploadShowcase; // Reuse memory storage multer for commission attachments
 
 // Admin Passkey Verification Middleware
 function verifyAdmin(req, res, next) {
@@ -137,11 +109,14 @@ app.post('/api/commissions', upload.array('referenceFiles', 5), async (req, res)
             });
         }
 
-        // Process uploaded file paths
-        const uploadedFiles = (req.files || []).map(file => ({
-            originalName: file.originalname,
-            path: `/uploads/${file.filename}`,
-            size: file.size
+        // Process uploaded reference files via Vercel Blob
+        const uploadedFiles = await Promise.all((req.files || []).map(async file => {
+            const uploadedUrl = await uploadImageToBlobOrBase64(file, 'moodboard');
+            return {
+                originalName: file.originalname,
+                path: uploadedUrl,
+                size: file.size
+            };
         }));
 
         // Persist to PostgreSQL FIRST — before any email attempt
