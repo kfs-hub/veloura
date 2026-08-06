@@ -247,8 +247,8 @@ app.put('/api/admin/commissions/:id/status', verifyAdmin, async (req, res) => {
     }
 });
 
-// Add New Product Showcase Item (Admin)
-app.post('/api/admin/products', verifyAdmin, uploadShowcase.single('productImage'), async (req, res) => {
+// Add New Product Showcase Item (Admin) — supports multiple images
+app.post('/api/admin/products', verifyAdmin, uploadShowcase.array('productImages', 10), async (req, res) => {
     try {
         const { title, category, categoryLabel, blurb, spec, surfaceType, palette, imageUrl, readyToShip } = req.body;
 
@@ -256,15 +256,29 @@ app.post('/api/admin/products', verifyAdmin, uploadShowcase.single('productImage
             return res.status(400).json({ success: false, message: 'Product title is required.' });
         }
 
-        let finalImgUrl = imageUrl || 'showcase images/canvas.png';
-        if (req.file) {
-            const uploadedUrl = await uploadImageToBlobOrBase64(req.file);
-            if (uploadedUrl) finalImgUrl = uploadedUrl;
+        // Upload all attached files to Blob
+        const uploadedUrls = [];
+        if (req.files && req.files.length > 0) {
+            for (const file of req.files) {
+                const url = await uploadImageToBlobOrBase64(file);
+                if (url) uploadedUrls.push(url);
+            }
+        }
+
+        // Primary image: first uploaded file, or the URL field, or default
+        const finalImgUrl = uploadedUrls[0] || imageUrl || 'showcase images/canvas.png';
+
+        // All images array (uploaded files + optional URL if not already included)
+        const allImageUrls = [...uploadedUrls];
+        if (imageUrl && !allImageUrls.includes(imageUrl)) {
+            allImageUrls.push(imageUrl);
         }
 
         const product = await db.addProduct({
             title, category, categoryLabel, blurb, spec, surfaceType, palette,
-            imageUrl: finalImgUrl, readyToShip
+            imageUrl: finalImgUrl,
+            imageUrls: allImageUrls,
+            readyToShip
         });
 
         res.status(201).json({
@@ -278,21 +292,40 @@ app.post('/api/admin/products', verifyAdmin, uploadShowcase.single('productImage
     }
 });
 
-// Update Existing Product Showcase Item (Admin)
-app.put('/api/admin/products/:id', verifyAdmin, uploadShowcase.single('productImage'), async (req, res) => {
+// Update Existing Product Showcase Item (Admin) — supports multiple images
+app.put('/api/admin/products/:id', verifyAdmin, uploadShowcase.array('productImages', 10), async (req, res) => {
     try {
         const { id } = req.params;
-        const { title, category, categoryLabel, blurb, spec, surfaceType, palette, imageUrl, readyToShip } = req.body;
+        const { title, category, categoryLabel, blurb, spec, surfaceType, palette, imageUrl, readyToShip, existingImageUrls } = req.body;
 
-        let finalImgUrl = imageUrl || undefined;
-        if (req.file) {
-            const uploadedUrl = await uploadImageToBlobOrBase64(req.file);
-            if (uploadedUrl) finalImgUrl = uploadedUrl;
+        // Parse existing image URLs that the admin chose to keep
+        let keptUrls = [];
+        if (existingImageUrls) {
+            try {
+                keptUrls = JSON.parse(existingImageUrls);
+                if (!Array.isArray(keptUrls)) keptUrls = [];
+            } catch (e) { keptUrls = []; }
         }
+
+        // Upload new files to Blob
+        const newUploadedUrls = [];
+        if (req.files && req.files.length > 0) {
+            for (const file of req.files) {
+                const url = await uploadImageToBlobOrBase64(file);
+                if (url) newUploadedUrls.push(url);
+            }
+        }
+
+        // Merge: kept existing + newly uploaded
+        const allImageUrls = [...keptUrls, ...newUploadedUrls];
+
+        // Primary image: first in the merged list, or imageUrl field, or leave unchanged
+        let finalImgUrl = allImageUrls[0] || imageUrl || undefined;
 
         const updated = await db.updateProduct(id, {
             title, category, categoryLabel, blurb, spec, surfaceType, palette,
             imageUrl: finalImgUrl,
+            imageUrls: allImageUrls.length > 0 ? allImageUrls : undefined,
             readyToShip: readyToShip !== undefined ? (readyToShip === true || readyToShip === 'true') : undefined
         });
 

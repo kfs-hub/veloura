@@ -57,9 +57,11 @@ async function initTables(client) {
             surface_type   TEXT,
             palette        TEXT,
             image_url      TEXT,
+            image_urls     JSONB DEFAULT '[]'::jsonb,
             ready_to_ship  BOOLEAN DEFAULT true,
             created_at     TIMESTAMPTZ DEFAULT NOW()
         );
+        ALTER TABLE products ADD COLUMN IF NOT EXISTS image_urls JSONB DEFAULT '[]'::jsonb;
         CREATE INDEX IF NOT EXISTS idx_commissions_ref_id ON commissions (ref_id);
         CREATE INDEX IF NOT EXISTS idx_commissions_status ON commissions (status);
         CREATE INDEX IF NOT EXISTS idx_products_category ON products (category);
@@ -144,6 +146,7 @@ function mapCommission(row) {
 
 function mapProduct(row) {
     if (!row) return null;
+    const rawUrls = typeof row.image_urls === 'string' ? JSON.parse(row.image_urls) : (row.image_urls || []);
     return {
         id: row.id,
         title: row.title,
@@ -154,6 +157,7 @@ function mapProduct(row) {
         surfaceType: row.surface_type,
         palette: row.palette,
         imageUrl: row.image_url,
+        imageUrls: Array.isArray(rawUrls) ? rawUrls : [],
         readyToShip: row.ready_to_ship,
         createdAt: row.created_at
     };
@@ -254,11 +258,12 @@ const db = {
     async addProduct(prodData) {
         await ensureInit();
         const id = `prod-${Date.now()}`;
+        const imageUrls = Array.isArray(prodData.imageUrls) ? prodData.imageUrls : [];
 
         const result = await pool.query(
             `INSERT INTO products
-             (id, title, category, category_label, blurb, spec, surface_type, palette, image_url, ready_to_ship, created_at)
-             VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,NOW())
+             (id, title, category, category_label, blurb, spec, surface_type, palette, image_url, image_urls, ready_to_ship, created_at)
+             VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,NOW())
              RETURNING *`,
             [
                 id,
@@ -270,6 +275,7 @@ const db = {
                 prodData.surfaceType || 'Canvas Art',
                 prodData.palette || 'Veloura Classic',
                 prodData.imageUrl || 'showcase images/canvas.png',
+                JSON.stringify(imageUrls),
                 prodData.readyToShip === true || prodData.readyToShip === 'true'
             ]
         );
@@ -296,6 +302,7 @@ const db = {
 
     async updateProduct(id, prodData) {
         await ensureInit();
+        const imageUrlsParam = Array.isArray(prodData.imageUrls) ? JSON.stringify(prodData.imageUrls) : null;
         const result = await pool.query(
             `UPDATE products
              SET title = COALESCE($1, title),
@@ -306,8 +313,9 @@ const db = {
                  surface_type = COALESCE($6, surface_type),
                  palette = COALESCE($7, palette),
                  image_url = COALESCE($8, image_url),
-                 ready_to_ship = COALESCE($9, ready_to_ship)
-             WHERE id = $10
+                 image_urls = COALESCE($9, image_urls),
+                 ready_to_ship = COALESCE($10, ready_to_ship)
+             WHERE id = $11
              RETURNING *`,
             [
                 prodData.title ?? null,
@@ -318,6 +326,7 @@ const db = {
                 prodData.surfaceType ?? null,
                 prodData.palette ?? null,
                 (prodData.imageUrl !== undefined && prodData.imageUrl !== '') ? prodData.imageUrl : null,
+                imageUrlsParam,
                 prodData.readyToShip ?? null,
                 id
             ]

@@ -403,8 +403,14 @@ document.addEventListener('DOMContentLoaded', function () {
         productsData.forEach(p => {
             const card = document.createElement('div');
             card.className = 'admin-prod-card';
+            const imgCount = (p.imageUrls && p.imageUrls.length > 0) ? p.imageUrls.length : (p.imageUrl ? 1 : 0);
+            const badgeHtml = imgCount > 1 ? `<span class="img-count-badge">📷 ${imgCount} Photos</span>` : '';
+
             card.innerHTML = `
-                <img src="${escapeHtml(p.imageUrl)}" class="admin-prod-img" alt="${escapeHtml(p.title)}" title="Click to expand image" style="cursor: pointer;">
+                <div class="admin-prod-img-wrap">
+                    <img src="${escapeHtml(p.imageUrl)}" class="admin-prod-img" alt="${escapeHtml(p.title)}" title="Click to expand image" style="cursor: pointer;">
+                    ${badgeHtml}
+                </div>
                 <div class="admin-prod-body">
                     <div class="admin-prod-title">${escapeHtml(p.title)}</div>
                     <div class="admin-prod-spec">${escapeHtml(p.surfaceType)} • ${escapeHtml(p.spec)}</div>
@@ -418,7 +424,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const imgEl = card.querySelector('.admin-prod-img');
             if (imgEl) {
-                imgEl.onclick = () => openLightbox(p.imageUrl, `${p.title} (${p.surfaceType})`);
+                const captionText = (p.imageUrls && p.imageUrls.length > 1) ? `${p.title} (1 of ${p.imageUrls.length} photos)` : `${p.title} (${p.surfaceType})`;
+                imgEl.onclick = () => openLightbox(p.imageUrl, captionText);
             }
 
             productsGrid.appendChild(card);
@@ -456,8 +463,11 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // =========================================================================
-    // EDIT PRODUCT MODAL
+    // EDIT PRODUCT MODAL (MULTI-IMAGE SUPPORT)
     // =========================================================================
+
+    let existingEditUrls = [];
+    let selectedEditFiles = [];
 
     function openEditModal(id) {
         const product = productsData.find(p => p.id === id);
@@ -475,17 +485,11 @@ document.addEventListener('DOMContentLoaded', function () {
         const fileInput = document.getElementById('editProdImgFile');
         if (fileInput) fileInput.value = '';
 
-        // Update image preview
-        const preview = document.getElementById('editImgPreview');
-        preview.src = product.imageUrl || 'showcase images/canvas.png';
-        preview.onerror = function () {
-            this.src = 'showcase images/canvas.png';
-        };
+        existingEditUrls = (product.imageUrls && product.imageUrls.length > 0) ? [...product.imageUrls] : (product.imageUrl ? [product.imageUrl] : []);
+        selectedEditFiles = [];
 
-        // Update modal title
+        renderEditFilePreviews();
         document.getElementById('editModalTitle').textContent = product.title;
-
-        // Show modal
         editProductModal.classList.add('active');
     }
 
@@ -500,30 +504,56 @@ document.addEventListener('DOMContentLoaded', function () {
         if (e.target === editProductModal) closeEditModal();
     });
 
-    // Live image preview update when URL changes
-    document.getElementById('editProdImgUrl').addEventListener('input', function () {
-        const preview = document.getElementById('editImgPreview');
-        const url = this.value.trim();
-        if (url) {
-            preview.src = url;
-            preview.onerror = function () {
-                this.src = 'showcase images/canvas.png';
-            };
-        }
-    });
-
-    // Live image preview when local file selected
     const editProdImgFileInput = document.getElementById('editProdImgFile');
     if (editProdImgFileInput) {
         editProdImgFileInput.addEventListener('change', function () {
-            const file = this.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    document.getElementById('editImgPreview').src = e.target.result;
+            selectedEditFiles = Array.from(this.files);
+            renderEditFilePreviews();
+        });
+    }
+
+    function renderEditFilePreviews() {
+        const container = document.getElementById('editImgPreviews');
+        if (!container) return;
+        container.innerHTML = '';
+        if (existingEditUrls.length === 0 && selectedEditFiles.length === 0) {
+            container.style.display = 'none';
+            return;
+        }
+        container.style.display = 'flex';
+
+        // Render existing URLs
+        existingEditUrls.forEach((url, index) => {
+            const item = document.createElement('div');
+            item.className = 'img-thumb-item';
+            item.innerHTML = `
+                <img src="${escapeHtml(url)}" class="img-thumb-img" alt="Existing ${index + 1}">
+                <button type="button" class="img-thumb-remove" title="Remove image">&times;</button>
+            `;
+            item.querySelector('.img-thumb-remove').onclick = function () {
+                existingEditUrls.splice(index, 1);
+                renderEditFilePreviews();
+            };
+            container.appendChild(item);
+        });
+
+        // Render new file previews
+        selectedEditFiles.forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const item = document.createElement('div');
+                item.className = 'img-thumb-item';
+                item.innerHTML = `
+                    <img src="${e.target.result}" class="img-thumb-img" alt="New ${index + 1}">
+                    <button type="button" class="img-thumb-remove" title="Remove image">&times;</button>
+                `;
+                item.querySelector('.img-thumb-remove').onclick = function () {
+                    selectedEditFiles.splice(index, 1);
+                    renderEditFilePreviews();
                 };
-                reader.readAsDataURL(file);
-            }
+                container.appendChild(item);
+            };
+            reader.readAsDataURL(file);
         });
     }
 
@@ -538,7 +568,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const spec = document.getElementById('editProdSpec').value.trim();
         const blurb = document.getElementById('editProdBlurb').value.trim();
         const imageUrl = document.getElementById('editProdImgUrl').value.trim();
-        const fileInput = document.getElementById('editProdImgFile');
 
         if (!title) {
             alert('Artwork title is required.');
@@ -550,38 +579,26 @@ document.addEventListener('DOMContentLoaded', function () {
         saveBtn.disabled = true;
 
         try {
-            let res;
-            if (fileInput && fileInput.files.length > 0) {
-                const formData = new FormData();
-                formData.append('title', title);
-                formData.append('category', category);
-                formData.append('surfaceType', surfaceType);
-                formData.append('spec', spec);
-                formData.append('blurb', blurb);
-                if (imageUrl) formData.append('imageUrl', imageUrl);
-                formData.append('productImage', fileInput.files[0]);
+            const formData = new FormData();
+            formData.append('title', title);
+            formData.append('category', category);
+            formData.append('surfaceType', surfaceType);
+            formData.append('spec', spec);
+            formData.append('blurb', blurb);
+            if (imageUrl) formData.append('imageUrl', imageUrl);
+            formData.append('existingImageUrls', JSON.stringify(existingEditUrls));
 
-                res = await fetch(`/api/admin/products/${id}`, {
-                    method: 'PUT',
-                    headers: {
-                        'x-admin-passcode': currentPasscode
-                    },
-                    body: formData
-                });
-            } else {
-                res = await fetch(`/api/admin/products/${id}`, {
-                    method: 'PUT',
-                    headers: getAdminHeaders(),
-                    body: JSON.stringify({
-                        title,
-                        category,
-                        surfaceType,
-                        spec,
-                        blurb,
-                        imageUrl
-                    })
-                });
-            }
+            selectedEditFiles.forEach(file => {
+                formData.append('productImages', file);
+            });
+
+            const res = await fetch(`/api/admin/products/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'x-admin-passcode': currentPasscode
+                },
+                body: formData
+            });
 
             const data = await res.json();
 
@@ -602,8 +619,47 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // =========================================================================
-    // ADD PRODUCT FORM
+    // ADD PRODUCT FORM (MULTI-IMAGE SUPPORT)
     // =========================================================================
+
+    let selectedAddFiles = [];
+    const prodImgFileInput = document.getElementById('prodImgFile');
+    const addImgPreviews = document.getElementById('addImgPreviews');
+
+    if (prodImgFileInput) {
+        prodImgFileInput.addEventListener('change', function () {
+            selectedAddFiles = Array.from(this.files);
+            renderAddFilePreviews();
+        });
+    }
+
+    function renderAddFilePreviews() {
+        if (!addImgPreviews) return;
+        addImgPreviews.innerHTML = '';
+        if (selectedAddFiles.length === 0) {
+            addImgPreviews.style.display = 'none';
+            return;
+        }
+        addImgPreviews.style.display = 'flex';
+
+        selectedAddFiles.forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const item = document.createElement('div');
+                item.className = 'img-thumb-item';
+                item.innerHTML = `
+                    <img src="${e.target.result}" class="img-thumb-img" alt="Preview ${index + 1}">
+                    <button type="button" class="img-thumb-remove" title="Remove image">&times;</button>
+                `;
+                item.querySelector('.img-thumb-remove').onclick = function () {
+                    selectedAddFiles.splice(index, 1);
+                    renderAddFilePreviews();
+                };
+                addImgPreviews.appendChild(item);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
 
     // Add Product Form Submit
     addProductForm.addEventListener('submit', async function (e) {
@@ -615,7 +671,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const spec = document.getElementById('prodSpec').value.trim() || 'Custom Spec';
         const blurb = document.getElementById('prodBlurb').value.trim();
         const imageUrl = document.getElementById('prodImgUrl').value.trim();
-        const fileInput = document.getElementById('prodImgFile');
 
         if (!title) return;
 
@@ -624,45 +679,33 @@ document.addEventListener('DOMContentLoaded', function () {
         saveBtn.textContent = 'Publishing...';
 
         try {
-            let res;
-            if (fileInput && fileInput.files.length > 0) {
-                const formData = new FormData();
-                formData.append('title', title);
-                formData.append('category', category);
-                formData.append('surfaceType', surfaceType);
-                formData.append('spec', spec);
-                formData.append('blurb', blurb);
-                if (imageUrl) formData.append('imageUrl', imageUrl);
-                formData.append('readyToShip', 'true');
-                formData.append('productImage', fileInput.files[0]);
+            const formData = new FormData();
+            formData.append('title', title);
+            formData.append('category', category);
+            formData.append('surfaceType', surfaceType);
+            formData.append('spec', spec);
+            formData.append('blurb', blurb);
+            if (imageUrl) formData.append('imageUrl', imageUrl);
+            formData.append('readyToShip', 'true');
 
-                res = await fetch('/api/admin/products', {
-                    method: 'POST',
-                    headers: {
-                        'x-admin-passcode': currentPasscode
-                    },
-                    body: formData
-                });
-            } else {
-                res = await fetch('/api/admin/products', {
-                    method: 'POST',
-                    headers: getAdminHeaders(),
-                    body: JSON.stringify({
-                        title,
-                        category,
-                        surfaceType,
-                        spec,
-                        blurb,
-                        imageUrl: imageUrl || 'showcase images/canvas.png',
-                        readyToShip: true
-                    })
-                });
-            }
+            selectedAddFiles.forEach(file => {
+                formData.append('productImages', file);
+            });
+
+            const res = await fetch('/api/admin/products', {
+                method: 'POST',
+                headers: {
+                    'x-admin-passcode': currentPasscode
+                },
+                body: formData
+            });
 
             const data = await res.json();
 
             if (data.success) {
                 addProductForm.reset();
+                selectedAddFiles = [];
+                renderAddFilePreviews();
                 showToast('✨ New artwork published to showcase!');
                 loadProducts();
             } else {

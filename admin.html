@@ -194,13 +194,15 @@
                             <input type="text" id="prodBlurb" placeholder="Describe materials, paint colors, sealant...">
                         </div>
 
-                        <div class="admin-form-group">
-                            <label>Upload Image File</label>
-                            <input type="file" id="prodImgFile" accept="image/jpeg,image/png,image/webp">
+                        <div class="admin-form-group col-span-2">
+                            <label>Upload Artwork Images (Multiple Allowed)</label>
+                            <input type="file" id="prodImgFile" accept="image/jpeg,image/png,image/webp" multiple>
                         </div>
 
-                        <div class="admin-form-group">
-                            <label>Or Image URL / Path</label>
+                        <div id="addImgPreviews" class="img-preview-strip col-span-2" style="display:none;"></div>
+
+                        <div class="admin-form-group col-span-2">
+                            <label>Or Image URL / Path (Optional single fallback)</label>
                             <input type="text" id="prodImgUrl" placeholder="showcase images/canvas.png">
                         </div>
 
@@ -331,12 +333,14 @@
                             placeholder="Describe materials, paint colors, sealant..."></textarea>
                     </div>
 
-                    <div class="admin-form-group">
-                        <label>Upload New Image File</label>
-                        <input type="file" id="editProdImgFile" accept="image/jpeg,image/png,image/webp">
+                    <div class="admin-form-group col-span-2">
+                        <label>Upload New Artwork Images (Adds to existing images)</label>
+                        <input type="file" id="editProdImgFile" accept="image/jpeg,image/png,image/webp" multiple>
                     </div>
 
-                    <div class="admin-form-group">
+                    <div id="editImgPreviews" class="img-preview-strip col-span-2"></div>
+
+                    <div class="admin-form-group col-span-2">
                         <label>Or Image URL / Path</label>
                         <input type="text" id="editProdImgUrl" placeholder="showcase images/canvas.png">
                     </div>
