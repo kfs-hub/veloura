@@ -256,6 +256,40 @@ document.addEventListener('DOMContentLoaded', function () {
     searchFilter.addEventListener('input', renderCommissionsTable);
     statusFilter.addEventListener('change', renderCommissionsTable);
 
+    // =========================================================================
+    // LIGHTBOX IMAGE EXPANDER (MOODBOARDS & SHOWCASE)
+    // =========================================================================
+
+    const lightboxModal = document.getElementById('lightboxModal');
+    const lightboxImg = document.getElementById('lightboxImg');
+    const lightboxCaption = document.getElementById('lightboxCaption');
+    const lightboxCloseBtn = document.getElementById('lightboxCloseBtn');
+
+    function openLightbox(src, captionText = '') {
+        if (!lightboxModal || !lightboxImg) return;
+        lightboxImg.src = src;
+        if (lightboxCaption) lightboxCaption.textContent = captionText;
+        lightboxModal.classList.add('active');
+    }
+
+    function closeLightbox() {
+        if (lightboxModal) lightboxModal.classList.remove('active');
+    }
+
+    if (lightboxCloseBtn) lightboxCloseBtn.addEventListener('click', closeLightbox);
+    if (lightboxModal) {
+        lightboxModal.addEventListener('click', (e) => {
+            if (e.target === lightboxModal || e.target.classList.contains('lightbox-content')) {
+                closeLightbox();
+            }
+        });
+    }
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && lightboxModal && lightboxModal.classList.contains('active')) {
+            closeLightbox();
+        }
+    });
+
     // Detail Modal Inspection
     function openDetailModal(id) {
         const item = commissionsData.find(c => c.id === id);
@@ -271,18 +305,29 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('detailVision').textContent = item.visionText || 'No custom vision text provided.';
         modalStatusSelect.value = item.status;
 
-        // Render uploaded moodboard thumbnails
+        // Render uploaded moodboard thumbnails with click-to-expand Lightbox
         const moodboardGrid = document.getElementById('detailMoodboard');
         moodboardGrid.innerHTML = '';
 
         if (item.uploadedFiles && item.uploadedFiles.length > 0) {
             item.uploadedFiles.forEach(file => {
+                const wrap = document.createElement('div');
+                wrap.className = 'moodboard-thumb-wrap';
+
                 const img = document.createElement('img');
                 img.src = file.path;
                 img.className = 'moodboard-thumb';
-                img.alt = file.originalName;
-                img.onclick = () => window.open(file.path, '_blank');
-                moodboardGrid.appendChild(img);
+                img.alt = file.originalName || 'Attached Moodboard File';
+                img.title = 'Click to expand image';
+
+                const zoomBadge = document.createElement('span');
+                zoomBadge.className = 'thumb-zoom-icon';
+                zoomBadge.innerHTML = '🔍 Zoom';
+
+                wrap.appendChild(img);
+                wrap.appendChild(zoomBadge);
+                wrap.onclick = () => openLightbox(file.path, `${file.originalName || 'Moodboard File'} (${item.clientName})`);
+                moodboardGrid.appendChild(wrap);
             });
         } else {
             moodboardGrid.innerHTML = `<span style="font-size: 0.85rem; color: var(--text-muted);">No reference files attached.</span>`;
@@ -359,7 +404,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const card = document.createElement('div');
             card.className = 'admin-prod-card';
             card.innerHTML = `
-                <img src="${escapeHtml(p.imageUrl)}" class="admin-prod-img" alt="${escapeHtml(p.title)}">
+                <img src="${escapeHtml(p.imageUrl)}" class="admin-prod-img" alt="${escapeHtml(p.title)}" title="Click to expand image" style="cursor: pointer;">
                 <div class="admin-prod-body">
                     <div class="admin-prod-title">${escapeHtml(p.title)}</div>
                     <div class="admin-prod-spec">${escapeHtml(p.surfaceType)} • ${escapeHtml(p.spec)}</div>
@@ -370,6 +415,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     </div>
                 </div>
             `;
+
+            const imgEl = card.querySelector('.admin-prod-img');
+            if (imgEl) {
+                imgEl.onclick = () => openLightbox(p.imageUrl, `${p.title} (${p.surfaceType})`);
+            }
+
             productsGrid.appendChild(card);
         });
 

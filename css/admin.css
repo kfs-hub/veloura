@@ -492,39 +492,112 @@ body {
     transform: scale(1.05);
 }
 
-/* Product Manager Form & Cards */
+/* ============================================================
+   Product Manager Form & Cards
+   ============================================================ */
+
 .product-form-card {
     background: #FFFFFF;
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-md);
     padding: 28px;
     margin-bottom: 32px;
+    box-sizing: border-box;
+    width: 100%;
 }
 
 .form-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 20px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.col-span-2 {
+    grid-column: span 2;
 }
 
 .admin-form-group {
     display: flex;
     flex-direction: column;
     gap: 6px;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
 }
+
 .admin-form-group label {
     font-size: 0.85rem;
     font-weight: 700;
     color: var(--text-secondary);
 }
-.admin-form-group input, .admin-form-group select, .admin-form-group textarea {
+
+.admin-form-group input,
+.admin-form-group select,
+.admin-form-group textarea {
     padding: 10px 14px;
     border: 1px solid var(--border-subtle);
     border-radius: 6px;
     font-family: inherit;
     font-size: 0.9rem;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    background: #FFFFFF;
+    color: var(--text-primary);
 }
 
+.admin-form-group input:focus,
+.admin-form-group select:focus,
+.admin-form-group textarea:focus {
+    outline: none;
+    border-color: var(--gold-primary);
+    box-shadow: 0 0 0 3px var(--gold-glow);
+}
+
+.admin-form-group textarea {
+    resize: vertical;
+    min-height: 60px;
+}
+
+/* File input custom styling */
+.admin-form-group input[type="file"] {
+    padding: 8px 12px;
+    background: #FAF8F5;
+    border: 1px dashed var(--border-gold);
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.admin-form-group input[type="file"]::file-selector-button {
+    background: #FAF5EC;
+    border: 1px solid var(--border-gold);
+    color: var(--gold-dark);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.8rem;
+    margin-right: 10px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.admin-form-group input[type="file"]::file-selector-button:hover {
+    background: var(--gold-primary);
+    color: #FFFFFF;
+}
+
+.form-submit-group {
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* Products Grid */
 .products-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -544,6 +617,11 @@ body {
     width: 100%;
     height: 180px;
     object-fit: cover;
+    cursor: pointer;
+    transition: var(--transition);
+}
+.admin-prod-img:hover {
+    opacity: 0.92;
 }
 
 .admin-prod-body {
@@ -565,22 +643,6 @@ body {
     margin-bottom: 12px;
 }
 
-.btn-delete-prod {
-    background: #FEF2F2;
-    border: 1px solid #FCA5A5;
-    color: #DC2626;
-    padding: 8px 14px;
-    border-radius: 6px;
-    font-size: 0.82rem;
-    font-weight: 700;
-    cursor: pointer;
-    margin-top: auto;
-}
-.btn-delete-prod:hover {
-    background: #DC2626;
-    color: #FFFFFF;
-}
-
 /* Edit Button for Product Cards */
 .admin-prod-actions {
     display: flex;
@@ -600,7 +662,6 @@ body {
     flex: 1;
     transition: var(--transition);
 }
-
 .btn-edit-prod:hover {
     background: var(--gold-primary);
     color: #FFFFFF;
@@ -608,10 +669,26 @@ body {
 }
 
 .btn-delete-prod {
+    background: #FEF2F2;
+    border: 1px solid #FCA5A5;
+    color: #DC2626;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
     flex: 1;
+    transition: var(--transition);
+}
+.btn-delete-prod:hover {
+    background: #DC2626;
+    color: #FFFFFF;
 }
 
-/* Edit Product Modal Overlay */
+/* ============================================================
+   Edit Product Modal
+   ============================================================ */
+
 .edit-modal {
     position: fixed;
     top: 0;
@@ -635,7 +712,15 @@ body {
 }
 
 .edit-modal-card {
+    background: #FFFFFF;
+    border-radius: var(--radius-lg);
     max-width: 720px;
+    width: 92%;
+    max-height: 92vh;
+    overflow-y: auto;
+    padding: 36px;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
 }
 
 /* Image Preview in Edit Modal */
@@ -678,25 +763,119 @@ body {
     cursor: pointer;
     transition: var(--transition);
 }
-
 .btn-cancel-edit:hover {
     background: #FEF2F2;
     color: #DC2626;
     border-color: #FCA5A5;
 }
 
-/* Textarea styling in edit form */
-.admin-form-group textarea {
-    padding: 10px 14px;
-    border: 1px solid var(--border-subtle);
-    border-radius: 6px;
-    font-family: inherit;
-    font-size: 0.9rem;
-    resize: vertical;
-    min-height: 60px;
+/* ============================================================
+   Image Lightbox Modal
+   ============================================================ */
+
+.lightbox-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(10, 10, 12, 0.92);
+    backdrop-filter: blur(12px);
+    z-index: 100000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Responsive Media Queries for Studio Admin Portal */
+.lightbox-modal.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.lightbox-content {
+    position: relative;
+    max-width: 92vw;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.lightbox-img {
+    max-width: 100%;
+    max-height: 80vh;
+    object-fit: contain;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(197, 160, 89, 0.4);
+    background: #1A1A1E;
+}
+
+.lightbox-caption {
+    color: #FAF5EC;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-top: 14px;
+    text-align: center;
+    word-break: break-word;
+}
+
+.lightbox-close {
+    position: absolute;
+    top: -44px;
+    right: 0;
+    background: rgba(255, 255, 255, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #FFFFFF;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    font-size: 1.4rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+}
+.lightbox-close:hover {
+    background: var(--gold-primary);
+    border-color: var(--gold-primary);
+}
+
+/* Moodboard Thumb Wrapper with Zoom Cue */
+.moodboard-thumb-wrap {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.moodboard-thumb-wrap .moodboard-thumb {
+    margin-top: 0;
+}
+
+.thumb-zoom-icon {
+    position: absolute;
+    bottom: 6px;
+    right: 6px;
+    background: rgba(26, 26, 30, 0.85);
+    color: #FFFFFF;
+    font-size: 0.72rem;
+    padding: 3px 6px;
+    border-radius: 4px;
+    pointer-events: none;
+    opacity: 0.9;
+    border: 1px solid rgba(197, 160, 89, 0.4);
+}
+
+/* ============================================================
+   RESPONSIVE MEDIA QUERIES
+   ============================================================ */
+
 @media (max-width: 992px) {
     .admin-container {
         padding: 0 20px;
@@ -745,6 +924,7 @@ body {
     .tabs-bar::-webkit-scrollbar {
         display: none;
     }
+
     .tab-btn {
         padding: 10px 16px;
         font-size: 0.88rem;
@@ -761,28 +941,135 @@ body {
         width: 100%;
     }
 
-    .commissions-table th, .commissions-table td {
+    .commissions-table th,
+    .commissions-table td {
         padding: 12px 14px;
         font-size: 0.84rem;
     }
 
     .detail-card {
-        width: 94%;
-        padding: 24px 18px;
-        max-height: 88vh;
+        width: 95%;
+        padding: 22px 16px;
+        max-height: 90vh;
+    }
+
+    /* ─── Add New Showcase Artwork Form ─── */
+    .product-form-card {
+        padding: 20px 16px;
+        border-radius: 14px;
+        margin-bottom: 24px;
+        width: 100%;
+        box-sizing: border-box;
     }
 
     .form-grid {
-        grid-template-columns: 1fr;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        width: 100%;
+        box-sizing: border-box;
     }
 
+    .col-span-2 {
+        grid-column: span 1 !important;
+    }
+
+    .admin-form-group {
+        width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+    }
+
+    /* iOS auto-zoom prevention + ensure full width */
+    .admin-form-group input,
+    .admin-form-group select,
+    .admin-form-group textarea {
+        font-size: 16px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    .form-submit-group {
+        width: 100% !important;
+        margin-top: 8px;
+    }
+
+    .form-submit-group button,
+    .form-submit-group .auth-btn {
+        width: 100% !important;
+        padding: 14px 20px !important;
+        font-size: 0.95rem;
+        box-sizing: border-box;
+    }
+
+    /* ─── Showcase Products Grid ─── */
     .products-grid {
         grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .admin-prod-card {
+        border-radius: 12px;
+    }
+
+    .admin-prod-img {
+        height: 160px;
+    }
+
+    .admin-prod-body {
+        padding: 16px;
+    }
+
+    .admin-prod-actions {
+        flex-direction: row;
+        gap: 10px;
+    }
+
+    .btn-edit-prod,
+    .btn-delete-prod {
+        padding: 10px 14px;
+        font-size: 0.85rem;
+    }
+
+    /* ─── Edit Product Modal ─── */
+    .edit-modal-card {
+        width: 95%;
+        max-height: 92vh;
+        padding: 22px 16px;
+    }
+
+    .edit-img-preview-wrap {
+        padding: 12px;
+        margin-bottom: 16px;
+    }
+
+    .edit-img-preview {
+        max-height: 140px;
+    }
+
+    .edit-modal-actions {
+        flex-direction: column-reverse;
+        gap: 10px;
+        align-items: stretch;
+    }
+
+    .edit-modal-actions button {
+        width: 100% !important;
+        padding: 14px 20px !important;
+        font-size: 0.95rem;
     }
 
     .auth-card {
         padding: 32px 20px;
         width: 92%;
+    }
+
+    .lightbox-close {
+        top: -38px;
+        width: 32px;
+        height: 32px;
+        font-size: 1.2rem;
     }
 }
 
@@ -828,6 +1115,13 @@ body {
     }
 
     .product-form-card {
-        padding: 18px 14px;
+        padding: 16px 12px;
+    }
+
+    .lightbox-close {
+        top: -38px;
+        width: 32px;
+        height: 32px;
+        font-size: 1.2rem;
     }
 }

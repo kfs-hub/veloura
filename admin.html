@@ -189,7 +189,7 @@
                             <input type="text" id="prodSpec" placeholder="e.g. 12 x 12 Gallery Canvas">
                         </div>
 
-                        <div class="admin-form-group" style="grid-column: span 2;">
+                        <div class="admin-form-group col-span-2">
                             <label>Short Description Blurb</label>
                             <input type="text" id="prodBlurb" placeholder="Describe materials, paint colors, sealant...">
                         </div>
@@ -204,7 +204,7 @@
                             <input type="text" id="prodImgUrl" placeholder="showcase images/canvas.png">
                         </div>
 
-                        <div class="admin-form-group" style="grid-column: span 2; justify-content: flex-end;">
+                        <div class="col-span-2 form-submit-group">
                             <button type="submit" class="auth-btn" id="saveProdBtn">Publish Artwork</button>
                         </div>
                     </div>
@@ -325,7 +325,7 @@
                         <input type="text" id="editProdSpec" placeholder="e.g. 12 x 12 Gallery Canvas">
                     </div>
 
-                    <div class="admin-form-group" style="grid-column: span 2;">
+                    <div class="admin-form-group col-span-2">
                         <label>Short Description Blurb</label>
                         <textarea id="editProdBlurb" rows="3"
                             placeholder="Describe materials, paint colors, sealant..."></textarea>
@@ -344,10 +344,18 @@
 
                 <div class="edit-modal-actions">
                     <button type="button" class="btn-cancel-edit" id="editCancelBtn">Cancel</button>
-                    <button type="submit" class="auth-btn" id="saveEditBtn"
-                        style="width: auto; padding: 12px 28px;">Save Changes</button>
+                    <button type="submit" class="auth-btn" id="saveEditBtn">Save Changes</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Image Lightbox Modal for Moodboards & Showcase -->
+    <div class="lightbox-modal" id="lightboxModal">
+        <div class="lightbox-content">
+            <button class="lightbox-close" id="lightboxCloseBtn" aria-label="Close Lightbox">&times;</button>
+            <img id="lightboxImg" class="lightbox-img" src="" alt="Expanded Image View">
+            <div id="lightboxCaption" class="lightbox-caption"></div>
         </div>
     </div>
 
