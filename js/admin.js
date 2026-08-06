@@ -420,6 +420,9 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('editProdSpec').value = product.spec || '';
         document.getElementById('editProdBlurb').value = product.blurb || '';
         document.getElementById('editProdImgUrl').value = product.imageUrl || '';
+        
+        const fileInput = document.getElementById('editProdImgFile');
+        if (fileInput) fileInput.value = '';
 
         // Update image preview
         const preview = document.getElementById('editImgPreview');
@@ -458,6 +461,21 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    // Live image preview when local file selected
+    const editProdImgFileInput = document.getElementById('editProdImgFile');
+    if (editProdImgFileInput) {
+        editProdImgFileInput.addEventListener('change', function () {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById('editImgPreview').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
     // Save Edit Form
     editProductForm.addEventListener('submit', async function (e) {
         e.preventDefault();
@@ -469,6 +487,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const spec = document.getElementById('editProdSpec').value.trim();
         const blurb = document.getElementById('editProdBlurb').value.trim();
         const imageUrl = document.getElementById('editProdImgUrl').value.trim();
+        const fileInput = document.getElementById('editProdImgFile');
 
         if (!title) {
             alert('Artwork title is required.');
@@ -480,18 +499,38 @@ document.addEventListener('DOMContentLoaded', function () {
         saveBtn.disabled = true;
 
         try {
-            const res = await fetch(`/api/admin/products/${id}`, {
-                method: 'PUT',
-                headers: getAdminHeaders(),
-                body: JSON.stringify({
-                    title,
-                    category,
-                    surfaceType,
-                    spec,
-                    blurb,
-                    imageUrl
-                })
-            });
+            let res;
+            if (fileInput && fileInput.files.length > 0) {
+                const formData = new FormData();
+                formData.append('title', title);
+                formData.append('category', category);
+                formData.append('surfaceType', surfaceType);
+                formData.append('spec', spec);
+                formData.append('blurb', blurb);
+                if (imageUrl) formData.append('imageUrl', imageUrl);
+                formData.append('productImage', fileInput.files[0]);
+
+                res = await fetch(`/api/admin/products/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'x-admin-passcode': currentPasscode
+                    },
+                    body: formData
+                });
+            } else {
+                res = await fetch(`/api/admin/products/${id}`, {
+                    method: 'PUT',
+                    headers: getAdminHeaders(),
+                    body: JSON.stringify({
+                        title,
+                        category,
+                        surfaceType,
+                        spec,
+                        blurb,
+                        imageUrl
+                    })
+                });
+            }
 
             const data = await res.json();
 
@@ -524,24 +563,50 @@ document.addEventListener('DOMContentLoaded', function () {
         const surfaceType = document.getElementById('prodSurface').value.trim() || 'Canvas Art';
         const spec = document.getElementById('prodSpec').value.trim() || 'Custom Spec';
         const blurb = document.getElementById('prodBlurb').value.trim();
-        const imageUrl = document.getElementById('prodImgUrl').value.trim() || 'showcase images/canvas.png';
+        const imageUrl = document.getElementById('prodImgUrl').value.trim();
+        const fileInput = document.getElementById('prodImgFile');
 
         if (!title) return;
 
+        const saveBtn = document.getElementById('saveProdBtn');
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Publishing...';
+
         try {
-            const res = await fetch('/api/admin/products', {
-                method: 'POST',
-                headers: getAdminHeaders(),
-                body: JSON.stringify({
-                    title,
-                    category,
-                    surfaceType,
-                    spec,
-                    blurb,
-                    imageUrl,
-                    readyToShip: true
-                })
-            });
+            let res;
+            if (fileInput && fileInput.files.length > 0) {
+                const formData = new FormData();
+                formData.append('title', title);
+                formData.append('category', category);
+                formData.append('surfaceType', surfaceType);
+                formData.append('spec', spec);
+                formData.append('blurb', blurb);
+                if (imageUrl) formData.append('imageUrl', imageUrl);
+                formData.append('readyToShip', 'true');
+                formData.append('productImage', fileInput.files[0]);
+
+                res = await fetch('/api/admin/products', {
+                    method: 'POST',
+                    headers: {
+                        'x-admin-passcode': currentPasscode
+                    },
+                    body: formData
+                });
+            } else {
+                res = await fetch('/api/admin/products', {
+                    method: 'POST',
+                    headers: getAdminHeaders(),
+                    body: JSON.stringify({
+                        title,
+                        category,
+                        surfaceType,
+                        spec,
+                        blurb,
+                        imageUrl: imageUrl || 'showcase images/canvas.png',
+                        readyToShip: true
+                    })
+                });
+            }
 
             const data = await res.json();
 
@@ -554,6 +619,10 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         } catch (err) {
             console.error('Error adding product:', err);
+            alert('Error publishing artwork.');
+        } finally {
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'Publish Artwork';
         }
     });
 

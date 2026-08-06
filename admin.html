@@ -195,11 +195,16 @@
                         </div>
 
                         <div class="admin-form-group">
-                            <label>Image URL (or select file)</label>
+                            <label>Upload Image File</label>
+                            <input type="file" id="prodImgFile" accept="image/jpeg,image/png,image/webp">
+                        </div>
+
+                        <div class="admin-form-group">
+                            <label>Or Image URL / Path</label>
                             <input type="text" id="prodImgUrl" placeholder="showcase images/canvas.png">
                         </div>
 
-                        <div class="admin-form-group" style="justify-content: flex-end;">
+                        <div class="admin-form-group" style="grid-column: span 2; justify-content: flex-end;">
                             <button type="submit" class="auth-btn" id="saveProdBtn">Publish Artwork</button>
                         </div>
                     </div>
@@ -326,8 +331,13 @@
                             placeholder="Describe materials, paint colors, sealant..."></textarea>
                     </div>
 
-                    <div class="admin-form-group" style="grid-column: span 2;">
-                        <label>Image URL (or path)</label>
+                    <div class="admin-form-group">
+                        <label>Upload New Image File</label>
+                        <input type="file" id="editProdImgFile" accept="image/jpeg,image/png,image/webp">
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label>Or Image URL / Path</label>
                         <input type="text" id="editProdImgUrl" placeholder="showcase images/canvas.png">
                     </div>
                 </div>

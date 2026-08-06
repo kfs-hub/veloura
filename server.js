@@ -54,6 +54,39 @@ const upload = multer({
     }
 });
 
+// Configure Showcase Images directory for artwork catalog
+const showcaseDir = process.env.VERCEL ? path.join('/tmp', 'showcase images') : path.join(__dirname, 'showcase images');
+if (!fs.existsSync(showcaseDir)) {
+    fs.mkdirSync(showcaseDir, { recursive: true });
+}
+
+// Multer Storage Configuration for Showcase Images
+const showcaseStorage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, showcaseDir);
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const ext = path.extname(file.originalname);
+        const safeName = path.basename(file.originalname, ext).toLowerCase().replace(/[^a-z0-9_-]/g, '_');
+        cb(null, safeName + '-' + uniqueSuffix + ext);
+    }
+});
+
+const uploadShowcase = multer({
+    storage: showcaseStorage,
+    limits: { fileSize: 10 * 1024 * 1024 }, // 10MB per file limit
+    fileFilter: function (req, file, cb) {
+        const allowedTypes = /jpeg|jpg|png|webp/;
+        const mimeValid = allowedTypes.test(file.mimetype);
+        const extValid = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+        if (mimeValid && extValid) {
+            return cb(null, true);
+        }
+        cb(new Error('Only image files (JPG, PNG, WEBP) under 10MB are allowed!'));
+    }
+});
+
 // Admin Passkey Verification Middleware
 function verifyAdmin(req, res, next) {
     const passcode = req.headers['x-admin-passcode'] || req.query.passcode;
@@ -231,7 +264,7 @@ app.put('/api/admin/commissions/:id/status', verifyAdmin, async (req, res) => {
 });
 
 // Add New Product Showcase Item (Admin)
-app.post('/api/admin/products', verifyAdmin, upload.single('productImage'), async (req, res) => {
+app.post('/api/admin/products', verifyAdmin, uploadShowcase.single('productImage'), async (req, res) => {
     try {
         const { title, category, categoryLabel, blurb, spec, surfaceType, palette, imageUrl, readyToShip } = req.body;
 
@@ -241,7 +274,7 @@ app.post('/api/admin/products', verifyAdmin, upload.single('productImage'), asyn
 
         let finalImgUrl = imageUrl || 'showcase images/canvas.png';
         if (req.file) {
-            finalImgUrl = `/uploads/${req.file.filename}`;
+            finalImgUrl = `showcase images/${req.file.filename}`;
         }
 
         const product = await db.addProduct({
@@ -261,14 +294,14 @@ app.post('/api/admin/products', verifyAdmin, upload.single('productImage'), asyn
 });
 
 // Update Existing Product Showcase Item (Admin)
-app.put('/api/admin/products/:id', verifyAdmin, upload.single('productImage'), async (req, res) => {
+app.put('/api/admin/products/:id', verifyAdmin, uploadShowcase.single('productImage'), async (req, res) => {
     try {
         const { id } = req.params;
         const { title, category, categoryLabel, blurb, spec, surfaceType, palette, imageUrl, readyToShip } = req.body;
 
         let finalImgUrl = imageUrl || undefined;
         if (req.file) {
-            finalImgUrl = `/uploads/${req.file.filename}`;
+            finalImgUrl = `showcase images/${req.file.filename}`;
         }
 
         const updated = await db.updateProduct(id, {
