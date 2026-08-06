@@ -8,6 +8,7 @@ const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
 const multer = require('multer');
+const { put } = require('@vercel/blob');
 require('dotenv').config();
 
 const db = require('./db');
@@ -16,6 +17,26 @@ const { sendCommissionConfirmation } = require('./services/email');
 const app = express();
 const PORT = process.env.PORT || 5500;
 const ADMIN_PASSCODE = process.env.ADMIN_PASSCODE || 'veloura2026';
+
+// Helper to upload showcase image to Vercel Blob (if configured) or Base64 fallback
+async function uploadImageToBlobOrBase64(file) {
+    if (!file) return null;
+    try {
+        if (process.env.BLOB_READ_WRITE_TOKEN) {
+            const ext = path.extname(file.originalname) || '.png';
+            const safeName = path.basename(file.originalname, ext).toLowerCase().replace(/[^a-z0-9_-]/g, '_');
+            const blob = await put(`showcase/${safeName}-${Date.now()}${ext}`, file.buffer, {
+                access: 'public'
+            });
+            return blob.url;
+        }
+    } catch (err) {
+        console.warn('Vercel Blob upload warning, falling back to Base64 Data URI:', err.message);
+    }
+    const mime = file.mimetype || 'image/png';
+    const base64 = file.buffer.toString('base64');
+    return `data:${mime};base64,${base64}`;
+}
 
 // Enable CORS & JSON parsing
 app.use(cors());
@@ -262,9 +283,8 @@ app.post('/api/admin/products', verifyAdmin, uploadShowcase.single('productImage
 
         let finalImgUrl = imageUrl || 'showcase images/canvas.png';
         if (req.file) {
-            const mime = req.file.mimetype || 'image/png';
-            const base64 = req.file.buffer.toString('base64');
-            finalImgUrl = `data:${mime};base64,${base64}`;
+            const uploadedUrl = await uploadImageToBlobOrBase64(req.file);
+            if (uploadedUrl) finalImgUrl = uploadedUrl;
         }
 
         const product = await db.addProduct({
@@ -291,9 +311,8 @@ app.put('/api/admin/products/:id', verifyAdmin, uploadShowcase.single('productIm
 
         let finalImgUrl = imageUrl || undefined;
         if (req.file) {
-            const mime = req.file.mimetype || 'image/png';
-            const base64 = req.file.buffer.toString('base64');
-            finalImgUrl = `data:${mime};base64,${base64}`;
+            const uploadedUrl = await uploadImageToBlobOrBase64(req.file);
+            if (uploadedUrl) finalImgUrl = uploadedUrl;
         }
 
         const updated = await db.updateProduct(id, {
