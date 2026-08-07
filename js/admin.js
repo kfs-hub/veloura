@@ -121,9 +121,15 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Toast notification for new orders
-    function showToast(message) {
+    function showToast(message, type = 'info') {
         const existing = document.getElementById('adminToast');
         if (existing) existing.remove();
+
+        const toastIcons = {
+            success: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg>',
+            delete: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"/></svg>',
+            info: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.5 21c1-4.5 3.5-9.5 3.5-13a4 4 0 0 0-8 0c0 1 .3 2 .8 3"/><path d="M13 8a4 4 0 0 1 4 4c0 3-2 6-3 9"/></svg>'
+        };
 
         const toast = document.createElement('div');
         toast.id = 'adminToast';
@@ -135,8 +141,9 @@ document.addEventListener('DOMContentLoaded', function () {
             border-left: 4px solid #C5A059;
             box-shadow: 0 8px 24px rgba(0,0,0,0.2);
             animation: slideInToast 0.3s ease;
+            display: flex; align-items: center; gap: 10px;
         `;
-        toast.textContent = message;
+        toast.innerHTML = `<span style="color:#C5A059; display:flex; flex-shrink:0;">${toastIcons[type] || toastIcons.info}</span><span>${escapeHtml(message)}</span>`;
 
         // Add animation
         if (!document.getElementById('toastStyle')) {
@@ -172,7 +179,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Notify if new commissions arrived during auto-poll
                 if (silent && newTotal > lastKnownTotal && lastKnownTotal > 0) {
                     const diff = newTotal - lastKnownTotal;
-                    showToast(`✨ ${diff} new commission${diff > 1 ? 's' : ''} received!`);
+                    showToast(`${diff} new commission${diff > 1 ? 's' : ''} received!`, 'success');
                 }
                 lastKnownTotal = newTotal;
 
@@ -333,7 +340,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 const zoomBadge = document.createElement('span');
                 zoomBadge.className = 'thumb-zoom-icon';
-                zoomBadge.innerHTML = '🔍 Zoom';
+                zoomBadge.innerHTML = '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px; margin-right:3px;" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.35-4.35"/></svg>Zoom';
 
                 wrap.appendChild(img);
                 wrap.appendChild(zoomBadge);
@@ -415,7 +422,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const card = document.createElement('div');
             card.className = 'admin-prod-card';
             const imgCount = (p.imageUrls && p.imageUrls.length > 0) ? p.imageUrls.length : (p.imageUrl ? 1 : 0);
-            const badgeHtml = imgCount > 1 ? `<span class="img-count-badge">📷 ${imgCount} Photos</span>` : '';
+            const badgeHtml = imgCount > 1 ? `<span class="img-count-badge"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px; margin-right:3px;" aria-hidden="true"><path d="M4 8h3l1.5-2h7L17 8h3v11H4z"/><circle cx="12" cy="13" r="3"/></svg>${imgCount} Photos</span>` : '';
 
             card.innerHTML = `
                 <div class="admin-prod-img-wrap">
@@ -427,7 +434,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     <div class="admin-prod-spec">${escapeHtml(p.surfaceType)} • ${escapeHtml(p.spec)}</div>
                     <p style="font-size:0.85rem; color: var(--text-secondary); margin-bottom: 16px;">${escapeHtml(p.blurb)}</p>
                     <div class="admin-prod-actions">
-                        <button class="btn-edit-prod" data-id="${p.id}">✏️ Edit</button>
+                        <button class="btn-edit-prod" data-id="${p.id}"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-right:4px;" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Edit</button>
                         <button class="btn-delete-prod" data-id="${p.id}">Delete Artwork</button>
                     </div>
                 </div>
@@ -462,7 +469,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         });
                         const data = await res.json();
                         if (data.success) {
-                            showToast('🗑️ Artwork removed from showcase.');
+                            showToast('Artwork removed from showcase.', 'delete');
                             loadProducts();
                         }
                     } catch (err) {
@@ -671,7 +678,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (res.ok && data.success) {
                 closeEditModal();
-                showToast('✨ Artwork updated successfully!');
+                showToast('Artwork updated successfully!', 'success');
                 loadProducts(); // refresh the grid
             } else {
                 alert(data.message || `Error updating product (Status ${res.status}).`);
@@ -781,7 +788,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 addProductForm.reset();
                 selectedAddFiles = [];
                 renderAddFilePreviews();
-                showToast('✨ New artwork published to showcase!');
+                showToast('New artwork published to showcase!', 'success');
                 loadProducts();
             } else {
                 alert(data.message || `Error adding product (Status ${res.status}).`);

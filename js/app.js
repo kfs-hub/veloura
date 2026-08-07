@@ -123,7 +123,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         <div class="art-card-side-thumbs">${sideThumbsHtml}</div>
                         <div class="carousel-dots">${dotsHtml}</div>
                         <span class="surface-badge">${escapeHtml(p.surfaceType)}</span>
-                        <span class="multi-photo-tag">📷 ${images.length} Photos</span>
+                        <span class="multi-photo-tag"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px; margin-right:3px;" aria-hidden="true"><path d="M4 8h3l1.5-2h7L17 8h3v11H4z"/><circle cx="12" cy="13" r="3"/></svg>${images.length} Photos</span>
                     </div>
                 `;
             } else {

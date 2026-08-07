@@ -201,7 +201,7 @@ document.addEventListener('DOMContentLoaded', function () {
         uploadedFiles.forEach((file, index) => {
             const chip = document.createElement('span');
             chip.className = 'file-chip';
-            chip.innerHTML = `🖼️ ${file.name.substring(0, 16)}... <span style="cursor:pointer; margin-left:6px;" data-index="${index}">&times;</span>`;
+            chip.innerHTML = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px; margin-right:3px;" aria-hidden="true"><rect x="3" y="4" width="18" height="14" rx="1.5"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M3 15l5-5 4 4 3-3 6 6"/></svg>${file.name.substring(0, 16)}... <span style="cursor:pointer; margin-left:6px;" data-index="${index}">&times;</span>`;
             filePreviewList.appendChild(chip);
         });
 
@@ -281,7 +281,7 @@ document.addEventListener('DOMContentLoaded', function () {
             console.log('[Commission] Response body:', result);
 
             if (response.ok && result.success && result.commission) {
-                // ✅ Success — show ref ID from PostgreSQL
+                // Success — show ref ID from PostgreSQL
                 refId.textContent = result.commission.refId;
                 modalEmail.textContent = result.commission.clientEmail;
                 modalIg.textContent = result.commission.clientIg || 'Not provided';
@@ -289,11 +289,11 @@ document.addEventListener('DOMContentLoaded', function () {
             } else {
                 // Server error (e.g. PostgreSQL offline)
                 console.error('[Commission] Server error:', result.message);
-                alert('⚠️ Submission failed: ' + (result.message || 'Database unavailable. Ensure PostgreSQL service is running.'));
+                alert('Submission failed: ' + (result.message || 'Database unavailable. Ensure PostgreSQL service is running.'));
             }
         } catch (err) {
             console.error('[Commission] Network/fetch error:', err);
-            alert('⚠️ Network Error: Could not connect to the server at http://localhost:5500.');
+            alert('Network Error: Could not connect to the server at http://localhost:5500.');
         } finally {
             if (submitBtn) {
                 submitBtn.disabled = false;
