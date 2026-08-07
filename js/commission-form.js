@@ -302,15 +302,46 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    form.addEventListener('submit', handleFormSubmit);
+    // "Review My Order" — validate required fields then scroll to the summary card
+    const proceedBtn = document.getElementById('proceedToSummary');
+    if (proceedBtn) {
+        proceedBtn.addEventListener('click', function () {
+            const nameInput = document.getElementById('clientName');
+            const emailInput = document.getElementById('clientEmail');
 
-    const submitBtnEl = document.getElementById('submitCommission');
-    if (submitBtnEl) {
-        submitBtnEl.addEventListener('click', function (e) {
+            // Highlight missing required fields using native validation
             if (form.checkValidity && !form.checkValidity()) {
                 form.reportValidity();
                 return;
             }
+
+            // Extra JS guard in case browser validation is bypassed
+            if (!nameInput?.value.trim()) {
+                nameInput?.focus();
+                return;
+            }
+            if (!emailInput?.value.trim()) {
+                emailInput?.focus();
+                return;
+            }
+
+            // Scroll to the summary card
+            const summaryCard = document.getElementById('summarySideCard');
+            if (summaryCard) {
+                summaryCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+                // Briefly pulse the card to draw the user's eye
+                summaryCard.classList.add('summary-highlight');
+                setTimeout(() => summaryCard.classList.remove('summary-highlight'), 1200);
+            }
+        });
+    }
+
+    // Submit button lives in the summary card (outside the <form> tag),
+    // so we drive submission via a direct click handler.
+    const submitBtnEl = document.getElementById('submitCommission');
+    if (submitBtnEl) {
+        submitBtnEl.addEventListener('click', function (e) {
             handleFormSubmit(e);
         });
     }

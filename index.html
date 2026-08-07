@@ -463,17 +463,18 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-gold btn-block btn-lg" id="submitCommission">
-                        <span>Submit Commission Request</span>
+                    <button type="button" class="btn btn-gold-outline btn-block btn-lg" id="proceedToSummary">
+                        <span>Review My Order</span>
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <polyline points="20 6 9 17 4 12"></polyline>
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M5 12h14"></path>
+                            <path d="m12 5 7 7-7 7"></path>
                         </svg>
                     </button>
                 </form>
 
                 <!-- Live Summary Preview Card -->
-                <div class="commission-summary-card">
+                <div class="commission-summary-card" id="summarySideCard">
                     <div class="summary-header">
                         <span class="summary-badge">Live Quote Estimator</span>
                         <h3>Order Summary Proof</h3>
@@ -509,6 +510,14 @@
                             <span class="price-note">Final quote confirmed after vision review. No payment charged
                                 today.</span>
                         </div>
+
+                        <button type="button" class="btn btn-gold btn-block btn-lg" id="submitCommission">
+                            <span>Submit Commission Request</span>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                        </button>
                     </div>
 
                     <div class="studio-guarantee">
