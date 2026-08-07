@@ -103,6 +103,13 @@ document.addEventListener('DOMContentLoaded', function () {
             'Large (16x16 in / Large Box)': '$250 – $380',
             'Statement (24x24 in+)': '$480 – $750',
             'Custom Dimensions': 'Quote on Request'
+        },
+        'MDF Board': {
+            'Small (6x6 in / 12 oz)': '$70 – $100',
+            'Medium (10x10 in / 16 oz)': '$130 – $175',
+            'Large (16x16 in / Large Box)': '$220 – $290',
+            'Statement (24x24 in+)': '$400 – $560',
+            'Custom Dimensions': 'Quote on Request'
         }
     };
 

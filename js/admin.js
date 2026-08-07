@@ -10,6 +10,17 @@ document.addEventListener('DOMContentLoaded', function () {
     let pollTimer = null;
     let lastKnownTotal = 0;
 
+    // Human-readable labels for each showcase category value.
+    // Keep this in sync with the <option> values in #prodCategory / #editProdCategory
+    // and the data-filter buttons on the public homepage gallery.
+    const CATEGORY_LABELS = {
+        canvas: 'Canvases & Wall Art',
+        drinkware: 'Mugs & Drinkware',
+        boxes: 'Keepsake Boxes & Decor',
+        mdf: 'MDF Boards & Decor',
+        custom: 'Custom Items'
+    };
+
     const PASSCODE_KEY = 'veloura_admin_passcode';
     let currentPasscode = sessionStorage.getItem(PASSCODE_KEY) || '';
     let commissionsData = [];
@@ -630,6 +641,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const formData = new FormData();
             formData.append('title', title);
             formData.append('category', category);
+            formData.append('categoryLabel', CATEGORY_LABELS[category] || category);
             formData.append('surfaceType', surfaceType);
             formData.append('spec', spec);
             formData.append('blurb', blurb);
@@ -737,6 +749,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const formData = new FormData();
             formData.append('title', title);
             formData.append('category', category);
+            formData.append('categoryLabel', CATEGORY_LABELS[category] || category);
             formData.append('surfaceType', surfaceType);
             formData.append('spec', spec);
             formData.append('blurb', blurb);
