@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 imageAreaHtml = `
                     <div class="art-card-image carousel-container">
-                        <img src="${escapeHtml(images[0])}" alt="Hand-painted dot mandala ${escapeHtml(p.surfaceType)}" class="art-img carousel-img" style="cursor: pointer;" title="Click to view full screen">
+                        <img src="${escapeHtml(images[0])}" alt="Hand-painted dot mandala ${escapeHtml(p.surfaceType)}" class="art-img carousel-img" style="cursor: pointer;" title="Click to view full screen" loading="lazy">
                         <button class="carousel-nav prev-btn" aria-label="Previous image">&lsaquo;</button>
                         <button class="carousel-nav next-btn" aria-label="Next image">&rsaquo;</button>
                         <div class="art-card-side-thumbs">${sideThumbsHtml}</div>
@@ -129,7 +129,7 @@ document.addEventListener('DOMContentLoaded', function () {
             } else {
                 imageAreaHtml = `
                     <div class="art-card-image">
-                        <img src="${escapeHtml(images[0])}" alt="Hand-painted dot mandala ${escapeHtml(p.surfaceType)}" class="art-img" style="cursor: pointer;" title="Click to view full screen">
+                        <img src="${escapeHtml(images[0])}" alt="Hand-painted dot mandala ${escapeHtml(p.surfaceType)}" class="art-img" style="cursor: pointer;" title="Click to view full screen" loading="lazy">
                         <span class="surface-badge">${escapeHtml(p.surfaceType)}</span>
                     </div>
                 `;
@@ -200,6 +200,39 @@ document.addEventListener('DOMContentLoaded', function () {
                         updateCarousel(parseInt(t.getAttribute('data-index'), 10));
                     });
                 });
+
+                // Touch swipe support (mobile) - swipe left/right on the image to change photos
+                const carouselContainer = card.querySelector('.carousel-container');
+                let touchStartX = 0;
+                let touchStartY = 0;
+                let touchMoved = false;
+
+                carouselContainer.addEventListener('touchstart', (e) => {
+                    touchStartX = e.touches[0].clientX;
+                    touchStartY = e.touches[0].clientY;
+                    touchMoved = false;
+                }, { passive: true });
+
+                carouselContainer.addEventListener('touchmove', () => {
+                    touchMoved = true;
+                }, { passive: true });
+
+                carouselContainer.addEventListener('touchend', (e) => {
+                    if (!touchMoved) return;
+                    const touchEndX = e.changedTouches[0].clientX;
+                    const touchEndY = e.changedTouches[0].clientY;
+                    const deltaX = touchEndX - touchStartX;
+                    const deltaY = touchEndY - touchStartY;
+
+                    // Only treat as a swipe if horizontal movement dominates (avoid hijacking page scroll)
+                    if (Math.abs(deltaX) > 40 && Math.abs(deltaX) > Math.abs(deltaY) * 1.5) {
+                        if (deltaX < 0) {
+                            updateCarousel(currentIndex + 1);
+                        } else {
+                            updateCarousel(currentIndex - 1);
+                        }
+                    }
+                }, { passive: true });
             }
 
             showcaseGrid.appendChild(card);

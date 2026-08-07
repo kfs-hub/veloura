@@ -680,6 +680,8 @@ section {
     .mobile-toggle {
         display: flex;
         z-index: 1002;
+        padding: 12px;
+        margin: -12px;
     }
 
     .mobile-toggle.active span:nth-child(1) {

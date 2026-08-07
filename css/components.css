@@ -1316,6 +1316,48 @@ textarea.form-control {
         height: 220px;
     }
 
+    /* Photo slides: on mobile, ditch the small side-thumb strip in favor of
+       swipe gestures + larger tap-friendly dots and nav arrows. */
+    .art-card-side-thumbs {
+        display: none;
+    }
+
+    .carousel-nav {
+        width: 40px;
+        height: 40px;
+        font-size: 1.4rem;
+        opacity: 0.95;
+    }
+
+    .carousel-nav.prev-btn {
+        left: 10px;
+    }
+
+    .carousel-nav.next-btn {
+        right: 10px;
+    }
+
+    .carousel-dots {
+        bottom: 14px;
+        gap: 10px;
+    }
+
+    .carousel-dot {
+        width: 9px;
+        height: 9px;
+        position: relative;
+    }
+
+    /* Invisible overlay widens the tap target without enlarging the visible dot */
+    .carousel-dot::after {
+        content: '';
+        position: absolute;
+        top: -9px;
+        left: -9px;
+        right: -9px;
+        bottom: -9px;
+    }
+
     .steps-grid {
         grid-template-columns: 1fr;
         gap: 16px;
@@ -1357,6 +1399,15 @@ textarea.form-control {
         overflow-y: auto;
         border-radius: var(--radius-md);
     }
+
+    /* Keep the lightbox close button on-screen and easy to tap on small viewports */
+    .lightbox-close {
+        top: 8px;
+        right: 8px;
+        width: 44px;
+        height: 44px;
+        background: rgba(10, 10, 12, 0.75);
+    }
 }
 
 @media (max-width: 480px) {
@@ -1369,17 +1420,35 @@ textarea.form-control {
     }
 
     .form-control {
-        padding: 10px 12px;
-        font-size: 0.9rem;
+        padding: 12px 12px;
+        /* iOS Safari auto-zooms the page when a focused input's font is under 16px */
+        font-size: 16px;
+    }
+
+    .filter-btn {
+        padding: 10px 16px;
+        font-size: 0.82rem;
     }
 
     .surface-radio-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
+        grid-template-columns: 1fr;
+        gap: 10px;
     }
 
     .surface-radio-box {
         padding: 10px 8px;
+    }
+
+    .surface-radio-card .card-content {
+        flex-direction: row;
+        justify-content: flex-start;
+        text-align: left;
+        gap: 14px;
+        padding: 14px 16px;
+    }
+
+    .surface-radio-card .card-icon {
+        margin-bottom: 0;
     }
 
     .surface-radio-box span {
