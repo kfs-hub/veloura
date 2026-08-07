@@ -1136,18 +1136,25 @@ textarea.form-control {
 
 .ig-grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(260px, 420px));
+    grid-template-columns: repeat(2, minmax(180px, 320px));
     justify-content: center;
     gap: 24px;
 }
 
 .ig-card {
     position: relative;
-    height: 260px;
+    aspect-ratio: 9 / 16;
+    height: auto;
     border-radius: var(--radius-md);
     overflow: hidden;
     display: block;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.4s ease;
+}
+
+.ig-card:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
 }
 
 .ig-image {
@@ -1157,35 +1164,63 @@ textarea.form-control {
     object-position: center;
     display: block;
     background: #FAF8F5;
-    transition: transform 0.5s ease;
+    /* always blurred to indicate it's a reel */
+    filter: blur(3px) brightness(0.75);
+    transform: scale(1.06); /* avoids blur edge bleed */
+    transition: filter 0.4s ease, transform 0.4s ease;
 }
 
+.ig-card:hover .ig-image {
+    filter: blur(5px) brightness(0.6);
+    transform: scale(1.1);
+}
+
+/* persistent overlay with instagram logo */
 .ig-overlay {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(250, 248, 245, 0.88);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    color: var(--gold-dark);
-    font-weight: 700;
-    opacity: 0;
-    transform: translateY(8px);
-    transition: opacity var(--transition-smooth), transform var(--transition-smooth);
+    gap: 14px;
+    transition: background 0.4s ease;
 }
 
-.ig-card:hover .ig-overlay {
+.ig-overlay .ig-logo {
+    width: 52px;
+    height: 52px;
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.4));
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), filter 0.4s ease;
+}
+
+.ig-card:hover .ig-overlay .ig-logo {
+    transform: scale(1.12);
+    filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.5));
+}
+
+.ig-overlay .ig-reel-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.92);
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+.ig-card:hover .ig-overlay .ig-reel-label {
     opacity: 1;
     transform: translateY(0);
 }
 
-.ig-card:hover .ig-image {
-    transform: scale(1.08);
+.ig-card:hover .ig-overlay {
+    background: rgba(0, 0, 0, 0.15);
 }
 
 /* Footer */
@@ -1428,10 +1463,16 @@ textarea.form-control {
         justify-content: flex-start;
         overflow-x: auto;
         flex-wrap: nowrap;
-        padding-bottom: 12px;
+        padding: 4px 16px 16px 16px;
+        margin-left: -16px;
+        margin-right: -16px;
+        width: calc(100% + 32px);
         margin-bottom: 28px;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
+        gap: 10px;
+        /* prevent scale(1.02) on hover from clipping at edges */
+        overflow-y: visible;
     }
 
     .filter-bar::-webkit-scrollbar {
@@ -1440,8 +1481,10 @@ textarea.form-control {
 
     .filter-btn {
         flex-shrink: 0;
-        padding: 8px 18px;
-        font-size: 0.85rem;
+        padding: 7px 14px;
+        font-size: 0.78rem;
+        white-space: nowrap;
+        transform-origin: center bottom;
     }
 
     .showcase-grid {
@@ -1526,7 +1569,7 @@ textarea.form-control {
     }
 
     .ig-card {
-        height: 180px;
+        height: auto;
     }
 
     .modal-dialog {
@@ -1563,8 +1606,9 @@ textarea.form-control {
     }
 
     .filter-btn {
-        padding: 10px 16px;
-        font-size: 0.82rem;
+        padding: 7px 13px;
+        font-size: 0.76rem;
+        white-space: nowrap;
     }
 
     .surface-radio-grid {
@@ -1605,10 +1649,11 @@ textarea.form-control {
     }
 
     .ig-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, minmax(120px, 260px));
+        justify-content: center;
     }
 
     .ig-card {
-        height: 200px;
+        height: auto;
     }
 }

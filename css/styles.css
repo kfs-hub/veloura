@@ -770,9 +770,10 @@ section {
     }
 
     .btn-hero-outline {
-        width: 100%;
+        width: auto;
         justify-content: center;
-        padding: 14px 20px;
+        padding: 10px 22px;
+        font-size: 0.72rem;
     }
 
     .hero-scroll-cue {
