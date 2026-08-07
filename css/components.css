@@ -1539,8 +1539,30 @@ textarea.form-control {
     }
 
     .steps-grid {
-        grid-template-columns: 1fr;
-        gap: 16px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .step-card {
+        padding: 18px 14px;
+    }
+
+    .step-number {
+        font-size: 1.5rem;
+    }
+
+    .step-icon {
+        width: 34px;
+        height: 34px;
+    }
+
+    .step-title {
+        font-size: 0.88rem;
+    }
+
+    .step-text {
+        font-size: 0.78rem;
+        line-height: 1.5;
     }
 
     .commission-form {
