@@ -190,6 +190,24 @@
     position: relative;
 }
 
+.carousel-track {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    /* transform is set inline per-card in JS (live drag tracking + eased snap) */
+}
+
+.carousel-slide {
+    flex: 0 0 100%;
+    width: 100%;
+    height: 100%;
+}
+
+.carousel-slide .art-img {
+    width: 100%;
+    height: 100%;
+}
+
 .carousel-nav {
     position: absolute;
     top: 50%;
@@ -1121,15 +1139,7 @@ textarea.form-control {
     color: var(--gold-dark);
 }
 
-.footer-social-links {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    align-items: flex-start;
-}
-
-.footer-ig-btn,
-.footer-email-btn {
+.footer-ig-btn {
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -1139,13 +1149,9 @@ textarea.form-control {
     border-radius: var(--radius-sm);
     color: var(--gold-dark);
     font-weight: 700;
-    font-size: 0.88rem;
-    transition: all 0.2s ease;
-    text-decoration: none;
 }
 
-.footer-ig-btn:hover,
-.footer-email-btn:hover {
+.footer-ig-btn:hover {
     background: var(--gold-primary);
     color: #FFF;
 }
