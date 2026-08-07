@@ -115,15 +115,21 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 const dotsHtml = images.map((_, idx) => `<span class="carousel-dot ${idx === 0 ? 'active' : ''}" data-index="${idx}"></span>`).join('');
 
+                const slidesHtml = images.map((url, idx) => `
+                    <div class="carousel-slide">
+                        <img src="${escapeHtml(url)}" alt="Hand-painted dot mandala ${escapeHtml(p.surfaceType)}" class="art-img carousel-img" style="cursor: pointer;" title="Click to view full screen" loading="lazy" data-index="${idx}">
+                    </div>
+                `).join('');
+
                 imageAreaHtml = `
                     <div class="art-card-image carousel-container">
-                        <img src="${escapeHtml(images[0])}" alt="Hand-painted dot mandala ${escapeHtml(p.surfaceType)}" class="art-img carousel-img" style="cursor: pointer;" title="Click to view full screen" loading="lazy">
+                        <div class="carousel-track">${slidesHtml}</div>
                         <button class="carousel-nav prev-btn" aria-label="Previous image">&lsaquo;</button>
                         <button class="carousel-nav next-btn" aria-label="Next image">&rsaquo;</button>
                         <div class="art-card-side-thumbs">${sideThumbsHtml}</div>
                         <div class="carousel-dots">${dotsHtml}</div>
                         <span class="surface-badge">${escapeHtml(p.surfaceType)}</span>
-                        <span class="multi-photo-tag"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px; margin-right:3px;" aria-hidden="true"><path d="M4 8h3l1.5-2h7L17 8h3v11H4z"/><circle cx="12" cy="13" r="3"/></svg>${images.length} Photos</span>
+                        <span class="multi-photo-tag">📷 ${images.length} Photos</span>
                     </div>
                 `;
             } else {
@@ -149,29 +155,42 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
             `;
 
-            // Lightbox handler for clicking main photo
-            const mainImg = card.querySelector('.art-img');
-            if (mainImg) {
-                mainImg.addEventListener('click', () => {
-                    const currentSrc = mainImg.src;
-                    openLightbox(currentSrc, `${p.title} (${p.surfaceType})`);
+            // Lightbox handler for clicking any photo (single image or any slide in the carousel).
+            // suppressClick guards against a swipe/drag also firing a click that would pop the lightbox open.
+            let suppressClick = false;
+            const allImgs = card.querySelectorAll('.art-img');
+            allImgs.forEach(imgNode => {
+                imgNode.addEventListener('click', () => {
+                    if (suppressClick) return;
+                    openLightbox(imgNode.src, `${p.title} (${p.surfaceType})`);
                 });
-            }
+            });
 
             if (hasMultiple) {
                 let currentIndex = 0;
-                const imgEl = card.querySelector('.carousel-img');
+                const track = card.querySelector('.carousel-track');
                 const prevBtn = card.querySelector('.prev-btn');
                 const nextBtn = card.querySelector('.next-btn');
                 const dots = card.querySelectorAll('.carousel-dot');
                 const sideThumbs = card.querySelectorAll('.side-thumb-btn');
+                const slideCount = images.length;
+
+                function setTrack(percent, animate) {
+                    track.style.transition = animate ? 'transform 0.38s cubic-bezier(0.22, 1, 0.36, 1)' : 'none';
+                    track.style.transform = `translateX(${percent}%)`;
+                }
 
                 function updateCarousel(newIdx) {
-                    currentIndex = (newIdx + images.length) % images.length;
-                    imgEl.src = images[currentIndex];
+                    currentIndex = Math.max(0, Math.min(slideCount - 1, newIdx));
+                    setTrack(-currentIndex * 100, true);
                     dots.forEach((d, i) => d.classList.toggle('active', i === currentIndex));
                     sideThumbs.forEach((t, i) => t.classList.toggle('active', i === currentIndex));
+                    if (prevBtn) prevBtn.style.opacity = currentIndex === 0 ? '0' : '';
+                    if (nextBtn) nextBtn.style.opacity = currentIndex === slideCount - 1 ? '0' : '';
+                    if (prevBtn) prevBtn.style.pointerEvents = currentIndex === 0 ? 'none' : '';
+                    if (nextBtn) nextBtn.style.pointerEvents = currentIndex === slideCount - 1 ? 'none' : '';
                 }
+                updateCarousel(0);
 
                 if (prevBtn) {
                     prevBtn.addEventListener('click', (e) => {
@@ -201,37 +220,55 @@ document.addEventListener('DOMContentLoaded', function () {
                     });
                 });
 
-                // Touch swipe support (mobile) - swipe left/right on the image to change photos
+                // Touch swipe support (mobile): the track follows the finger in real time while
+                // dragging, then eases into place on release — like a native photo slider, not a snap-cut.
                 const carouselContainer = card.querySelector('.carousel-container');
                 let touchStartX = 0;
                 let touchStartY = 0;
-                let touchMoved = false;
+                let isDragging = false;
+                let containerWidth = 1;
 
                 carouselContainer.addEventListener('touchstart', (e) => {
                     touchStartX = e.touches[0].clientX;
                     touchStartY = e.touches[0].clientY;
-                    touchMoved = false;
+                    isDragging = false;
+                    containerWidth = carouselContainer.offsetWidth || 1;
                 }, { passive: true });
 
-                carouselContainer.addEventListener('touchmove', () => {
-                    touchMoved = true;
+                carouselContainer.addEventListener('touchmove', (e) => {
+                    const dx = e.touches[0].clientX - touchStartX;
+                    const dy = e.touches[0].clientY - touchStartY;
+
+                    if (!isDragging) {
+                        // Only claim the gesture once horizontal intent is clear, so vertical page scroll still works
+                        if (Math.abs(dx) < 8 || Math.abs(dx) < Math.abs(dy)) return;
+                        isDragging = true;
+                        suppressClick = true;
+                    }
+
+                    let dragPercent = (dx / containerWidth) * 100;
+                    // Rubber-band resistance at the first/last photo so it doesn't slide off into empty space
+                    const atStart = currentIndex === 0 && dragPercent > 0;
+                    const atEnd = currentIndex === slideCount - 1 && dragPercent < 0;
+                    if (atStart || atEnd) dragPercent *= 0.35;
+
+                    setTrack(-currentIndex * 100 + dragPercent, false);
                 }, { passive: true });
 
                 carouselContainer.addEventListener('touchend', (e) => {
-                    if (!touchMoved) return;
-                    const touchEndX = e.changedTouches[0].clientX;
-                    const touchEndY = e.changedTouches[0].clientY;
-                    const deltaX = touchEndX - touchStartX;
-                    const deltaY = touchEndY - touchStartY;
+                    if (!isDragging) return;
+                    const dx = e.changedTouches[0].clientX - touchStartX;
+                    const dragPercent = (dx / containerWidth) * 100;
 
-                    // Only treat as a swipe if horizontal movement dominates (avoid hijacking page scroll)
-                    if (Math.abs(deltaX) > 40 && Math.abs(deltaX) > Math.abs(deltaY) * 1.5) {
-                        if (deltaX < 0) {
-                            updateCarousel(currentIndex + 1);
-                        } else {
-                            updateCarousel(currentIndex - 1);
-                        }
+                    if (Math.abs(dragPercent) > 16) {
+                        updateCarousel(dragPercent < 0 ? currentIndex + 1 : currentIndex - 1);
+                    } else {
+                        setTrack(-currentIndex * 100, true);
                     }
+
+                    isDragging = false;
+                    // Let the click event that follows touchend fire and see suppressClick=true, then clear it
+                    setTimeout(() => { suppressClick = false; }, 50);
                 }, { passive: true });
             }
 
@@ -424,28 +461,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 btn.style.transform = '';
             });
         });
-    }
-
-    // ======================================================================
-    // Dynamic Footer Email Link (Gmail Web on Desktop, mailto: on Phone Screens)
-    // ======================================================================
-    const footerEmailBtn = document.querySelector('.footer-email-btn');
-    if (footerEmailBtn) {
-        const updateEmailHref = () => {
-            const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth <= 768;
-            if (isMobile) {
-                footerEmailBtn.href = 'mailto:velouradots@gmail.com';
-                footerEmailBtn.removeAttribute('target');
-                footerEmailBtn.removeAttribute('rel');
-            } else {
-                footerEmailBtn.href = 'https://mail.google.com/mail/?view=cm&fs=1&to=velouradots@gmail.com';
-                footerEmailBtn.target = '_blank';
-                footerEmailBtn.rel = 'noopener';
-            }
-        };
-
-        updateEmailHref();
-        window.addEventListener('resize', updateEmailHref);
     }
 
 });
