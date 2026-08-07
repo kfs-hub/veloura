@@ -426,4 +426,26 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // ======================================================================
+    // Dynamic Footer Email Link (Gmail Web on Desktop, mailto: on Phone Screens)
+    // ======================================================================
+    const footerEmailBtn = document.querySelector('.footer-email-btn');
+    if (footerEmailBtn) {
+        const updateEmailHref = () => {
+            const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || window.innerWidth <= 768;
+            if (isMobile) {
+                footerEmailBtn.href = 'mailto:velouradots@gmail.com';
+                footerEmailBtn.removeAttribute('target');
+                footerEmailBtn.removeAttribute('rel');
+            } else {
+                footerEmailBtn.href = 'https://mail.google.com/mail/?view=cm&fs=1&to=velouradots@gmail.com';
+                footerEmailBtn.target = '_blank';
+                footerEmailBtn.rel = 'noopener';
+            }
+        };
+
+        updateEmailHref();
+        window.addEventListener('resize', updateEmailHref);
+    }
+
 });
