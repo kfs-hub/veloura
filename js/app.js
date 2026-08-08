@@ -379,6 +379,11 @@ document.addEventListener('DOMContentLoaded', function () {
     window.addEventListener('scroll', () => {
         if (window.scrollY > 40) {
             header.classList.add('scrolled');
+            // Close mobile drawer when scrolling into the floating pill state
+            if (navMenu && mobileToggle) {
+                navMenu.classList.remove('active');
+                mobileToggle.classList.remove('active');
+            }
         } else {
             header.classList.remove('scrolled');
         }

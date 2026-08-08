@@ -202,18 +202,17 @@ p {
     z-index: 1000;
     padding: 24px 0;
     background: transparent;
-    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: padding 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                background 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .site-header.scrolled {
-    padding: 14px 0;
-    background: rgba(255, 255, 255, 0.92);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 16px 0;
+    background: transparent;
 }
 
+/* Header inner container: full-width flex row in the hero, becomes a
+   centered, shrink-to-fit group once scrolled (logo badge + pill nav) */
 .header-container {
     display: flex;
     align-items: center;
@@ -221,6 +220,10 @@ p {
     max-width: 1280px;
     margin: 0 auto;
     padding: 0 48px;
+    gap: 14px;
+    transition: max-width 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                padding 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                justify-content 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Left Brand Logo & Name */
@@ -229,6 +232,11 @@ p {
     align-items: center;
     gap: 12px;
     text-decoration: none;
+    transition: background 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                border 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                border-radius 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                padding 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .brand-logo-icon {
@@ -237,7 +245,10 @@ p {
     border-radius: 50%;
     object-fit: cover;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-    transition: transform var(--transition-fast);
+    transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                height 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.3s ease;
 }
 
 .brand-logo-left:hover .brand-logo-icon {
@@ -251,19 +262,25 @@ p {
     letter-spacing: 0.08em;
     color: #FFFFFF;
     line-height: 1;
-    transition: color var(--transition-fast);
     text-transform: lowercase;
+    white-space: nowrap;
+    transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                margin 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                color 0.3s ease;
 }
 
-.site-header.scrolled .brand-name-text {
-    color: #111111;
-}
-
-/* Right Aligned Navigation Menu */
+/* Navigation Menu */
 .nav-menu {
     display: flex;
     align-items: center;
     gap: 40px;
+    transition: gap 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                background 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                border 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                border-radius 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                padding 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .nav-link {
@@ -276,11 +293,14 @@ p {
     padding: 6px 0;
     white-space: nowrap;
     text-decoration: none;
-    transition: color var(--transition-fast);
-}
-
-.site-header.scrolled .nav-link {
-    color: #1A1A1E;
+    transition: color 0.3s ease,
+                background 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                border 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                border-radius 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                padding 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                font-size 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                letter-spacing 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                text-transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .nav-link:hover {
@@ -311,6 +331,7 @@ p {
     flex-direction: column;
     gap: 5px;
     padding: 6px;
+    transition: all 0.3s ease;
 }
 
 .mobile-toggle span {
@@ -320,8 +341,85 @@ p {
     transition: all 0.3s ease;
 }
 
-.site-header.scrolled .mobile-toggle span {
-    background: #111111;
+/* ==========================================================================
+   Scrolled state (desktop only) — morphs into the Vorta-style floating
+   navbar: a bordered circular logo badge + a segmented pill of individually
+   outlined nav-link capsules, centered and shrunk to fit. The hero-section
+   look above stays completely untouched; mobile keeps its existing drawer.
+   ========================================================================== */
+@media (min-width: 769px) {
+    .site-header.scrolled .header-container {
+        max-width: max-content;
+        padding: 0;
+        justify-content: center;
+    }
+
+    .site-header.scrolled .brand-logo-left {
+        background: rgba(255, 255, 255, 0.75);
+        border: 2px solid var(--gold-primary);
+        border-radius: 50%;
+        padding: 0;
+        gap: 0;
+        box-shadow: 0 4px 16px rgba(197, 160, 89, 0.25);
+        width: 46px;
+        height: 46px;
+        min-width: 46px;
+        min-height: 46px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+    }
+
+    .site-header.scrolled .brand-logo-icon {
+        width: 32px;
+        height: 32px;
+        box-shadow: none;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+
+    .site-header.scrolled .brand-name-text {
+        width: 0;
+        opacity: 0;
+        margin: 0;
+        overflow: hidden;
+    }
+
+    .site-header.scrolled .nav-menu {
+        gap: 4px;
+        background: rgba(255, 255, 255, 0.75);
+        border: 2px solid var(--gold-primary);
+        border-radius: 999px;
+        padding: 6px;
+        box-shadow: 0 6px 20px rgba(197, 160, 89, 0.2);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+    }
+
+    .site-header.scrolled .nav-link {
+        color: var(--text-primary);
+        background: rgba(255, 255, 255, 0.6);
+        border: 1.5px solid var(--gold-primary);
+        border-radius: 999px;
+        padding: 9px 18px;
+        font-size: 0.76rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+    }
+
+    .site-header.scrolled .nav-link::after {
+        display: none;
+    }
+
+    .site-header.scrolled .nav-link:hover {
+        background: var(--gold-primary);
+        color: #FFFFFF;
+        border-color: var(--gold-primary);
+    }
 }
 
 /* Hero Section */
@@ -700,13 +798,129 @@ section {
 
 @media (max-width: 768px) {
     .header-container {
-        padding: 0 20px;
+        padding: 0 16px;
     }
 
     .brand-name-text {
         font-size: 1.25rem;
     }
 
+    /* ── Scrolled state on mobile: same floating pill design as desktop ── */
+    .site-header.scrolled {
+        background: transparent;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        box-shadow: none;
+        border-bottom: none;
+    }
+
+    /* Collapse the container to center-aligned, same as desktop */
+    .site-header.scrolled .header-container {
+        max-width: max-content;
+        margin: 0 auto;
+        padding: 0 16px;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    /* Logo circle */
+    .site-header.scrolled .brand-logo-left {
+        background: rgba(255, 255, 255, 0.75);
+        border: 2px solid var(--gold-primary);
+        border-radius: 50%;
+        padding: 0;
+        gap: 0;
+        width: 42px;
+        height: 42px;
+        min-width: 42px;
+        min-height: 42px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        box-shadow: 0 4px 16px rgba(197, 160, 89, 0.25);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+    }
+
+    .site-header.scrolled .brand-logo-icon {
+        width: 28px;
+        height: 28px;
+        box-shadow: none;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+
+    /* Hide brand text */
+    .site-header.scrolled .brand-name-text {
+        width: 0;
+        opacity: 0;
+        margin: 0;
+        overflow: hidden;
+        pointer-events: none;
+    }
+
+    /* Hide hamburger — nav is inline in scrolled state */
+    .site-header.scrolled .mobile-toggle {
+        display: none;
+    }
+
+    /* Nav pill — horizontally scrollable so all 4 items fit */
+    .site-header.scrolled .nav-menu {
+        position: static;
+        right: auto;
+        width: auto;
+        max-width: calc(100vw - 80px);
+        height: auto;
+        background: rgba(255, 255, 255, 0.75);
+        border: 2px solid var(--gold-primary);
+        border-radius: 999px;
+        padding: 5px;
+        gap: 3px;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: center;
+        box-shadow: 0 6px 20px rgba(197, 160, 89, 0.2);
+        overflow-x: auto;
+        overflow-y: visible;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        transition: none;
+        /* reset the drawer transition */
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+    }
+
+    .site-header.scrolled .nav-menu::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* Pill nav links — same capsule style as desktop */
+    .site-header.scrolled .nav-link {
+        color: var(--text-primary);
+        background: rgba(255, 255, 255, 0.6);
+        border: 1.5px solid var(--gold-primary);
+        border-radius: 999px;
+        padding: 7px 13px;
+        font-size: 0.68rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        width: auto;
+        flex-shrink: 0;
+    }
+
+    .site-header.scrolled .nav-link::after {
+        display: none;
+    }
+
+    .site-header.scrolled .nav-link:hover {
+        background: var(--gold-primary);
+        color: #FFFFFF;
+        border-color: var(--gold-primary);
+    }
+
+    /* ── Default (not scrolled) mobile styles ── */
     .nav-menu {
         position: fixed;
         top: 0;
@@ -725,7 +939,7 @@ section {
         padding: 40px 32px;
         transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         border-left: 1px solid var(--border-gold);
-        box-shadow: -10px 0 30px rgba(0, 0, 0, 0.15);
+        box-shadow: -10px 0 30px rgba(197, 160, 89, 0.15);
         z-index: 1001;
     }
 
