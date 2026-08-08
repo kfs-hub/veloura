@@ -3,6 +3,23 @@
    Buttons, Showcase Grid, Commission Builder, Light Cards, Modal, Toasts
    ========================================================================== */
 
+/* UI Components - Ensure consistent body font usage */
+button,
+input,
+select,
+textarea,
+.btn,
+.form-control,
+.form-label {
+    font-family: var(--font-body);
+}
+
+.nav-link {
+    font-family: var(--font-body);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+}
+
 /* Buttons */
 .btn {
     display: inline-flex;
@@ -598,7 +615,7 @@
 .step-number {
     font-family: var(--font-heading);
     font-size: 2.2rem;
-    font-weight: 800;
+    font-weight: 700;
     color: rgba(197, 160, 89, 0.4);
     line-height: 1;
 }
@@ -768,6 +785,7 @@ textarea.form-control {
     font-size: 0.82rem;
     font-weight: 700;
     color: var(--text-primary);
+    letter-spacing: 0.02em;
 }
 
 .card-sub {
@@ -1003,10 +1021,11 @@ textarea.form-control {
 .price-amount {
     font-family: var(--font-heading);
     font-size: 1.8rem;
-    font-weight: 800;
+    font-weight: 700;
     color: var(--gold-dark);
     display: block;
     margin: 4px 0;
+    letter-spacing: 0.01em;
 }
 
 .price-note {
