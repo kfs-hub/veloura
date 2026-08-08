@@ -374,8 +374,9 @@ document.addEventListener('DOMContentLoaded', function () {
     // Load showcase products on page load
     loadShowcaseProducts();
 
-    // Sticky Header Scroll Effect (AICM Floating Style)
+    // Sticky Header Scroll Effect — triggers when hero section leaves the viewport
     const header = document.getElementById('siteHeader');
+    const heroSection = document.getElementById('hero');
     const navLinks = document.querySelectorAll('.nav-link');
 
     function setScrolledState(scrolled) {
@@ -398,9 +399,21 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    window.addEventListener('scroll', () => {
-        setScrolledState(window.scrollY > 40);
-    }, { passive: true });
+    if (heroSection) {
+        const heroObserver = new IntersectionObserver((entries) => {
+            // hero is less than 50% visible = halfway scrolled out
+            setScrolledState(!entries[0].isIntersecting);
+        }, {
+            threshold: 0.7,
+            rootMargin: '0px 0px 0px 0px'
+        });
+        heroObserver.observe(heroSection);
+    } else {
+        // Fallback for pages without a hero section
+        window.addEventListener('scroll', () => {
+            setScrolledState(window.scrollY > 40);
+        }, { passive: true });
+    }
 
     // ======================================================================
     // Scroll Reveal Animations (IntersectionObserver)
