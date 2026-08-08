@@ -376,10 +376,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Sticky Header Scroll Effect (AICM Floating Style)
     const header = document.getElementById('siteHeader');
-    window.addEventListener('scroll', () => {
-        if (window.scrollY > 40) {
+    const navLinks = document.querySelectorAll('.nav-link');
+
+    function setScrolledState(scrolled) {
+        // Freeze nav-link transitions before the class swap to prevent block artifact
+        navLinks.forEach(l => l.classList.add('no-transition'));
+
+        if (scrolled) {
             header.classList.add('scrolled');
-            // Close mobile drawer when scrolling into the floating pill state
             if (navMenu && mobileToggle) {
                 navMenu.classList.remove('active');
                 mobileToggle.classList.remove('active');
@@ -387,7 +391,16 @@ document.addEventListener('DOMContentLoaded', function () {
         } else {
             header.classList.remove('scrolled');
         }
-    });
+
+        // Re-enable transitions on the next paint so hover still animates
+        requestAnimationFrame(() => {
+            navLinks.forEach(l => l.classList.remove('no-transition'));
+        });
+    }
+
+    window.addEventListener('scroll', () => {
+        setScrolledState(window.scrollY > 40);
+    }, { passive: true });
 
     // ======================================================================
     // Scroll Reveal Animations (IntersectionObserver)
