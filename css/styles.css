@@ -504,43 +504,6 @@ p {
     padding: 0 32px;
 }
 
-.hero-eyebrow {
-    font-size: 0.78rem;
-    font-weight: 600;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.85);
-    margin-bottom: 14px;
-}
-
-/* Hero Eyebrow Pill Badge */
-.hero-eyebrow-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 16px;
-    border-radius: 30px;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(197, 160, 89, 0.4);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    font-family: var(--font-body);
-    font-size: 0.72rem;
-    font-weight: 600;
-    letter-spacing: 0.18em;
-    color: #E2B666;
-    margin-bottom: 22px;
-    text-transform: uppercase;
-}
-
-.pill-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: #E2B666;
-    box-shadow: 0 0 8px #E2B666;
-}
-
 .hero-title {
     font-family: var(--font-heading);
     font-size: clamp(3rem, 5.2vw, 4.4rem);
@@ -569,27 +532,23 @@ p {
     color: rgba(255, 255, 255, 0.95);
 }
 
-.hero-bullets {
-    list-style: none;
-    padding: 0;
-    margin: 0 0 32px 0;
-}
-
-.hero-bullets li {
-    font-size: 1rem;
-    font-weight: 600;
+.hero-tagline {
+    font-size: 1.05rem;
+    font-weight: 500;
     font-style: italic;
     color: rgba(255, 255, 255, 0.92);
-    margin-bottom: 6px;
-    padding-left: 16px;
-    position: relative;
+    max-width: 560px;
+    line-height: 1.5;
+    margin: 0 0 36px 0;
 }
 
-.hero-bullets li::before {
-    content: '\2022\2009';
-    position: absolute;
-    left: 0;
-    color: var(--gold-primary);
+/* Centers the CTA independently of the left-aligned hero copy above it,
+   and keeps it clear of the floating scroll cue below. */
+.hero-cta {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 56px;
 }
 
 .btn-hero-outline {
@@ -785,29 +744,24 @@ section {
 }
 
 /* Hero content entrance animation */
-.hero-content .hero-eyebrow-pill,
 .hero-content .hero-title,
-.hero-content .hero-bullets,
-.hero-content .btn-hero-outline {
+.hero-content .hero-tagline,
+.hero-content .hero-cta {
     opacity: 0;
     transform: translateY(30px);
     animation: heroEntrance 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.hero-content .hero-eyebrow-pill {
+.hero-content .hero-title {
     animation-delay: 0.2s;
 }
 
-.hero-content .hero-title {
-    animation-delay: 0.35s;
+.hero-content .hero-tagline {
+    animation-delay: 0.4s;
 }
 
-.hero-content .hero-bullets {
-    animation-delay: 0.5s;
-}
-
-.hero-content .btn-hero-outline {
-    animation-delay: 0.65s;
+.hero-content .hero-cta {
+    animation-delay: 0.6s;
 }
 
 @keyframes heroEntrance {
@@ -1046,8 +1000,9 @@ section {
         margin-bottom: 18px;
     }
 
-    .hero-bullets li {
+    .hero-tagline {
         font-size: 0.92rem;
+        margin-bottom: 30px;
     }
 
     section {
@@ -1077,14 +1032,12 @@ section {
         font-size: 1.15rem;
     }
 
-    .hero-eyebrow-pill {
-        font-size: 0.65rem;
-        padding: 5px 12px;
-        margin-bottom: 16px;
-    }
-
     .hero-title {
         font-size: 1.85rem;
+    }
+
+    .hero-cta {
+        margin-bottom: 40px;
     }
 
     .btn-hero-outline {
