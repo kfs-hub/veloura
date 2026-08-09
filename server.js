@@ -300,11 +300,15 @@ app.put('/api/admin/products/:id', verifyAdmin, uploadShowcase.array('productIma
         const { title, category, categoryLabel, blurb, spec, surfaceType, surfaceSize, palette, budgetRange, timelineSelect, imageUrl, readyToShip, existingImageUrls } = req.body;
 
         // Parse existing image URLs that the admin chose to keep
+        // Strip any Base64 data URIs that may have been stored previously — they are
+        // too large for the database and should be replaced with proper Blob URLs.
         let keptUrls = [];
         if (existingImageUrls) {
             try {
-                keptUrls = JSON.parse(existingImageUrls);
-                if (!Array.isArray(keptUrls)) keptUrls = [];
+                const parsed = JSON.parse(existingImageUrls);
+                keptUrls = Array.isArray(parsed)
+                    ? parsed.filter(u => typeof u === 'string' && !u.startsWith('data:'))
+                    : [];
             } catch (e) { keptUrls = []; }
         }
 
@@ -320,8 +324,9 @@ app.put('/api/admin/products/:id', verifyAdmin, uploadShowcase.array('productIma
         // Merge: kept existing + newly uploaded
         const allImageUrls = [...keptUrls, ...newUploadedUrls];
 
-        // Primary image: first in the merged list, or imageUrl field, or leave unchanged
-        let finalImgUrl = allImageUrls[0] || imageUrl || undefined;
+        // Primary image: first in the merged list, or imageUrl field (only if it's a real URL, not Base64)
+        const safeImageUrl = (imageUrl && !imageUrl.startsWith('data:')) ? imageUrl : undefined;
+        let finalImgUrl = allImageUrls[0] || safeImageUrl || undefined;
 
         const updated = await db.updateProduct(id, {
             title, category, categoryLabel, blurb, spec, surfaceType, surfaceSize, palette,
