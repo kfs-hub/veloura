@@ -289,7 +289,7 @@ app.post('/api/admin/products', verifyAdmin, uploadShowcase.array('productImages
         });
     } catch (err) {
         console.error('Error adding product:', err);
-        res.status(500).json({ success: false, message: 'Failed to add product item.' });
+        res.status(500).json({ success: false, message: `Failed to add product item: ${err.message}` });
     }
 });
 
@@ -347,7 +347,7 @@ app.put('/api/admin/products/:id', verifyAdmin, uploadShowcase.array('productIma
         });
     } catch (err) {
         console.error('Error updating product:', err);
-        res.status(500).json({ success: false, message: 'Failed to update product item.' });
+        res.status(500).json({ success: false, message: `Failed to update product item: ${err.message}` });
     }
 });
 
