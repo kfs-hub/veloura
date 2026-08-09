@@ -27,7 +27,7 @@ async function uploadImageToBlobOrBase64(file, folder = 'showcase') {
         const safeName = path.basename(file.originalname, ext).toLowerCase().replace(/[^a-z0-9_-]/g, '_');
         const blobPath = `${folder}/${safeName}-${Date.now()}${ext}`;
         try {
-            const blob = await put(blobPath, file.buffer, { access: 'public' });
+            const blob = await put(blobPath, file.buffer, { access: 'private' });
             return blob.url;
         } catch (putErr) {
             throw new Error(`Image upload failed: ${putErr.message}`);
@@ -169,6 +169,33 @@ app.get('/api/commissions/:refId', async (req, res) => {
         res.json({ success: true, commission });
     } catch (err) {
         res.status(500).json({ success: false, message: 'Database error.' });
+    }
+});
+
+// Image proxy — serves private Vercel Blob images through the server
+// Usage: /api/image?url=https://...private.blob.vercel-storage.com/...
+const { head } = require('@vercel/blob');
+app.get('/api/image', async (req, res) => {
+    try {
+        const { url } = req.query;
+        if (!url || !url.includes('blob.vercel-storage.com')) {
+            return res.status(400).send('Invalid image URL');
+        }
+        const response = await fetch(url, {
+            headers: {
+                Authorization: `Bearer ${process.env.BLOB_READ_WRITE_TOKEN}`
+            }
+        });
+        if (!response.ok) {
+            return res.status(response.status).send('Image not found');
+        }
+        const contentType = response.headers.get('content-type') || 'image/jpeg';
+        res.setHeader('Content-Type', contentType);
+        res.setHeader('Cache-Control', 'public, max-age=86400');
+        const buffer = await response.arrayBuffer();
+        res.send(Buffer.from(buffer));
+    } catch (err) {
+        res.status(500).send('Error fetching image');
     }
 });
 

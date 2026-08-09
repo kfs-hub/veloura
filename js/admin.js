@@ -415,6 +415,14 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    function proxyImageUrl(url) {
+        if (!url) return url;
+        if (url.includes('private.blob.vercel-storage.com')) {
+            return `/api/image?url=${encodeURIComponent(url)}`;
+        }
+        return url;
+    }
+
     function renderProductsGrid() {
         productsGrid.innerHTML = '';
 
@@ -426,7 +434,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             card.innerHTML = `
                 <div class="admin-prod-img-wrap">
-                    <img src="${escapeHtml(p.imageUrl)}" class="admin-prod-img" alt="${escapeHtml(p.title)}" title="Click to expand image" style="cursor: pointer;">
+                    <img src="${escapeHtml(proxyImageUrl(p.imageUrl))}" class="admin-prod-img" alt="${escapeHtml(p.title)}" title="Click to expand image" style="cursor: pointer;">
                     ${badgeHtml}
                 </div>
                 <div class="admin-prod-body">

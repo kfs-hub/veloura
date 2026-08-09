@@ -129,6 +129,14 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    function proxyImageUrl(url) {
+        if (!url) return url;
+        if (url.includes('private.blob.vercel-storage.com')) {
+            return `/api/image?url=${encodeURIComponent(url)}`;
+        }
+        return url;
+    }
+
     function renderShowcaseCards(products) {
         showcaseGrid.innerHTML = '';
 
@@ -140,19 +148,20 @@ document.addEventListener('DOMContentLoaded', function () {
             const isCustom = p.category === 'custom';
             const buttonText = isCustom ? 'Commission Object &rarr;' : 'Order Similar &rarr;';
             const images = (p.imageUrls && p.imageUrls.length > 0) ? p.imageUrls : [p.imageUrl || 'showcase images/canvas.png'];
+            const proxiedImages = images.map(proxyImageUrl);
             const hasMultiple = images.length > 1;
 
             let imageAreaHtml = '';
             if (hasMultiple) {
-                const sideThumbsHtml = images.map((url, idx) => `
+                const sideThumbsHtml = proxiedImages.map((url, idx) => `
                     <button type="button" class="side-thumb-btn ${idx === 0 ? 'active' : ''}" data-index="${idx}" title="View photo ${idx + 1}">
                         <img src="${escapeHtml(url)}" alt="${escapeHtml(p.title)} photo ${idx + 1}" class="side-thumb-img" loading="lazy" decoding="async">
                     </button>
                 `).join('');
 
-                const dotsHtml = images.map((_, idx) => `<span class="carousel-dot ${idx === 0 ? 'active' : ''}" data-index="${idx}"></span>`).join('');
+                const dotsHtml = proxiedImages.map((_, idx) => `<span class="carousel-dot ${idx === 0 ? 'active' : ''}" data-index="${idx}"></span>`).join('');
 
-                const slidesHtml = images.map((url, idx) => `
+                const slidesHtml = proxiedImages.map((url, idx) => `
                     <div class="carousel-slide">
                         <img src="${escapeHtml(url)}" alt="Hand-painted dot mandala ${escapeHtml(p.surfaceType)}" class="art-img carousel-img" style="cursor: pointer;" title="Click to view full screen" loading="lazy" decoding="async" data-index="${idx}">
                     </div>
@@ -166,13 +175,13 @@ document.addEventListener('DOMContentLoaded', function () {
                         <div class="art-card-side-thumbs">${sideThumbsHtml}</div>
                         <div class="carousel-dots">${dotsHtml}</div>
                         <span class="surface-badge">${escapeHtml(p.surfaceType)}</span>
-                        <span class="multi-photo-tag">📷 ${images.length} Photos</span>
+                        <span class="multi-photo-tag">📷 ${proxiedImages.length} Photos</span>
                     </div>
                 `;
             } else {
                 imageAreaHtml = `
                     <div class="art-card-image">
-                        <img src="${escapeHtml(images[0])}" alt="Hand-painted dot mandala ${escapeHtml(p.surfaceType)}" class="art-img" style="cursor: pointer;" title="Click to view full screen" loading="lazy" decoding="async">
+                        <img src="${escapeHtml(proxiedImages[0])}" alt="Hand-painted dot mandala ${escapeHtml(p.surfaceType)}" class="art-img" style="cursor: pointer;" title="Click to view full screen" loading="lazy" decoding="async">
                         <span class="surface-badge">${escapeHtml(p.surfaceType)}</span>
                     </div>
                 `;
@@ -200,6 +209,10 @@ document.addEventListener('DOMContentLoaded', function () {
             let suppressClick = false;
             const allImgs = card.querySelectorAll('.art-img');
             allImgs.forEach(imgNode => {
+                imgNode.addEventListener('error', () => {
+                    imgNode.style.background = '#F3F0EA';
+                    imgNode.removeAttribute('src');
+                });
                 imgNode.addEventListener('click', () => {
                     if (suppressClick) return;
                     openLightbox(imgNode.src, `${p.title} (${p.surfaceType})`);
