@@ -452,7 +452,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const imgEl = card.querySelector('.admin-prod-img');
             if (imgEl) {
                 const captionText = (p.imageUrls && p.imageUrls.length > 1) ? `${p.title} (1 of ${p.imageUrls.length} photos)` : `${p.title} (${p.surfaceType})`;
-                imgEl.onclick = () => openLightbox(p.imageUrl, captionText);
+                imgEl.onclick = () => openLightbox(proxyImageUrl(p.imageUrl), captionText);
             }
 
             productsGrid.appendChild(card);
