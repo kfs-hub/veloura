@@ -432,9 +432,9 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // ======================================================================
-    // View More Artwork — show 3cards initially, reveal rest on click
+    // View More Artwork — show 6 cards on desktop / 3 on mobile, reveal rest on click
     // ======================================================================
-    const INITIAL_CARDS =6;
+    const INITIAL_CARDS = window.innerWidth <= 768 ? 3 : 6;
 
     function initViewMore() {
         const allCards = Array.from(showcaseGrid.querySelectorAll('.art-card'));
