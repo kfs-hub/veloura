@@ -319,6 +319,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const name = nameInput ? nameInput.value.trim() : '';
         const email = emailInput ? emailInput.value.trim() : '';
         const ig = document.getElementById('clientIg')?.value.trim() || '';
+        const phone = document.getElementById('clientPhone')?.value.trim() || '';
         const visionText = document.getElementById('visionText')?.value.trim() || '';
         const surfaceSize = document.getElementById('surfaceSize')?.value || '';
         const budgetRange = document.getElementById('budgetRange')?.value || '';
@@ -346,6 +347,7 @@ document.addEventListener('DOMContentLoaded', function () {
         formData.append('clientName', name);
         formData.append('clientEmail', email);
         formData.append('clientIg', ig);
+        formData.append('clientPhone', phone);
         formData.append('surfaceType', activeSurface);
         formData.append('surfaceSize', surfaceSize);
         formData.append('colorPalette', activePalette);

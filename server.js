@@ -91,7 +91,8 @@ app.post('/api/commissions', upload.array('referenceFiles', 5), async (req, res)
             timelineSelect,
             clientName,
             clientEmail,
-            clientIg
+            clientIg,
+            clientPhone
         } = req.body;
 
         if (!clientName || !clientEmail) {
@@ -122,6 +123,7 @@ app.post('/api/commissions', upload.array('referenceFiles', 5), async (req, res)
             clientName,
             clientEmail,
             clientIg,
+            clientPhone,
             uploadedFiles
         });
 

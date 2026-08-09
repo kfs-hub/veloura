@@ -43,6 +43,7 @@ async function initTables(client) {
             client_name     TEXT NOT NULL,
             client_email    TEXT NOT NULL,
             client_ig       TEXT,
+            client_phone    TEXT,
             uploaded_files  JSONB DEFAULT '[]'::jsonb,
             created_at      TIMESTAMPTZ DEFAULT NOW(),
             updated_at      TIMESTAMPTZ
@@ -70,6 +71,7 @@ async function initTables(client) {
         ALTER TABLE products ADD COLUMN IF NOT EXISTS timeline_select TEXT;
         CREATE INDEX IF NOT EXISTS idx_commissions_ref_id ON commissions (ref_id);
         CREATE INDEX IF NOT EXISTS idx_commissions_status ON commissions (status);
+        ALTER TABLE commissions ADD COLUMN IF NOT EXISTS client_phone TEXT;
         CREATE INDEX IF NOT EXISTS idx_products_category ON products (category);
     `);
 
@@ -144,6 +146,7 @@ function mapCommission(row) {
         clientName: row.client_name,
         clientEmail: row.client_email,
         clientIg: row.client_ig,
+        clientPhone: row.client_phone,
         uploadedFiles: typeof row.uploaded_files === 'string' ? JSON.parse(row.uploaded_files) : (row.uploaded_files || []),
         createdAt: row.created_at,
         updatedAt: row.updated_at
@@ -186,8 +189,8 @@ const db = {
         const result = await pool.query(
             `INSERT INTO commissions
              (id, ref_id, status, surface_type, surface_size, color_palette, vision_text,
-              budget_range, timeline_select, client_name, client_email, client_ig, uploaded_files, created_at)
-             VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,NOW())
+              budget_range, timeline_select, client_name, client_email, client_ig, client_phone, uploaded_files, created_at)
+             VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,NOW())
              RETURNING *`,
             [
                 id,
@@ -202,6 +205,7 @@ const db = {
                 data.clientName || 'Valued Collector',
                 data.clientEmail,
                 data.clientIg || '',
+                data.clientPhone || '',
                 JSON.stringify(data.uploadedFiles || [])
             ]
         );

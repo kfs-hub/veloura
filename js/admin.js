@@ -318,6 +318,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('detailClientName').textContent = item.clientName;
         document.getElementById('detailEmail').textContent = item.clientEmail;
         document.getElementById('detailIg').textContent = item.clientIg || 'Not provided';
+        document.getElementById('detailPhone').textContent = item.clientPhone || 'Not provided';
         document.getElementById('detailSurface').textContent = `${item.surfaceType} (${item.surfaceSize})`;
         document.getElementById('detailPalette').textContent = `${item.colorPalette} (${item.budgetRange})`;
         document.getElementById('detailVision').textContent = item.visionText || 'No custom vision text provided.';
