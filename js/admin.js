@@ -562,7 +562,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const item = document.createElement('div');
             item.className = 'img-thumb-item';
             item.innerHTML = `
-                <img src="${escapeHtml(url)}" class="img-thumb-img" alt="Existing ${index + 1}">
+                <img src="${escapeHtml(proxyImageUrl(url))}" class="img-thumb-img" alt="Existing ${index + 1}">
                 <button type="button" class="img-thumb-remove" title="Remove image">&times;</button>
             `;
             item.querySelector('.img-thumb-remove').onclick = function () {
