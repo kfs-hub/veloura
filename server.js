@@ -185,6 +185,10 @@ app.get('/api/products', async (req, res) => {
     try {
         const { category } = req.query;
         const products = await db.getAllProducts(category);
+        // Cache at the CDN edge for a minute, and allow slightly-stale responses
+        // to be served instantly while a fresh copy is fetched in the background —
+        // avoids hitting Postgres on every single storefront visit.
+        res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
         res.json({ success: true, count: products.length, products });
     } catch (err) {
         res.status(500).json({ success: false, message: 'Database error.' });

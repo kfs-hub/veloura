@@ -32,12 +32,49 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const showcaseGrid = document.getElementById('showcaseGrid');
 
+    // Show a lightweight skeleton grid immediately so the section doesn't feel
+    // frozen while /api/products resolves.
+    function renderShowcaseSkeleton(count = 6) {
+        if (!showcaseGrid) return;
+        showcaseGrid.innerHTML = Array.from({ length: count }).map(() => `
+            <div class="art-card skeleton-card" aria-hidden="true">
+                <div class="art-card-image skeleton-shimmer"></div>
+                <div class="art-card-body">
+                    <div class="skeleton-line skeleton-shimmer" style="width:40%;height:12px;"></div>
+                    <div class="skeleton-line skeleton-shimmer" style="width:75%;height:18px;margin-top:10px;"></div>
+                    <div class="skeleton-line skeleton-shimmer" style="width:95%;height:12px;margin-top:14px;"></div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // Warm up the connection to wherever product images are hosted (Vercel Blob)
+    // so the very first image requests skip DNS/TLS setup time.
+    function preconnectToImageHost(products) {
+        try {
+            const firstUrl = products.find(p => p.imageUrl && p.imageUrl.startsWith('http'))?.imageUrl;
+            if (!firstUrl) return;
+            const origin = new URL(firstUrl).origin;
+            if (document.querySelector(`link[rel="preconnect"][href="${origin}"]`)) return;
+            ['preconnect', 'dns-prefetch'].forEach(rel => {
+                const link = document.createElement('link');
+                link.rel = rel;
+                link.href = origin;
+                if (rel === 'preconnect') link.crossOrigin = 'anonymous';
+                document.head.appendChild(link);
+            });
+        } catch (e) { /* non-critical */ }
+    }
+
+    renderShowcaseSkeleton();
+
     async function loadShowcaseProducts() {
         try {
             const res = await fetch('/api/products');
             const data = await res.json();
 
             if (data.success && data.products.length > 0) {
+                preconnectToImageHost(data.products);
                 renderShowcaseCards(data.products);
             } else {
                 // Fallback: show a message if no products
@@ -109,7 +146,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (hasMultiple) {
                 const sideThumbsHtml = images.map((url, idx) => `
                     <button type="button" class="side-thumb-btn ${idx === 0 ? 'active' : ''}" data-index="${idx}" title="View photo ${idx + 1}">
-                        <img src="${escapeHtml(url)}" alt="${escapeHtml(p.title)} photo ${idx + 1}" class="side-thumb-img">
+                        <img src="${escapeHtml(url)}" alt="${escapeHtml(p.title)} photo ${idx + 1}" class="side-thumb-img" loading="lazy" decoding="async">
                     </button>
                 `).join('');
 
@@ -117,7 +154,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 const slidesHtml = images.map((url, idx) => `
                     <div class="carousel-slide">
-                        <img src="${escapeHtml(url)}" alt="Hand-painted dot mandala ${escapeHtml(p.surfaceType)}" class="art-img carousel-img" style="cursor: pointer;" title="Click to view full screen" loading="lazy" data-index="${idx}">
+                        <img src="${escapeHtml(url)}" alt="Hand-painted dot mandala ${escapeHtml(p.surfaceType)}" class="art-img carousel-img" style="cursor: pointer;" title="Click to view full screen" loading="lazy" decoding="async" data-index="${idx}">
                     </div>
                 `).join('');
 
@@ -135,7 +172,7 @@ document.addEventListener('DOMContentLoaded', function () {
             } else {
                 imageAreaHtml = `
                     <div class="art-card-image">
-                        <img src="${escapeHtml(images[0])}" alt="Hand-painted dot mandala ${escapeHtml(p.surfaceType)}" class="art-img" style="cursor: pointer;" title="Click to view full screen" loading="lazy">
+                        <img src="${escapeHtml(images[0])}" alt="Hand-painted dot mandala ${escapeHtml(p.surfaceType)}" class="art-img" style="cursor: pointer;" title="Click to view full screen" loading="lazy" decoding="async">
                         <span class="surface-badge">${escapeHtml(p.surfaceType)}</span>
                     </div>
                 `;

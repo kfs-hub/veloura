@@ -580,8 +580,10 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Client-side Image Compression Helper (Prevents Vercel 4.5MB payload limits)
-    function compressImageFile(file, maxWidth = 1600, maxHeight = 1600, quality = 0.85) {
+    // Client-side Image Compression Helper (Prevents Vercel 4.5MB payload limits,
+    // and keeps showcase images fast to load — cards render at ~350x260px, so
+    // there's no benefit to storing/serving 1600px originals for the grid).
+    function compressImageFile(file, maxWidth = 1200, maxHeight = 1200, quality = 0.78) {
         return new Promise((resolve) => {
             if (!file || !file.type.startsWith('image/') || file.size < 400 * 1024) {
                 return resolve(file);
