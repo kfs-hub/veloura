@@ -21,29 +21,25 @@ const ADMIN_PASSCODE = process.env.ADMIN_PASSCODE || 'veloura2026';
 // Helper to upload image to Vercel Blob (if configured) or Base64 fallback
 async function uploadImageToBlobOrBase64(file, folder = 'showcase') {
     if (!file) return null;
-    try {
-        if (process.env.BLOB_READ_WRITE_TOKEN) {
-            const ext = path.extname(file.originalname) || '.png';
-            const safeName = path.basename(file.originalname, ext).toLowerCase().replace(/[^a-z0-9_-]/g, '_');
-            const blobPath = `${folder}/${safeName}-${Date.now()}${ext}`;
-            let blob;
-            try {
-                blob = await put(blobPath, file.buffer, { access: 'public' });
-            } catch (putErr) {
-                if (putErr.message && putErr.message.includes('private store')) {
-                    blob = await put(blobPath, file.buffer, { access: 'private' });
-                } else {
-                    throw putErr;
-                }
-            }
+
+    if (process.env.BLOB_READ_WRITE_TOKEN) {
+        const ext = path.extname(file.originalname) || '.png';
+        const safeName = path.basename(file.originalname, ext).toLowerCase().replace(/[^a-z0-9_-]/g, '_');
+        const blobPath = `${folder}/${safeName}-${Date.now()}${ext}`;
+        try {
+            const blob = await put(blobPath, file.buffer, { access: 'public' });
             return blob.url;
+        } catch (putErr) {
+            if (putErr.message && putErr.message.includes('private store')) {
+                const blob = await put(blobPath, file.buffer, { access: 'private' });
+                return blob.url;
+            }
+            throw new Error(`Image upload failed: ${putErr.message}`);
         }
-    } catch (err) {
-        console.warn('Vercel Blob upload warning, falling back to Base64 Data URI:', err.message);
     }
-    const mime = file.mimetype || 'image/png';
-    const base64 = file.buffer.toString('base64');
-    return `data:${mime};base64,${base64}`;
+
+    // No Blob token at all — reject rather than store giant Base64 in the DB
+    throw new Error('No BLOB_READ_WRITE_TOKEN configured. Please set it in your environment variables.');
 }
 
 // Enable CORS & JSON parsing
