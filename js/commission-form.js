@@ -453,7 +453,7 @@ document.addEventListener('DOMContentLoaded', function () {
             ? surfaceOrOptions
             : { surface: surfaceOrOptions, palette: paletteArg };
 
-        const { surface, palette, size, budget, timeline } = options;
+        const { surface, palette, size, budget, timeline, blurb } = options;
 
         // Find matching surface card
         if (surface) {
@@ -489,12 +489,19 @@ document.addEventListener('DOMContentLoaded', function () {
             timelineSelect.classList.remove('field-invalid');
         }
 
+        // Autofill the vision/description field with the product blurb
+        const visionTextEl = document.getElementById('visionText');
+        if (blurb && visionTextEl) {
+            visionTextEl.value = blurb;
+            visionTextEl.classList.remove('field-invalid');
+        }
+
         updateSummary();
 
-        // Scroll to form
+        // Scroll to commission section, then after scroll completes highlight the form
         const section = document.getElementById('commission');
         if (section) {
-            section.scrollIntoView({ behavior: 'smooth' });
+            section.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
     };
 });

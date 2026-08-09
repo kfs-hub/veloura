@@ -189,7 +189,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         <button class="btn-link open-commission-item" data-surface="${escapeHtml(p.surfaceType)}"
                             data-palette="${escapeHtml(p.palette)}" data-size="${escapeHtml(p.surfaceSize)}"
                             data-budget="${escapeHtml(p.budgetRange)}"
-                            data-timeline="${escapeHtml(p.timelineSelect)}">${buttonText}</button>
+                            data-timeline="${escapeHtml(p.timelineSelect)}"
+                            data-blurb="${escapeHtml(p.blurb)}">${buttonText}</button>
                     </div>
                 </div>
             `;
@@ -381,9 +382,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 const size = this.getAttribute('data-size');
                 const budget = this.getAttribute('data-budget');
                 const timeline = this.getAttribute('data-timeline');
+                const blurb = this.getAttribute('data-blurb');
 
                 if (window.prefillCommissionForm) {
-                    window.prefillCommissionForm({ surface, palette, size, budget, timeline });
+                    window.prefillCommissionForm({ surface, palette, size, budget, timeline, blurb });
                 }
             });
         });
