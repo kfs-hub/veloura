@@ -336,6 +336,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Trigger stagger animation for the new cards
         triggerStaggerReveal();
+
+        // Hide cards beyond the initial 4 and set up the View More button
+        initViewMore();
     }
 
     // ======================================================================
@@ -425,6 +428,53 @@ document.addEventListener('DOMContentLoaded', function () {
                     card.style.transform = 'translateY(0)';
                 });
             });
+        });
+    }
+
+    // ======================================================================
+    // View More Artwork — show 3cards initially, reveal rest on click
+    // ======================================================================
+    const INITIAL_CARDS =6;
+
+    function initViewMore() {
+        const allCards = Array.from(showcaseGrid.querySelectorAll('.art-card'));
+        const viewMoreBtn = document.getElementById('showcaseViewMoreBtn');
+        const fadeOverlay = document.getElementById('showcaseFadeOverlay');
+        const moreWrap = document.getElementById('showcaseMoreWrap');
+
+        if (!viewMoreBtn || !fadeOverlay) return;
+
+        // If 4 or fewer cards, no need for the button at all
+        if (allCards.length <= INITIAL_CARDS) {
+            if (moreWrap) moreWrap.style.display = 'none';
+            return;
+        }
+
+        // Hide cards beyond the first 4
+        allCards.forEach((card, i) => {
+            if (i >= INITIAL_CARDS) card.classList.add('showcase-hidden');
+        });
+
+        // Show the fade + button
+        if (moreWrap) moreWrap.style.display = '';
+
+        viewMoreBtn.addEventListener('click', function () {
+            // Reveal all hidden cards with a stagger fade-in
+            const hidden = Array.from(showcaseGrid.querySelectorAll('.art-card.showcase-hidden'));
+            hidden.forEach((card, i) => {
+                card.classList.remove('showcase-hidden');
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(32px)';
+                card.style.transition = `opacity 0.6s cubic-bezier(0.16,1,0.3,1) ${i * 0.07}s, transform 0.6s cubic-bezier(0.16,1,0.3,1) ${i * 0.07}s`;
+                requestAnimationFrame(() => requestAnimationFrame(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }));
+            });
+
+            // Fade out the overlay and hide the button
+            fadeOverlay.classList.add('hidden');
+            viewMoreBtn.classList.add('hidden');
         });
     }
 

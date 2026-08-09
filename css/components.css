@@ -225,6 +225,52 @@ textarea,
     gap: 30px;
 }
 
+/* View More Artwork — fade + reveal wrapper */
+.showcase-more-wrap {
+    position: relative;
+    margin-top: -120px; /* overlap the grid so the fade sits on top of the last row */
+    padding-top: 120px;
+    text-align: center;
+    pointer-events: none; /* let clicks pass through to cards behind */
+}
+
+.showcase-fade-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 180px;
+    background: linear-gradient(to bottom,
+        rgba(250, 248, 245, 0) 0%,
+        rgba(250, 248, 245, 0.85) 55%,
+        rgba(250, 248, 245, 1) 100%);
+    pointer-events: none;
+    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.showcase-fade-overlay.hidden {
+    opacity: 0;
+}
+
+.showcase-view-more-btn {
+    position: relative;
+    pointer-events: all;
+    margin-top: 8px;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.showcase-view-more-btn.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(8px);
+}
+
+/* Hidden cards — collapsed before "View More" is clicked */
+.art-card.showcase-hidden {
+    display: none;
+}
+
+
 .art-card {
     background: var(--bg-card);
     border: 1px solid var(--border-subtle);
