@@ -30,10 +30,6 @@ async function uploadImageToBlobOrBase64(file, folder = 'showcase') {
             const blob = await put(blobPath, file.buffer, { access: 'public' });
             return blob.url;
         } catch (putErr) {
-            if (putErr.message && putErr.message.includes('private store')) {
-                const blob = await put(blobPath, file.buffer, { access: 'private' });
-                return blob.url;
-            }
             throw new Error(`Image upload failed: ${putErr.message}`);
         }
     }
