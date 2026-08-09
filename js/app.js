@@ -150,7 +150,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     <div class="art-card-footer">
                         <span class="art-spec">${escapeHtml(p.spec)}</span>
                         <button class="btn-link open-commission-item" data-surface="${escapeHtml(p.surfaceType)}"
-                            data-palette="${escapeHtml(p.palette)}">${buttonText}</button>
+                            data-palette="${escapeHtml(p.palette)}" data-size="${escapeHtml(p.surfaceSize)}"
+                            data-budget="${escapeHtml(p.budgetRange)}"
+                            data-timeline="${escapeHtml(p.timelineSelect)}">${buttonText}</button>
                     </div>
                 </div>
             `;
@@ -339,9 +341,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 e.preventDefault();
                 const surface = this.getAttribute('data-surface');
                 const palette = this.getAttribute('data-palette');
+                const size = this.getAttribute('data-size');
+                const budget = this.getAttribute('data-budget');
+                const timeline = this.getAttribute('data-timeline');
 
                 if (window.prefillCommissionForm) {
-                    window.prefillCommissionForm(surface, palette);
+                    window.prefillCommissionForm({ surface, palette, size, budget, timeline });
                 }
             });
         });

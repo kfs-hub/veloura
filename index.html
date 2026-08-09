@@ -208,10 +208,10 @@
 
                     <!-- Step 1: Surface Selection -->
                     <div class="form-group">
-                        <label class="form-label">1. Choose Surface / Item Category</label>
-                        <div class="surface-radio-grid">
-                            <label class="surface-radio-card active">
-                                <input type="radio" name="surfaceType" value="Canvas Art" checked>
+                        <label class="form-label">1. Choose Surface / Item Category <span class="required-asterisk">*</span></label>
+                        <div class="surface-radio-grid" id="surfaceRadioGrid">
+                            <label class="surface-radio-card">
+                                <input type="radio" name="surfaceType" value="Canvas Art" required>
                                 <div class="card-content">
                                     <div class="card-icon">
                                         <svg width="26" height="26" viewBox="0 0 24 24" fill="none"
@@ -228,7 +228,7 @@
                             </label>
 
                             <label class="surface-radio-card">
-                                <input type="radio" name="surfaceType" value="Ceramic Mug">
+                                <input type="radio" name="surfaceType" value="Ceramic Mug" required>
                                 <div class="card-content">
                                     <div class="card-icon">
                                         <svg width="26" height="26" viewBox="0 0 24 24" fill="none"
@@ -247,7 +247,7 @@
                             </label>
 
                             <label class="surface-radio-card">
-                                <input type="radio" name="surfaceType" value="Stainless Bottle">
+                                <input type="radio" name="surfaceType" value="Stainless Bottle" required>
                                 <div class="card-content">
                                     <div class="card-icon">
                                         <svg width="26" height="26" viewBox="0 0 24 24" fill="none"
@@ -265,7 +265,7 @@
                             </label>
 
                             <label class="surface-radio-card">
-                                <input type="radio" name="surfaceType" value="Wooden Box">
+                                <input type="radio" name="surfaceType" value="Wooden Box" required>
                                 <div class="card-content">
                                     <div class="card-icon">
                                         <svg width="26" height="26" viewBox="0 0 24 24" fill="none"
@@ -284,7 +284,7 @@
                             </label>
 
                             <label class="surface-radio-card">
-                                <input type="radio" name="surfaceType" value="MDF Board">
+                                <input type="radio" name="surfaceType" value="MDF Board" required>
                                 <div class="card-content">
                                     <div class="card-icon">
                                         <svg width="26" height="26" viewBox="0 0 24 24" fill="none"
@@ -301,7 +301,7 @@
                             </label>
 
                             <label class="surface-radio-card">
-                                <input type="radio" name="surfaceType" value="Custom Object">
+                                <input type="radio" name="surfaceType" value="Custom Object" required>
                                 <div class="card-content">
                                     <div class="card-icon">
                                         <svg width="26" height="26" viewBox="0 0 24 24" fill="none"
@@ -327,10 +327,11 @@
                     <!-- Step 2: Dimensions & Palette -->
                     <div class="form-row">
                         <div class="form-group half">
-                            <label class="form-label" for="surfaceSize">2. Surface Size / Dimensions</label>
-                            <select id="surfaceSize" class="form-control">
+                            <label class="form-label" for="surfaceSize">2. Surface Size / Dimensions <span class="required-asterisk">*</span></label>
+                            <select id="surfaceSize" class="form-control" required>
+                                <option value="" disabled selected>Select a size&hellip;</option>
                                 <option value="Small (6x6 in / 12 oz)">Small (6x6" Canvas / 12 oz Mug)</option>
-                                <option value="Medium (10x10 in / 16 oz)" selected>Medium (10x10" Canvas / 16 oz Mug /
+                                <option value="Medium (10x10 in / 16 oz)">Medium (10x10" Canvas / 16 oz Mug /
                                     750ml Bottle)</option>
                                 <option value="Large (16x16 in / Large Box)">Large (16x16" Canvas / Large Keepsake
                                     Chest)</option>
@@ -340,10 +341,10 @@
                         </div>
 
                         <div class="form-group half">
-                            <label class="form-label">3. Signature Color Palette</label>
-                            <div class="palette-picker">
-                                <label class="palette-option active" data-palette="Veloura Classic">
-                                    <input type="radio" name="colorPalette" value="Veloura Classic" checked>
+                            <label class="form-label">3. Signature Color Palette <span class="required-asterisk">*</span></label>
+                            <div class="palette-picker" id="palettePicker">
+                                <label class="palette-option" data-palette="Veloura Classic">
+                                    <input type="radio" name="colorPalette" value="Veloura Classic" required>
                                     <span class="palette-swatches">
                                         <span class="swatch" style="background: #C5A059;"></span>
                                         <span class="swatch" style="background: #B81D24;"></span>
@@ -354,7 +355,7 @@
                                 </label>
 
                                 <label class="palette-option" data-palette="Celestial Moonlight">
-                                    <input type="radio" name="colorPalette" value="Celestial Moonlight">
+                                    <input type="radio" name="colorPalette" value="Celestial Moonlight" required>
                                     <span class="palette-swatches">
                                         <span class="swatch" style="background: #E2E8F0;"></span>
                                         <span class="swatch" style="background: #3B82F6;"></span>
@@ -365,7 +366,7 @@
                                 </label>
 
                                 <label class="palette-option" data-palette="Emerald Sanctuary">
-                                    <input type="radio" name="colorPalette" value="Emerald Sanctuary">
+                                    <input type="radio" name="colorPalette" value="Emerald Sanctuary" required>
                                     <span class="palette-swatches">
                                         <span class="swatch" style="background: #D4AF37;"></span>
                                         <span class="swatch" style="background: #059669;"></span>
@@ -376,7 +377,7 @@
                                 </label>
 
                                 <label class="palette-option" data-palette="Custom Palette">
-                                    <input type="radio" name="colorPalette" value="Custom Palette">
+                                    <input type="radio" name="colorPalette" value="Custom Palette" required>
                                     <span class="palette-swatches">
                                         <span class="swatch rainbow"></span>
                                     </span>
@@ -416,10 +417,11 @@
                     <!-- Step 5: Budget & Timeline -->
                     <div class="form-row">
                         <div class="form-group half">
-                            <label class="form-label" for="budgetRange">6. Target Budget Range</label>
-                            <select id="budgetRange" class="form-control">
+                            <label class="form-label" for="budgetRange">6. Target Budget Range <span class="required-asterisk">*</span></label>
+                            <select id="budgetRange" class="form-control" required>
+                                <option value="" disabled selected>Select a budget range&hellip;</option>
                                 <option value="$75 - $150">$75 – $150 (Mugs / Coasters / Small Art)</option>
-                                <option value="$150 - $300" selected>$150 – $300 (Medium Canvases / Flasks / Boxes)
+                                <option value="$150 - $300">$150 – $300 (Medium Canvases / Flasks / Boxes)
                                 </option>
                                 <option value="$300 - $500">$300 – $500 (Large Statement Canvas / Complex Boxes)
                                 </option>
@@ -428,8 +430,9 @@
                         </div>
 
                         <div class="form-group half">
-                            <label class="form-label" for="timelineSelect">7. Delivery Timeline</label>
-                            <select id="timelineSelect" class="form-control">
+                            <label class="form-label" for="timelineSelect">7. Delivery Timeline <span class="required-asterisk">*</span></label>
+                            <select id="timelineSelect" class="form-control" required>
+                                <option value="" disabled selected>Select a timeline&hellip;</option>
                                 <option value="Standard 3-4 Weeks">Standard Creation (3–4 Weeks)</option>
                                 <option value="Express Gift 2 Weeks">Express Gift Priority (2 Weeks)</option>
                                 <option value="Flexible Schedule">Flexible / Future Date</option>
@@ -482,26 +485,26 @@
                     <div class="summary-details">
                         <div class="summary-row">
                             <span class="summary-label">Selected Surface:</span>
-                            <span class="summary-val" id="summarySurface">Canvas Art</span>
+                            <span class="summary-val" id="summarySurface">Not selected yet</span>
                         </div>
                         <div class="summary-row">
                             <span class="summary-label">Dimensions:</span>
-                            <span class="summary-val" id="summarySize">Medium (10x10")</span>
+                            <span class="summary-val" id="summarySize">Not selected yet</span>
                         </div>
                         <div class="summary-row">
                             <span class="summary-label">Palette Theme:</span>
-                            <span class="summary-val" id="summaryPalette">Veloura Classic</span>
+                            <span class="summary-val" id="summaryPalette">Not selected yet</span>
                         </div>
                         <div class="summary-row">
                             <span class="summary-label">Timeline:</span>
-                            <span class="summary-val" id="summaryTimeline">Standard 3-4 Weeks</span>
+                            <span class="summary-val" id="summaryTimeline">Not selected yet</span>
                         </div>
 
                         <div class="summary-divider"></div>
 
                         <div class="summary-price-box">
                             <span class="price-title">Estimated Investment</span>
-                            <span class="price-amount" id="estimatedPrice">$185 – $240</span>
+                            <span class="price-amount" id="estimatedPrice">Select required options above</span>
                             <span class="price-note">Final quote confirmed after vision review. No payment charged
                                 today.</span>
                         </div>

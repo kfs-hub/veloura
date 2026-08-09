@@ -723,6 +723,32 @@ textarea.form-control {
     resize: vertical;
 }
 
+/* Required Field Indicators & Validation Error States */
+.required-asterisk {
+    color: #C0392B;
+    font-weight: 700;
+    margin-left: 2px;
+}
+
+.form-control.field-invalid {
+    border-color: #C0392B !important;
+    box-shadow: 0 0 0 2px rgba(192, 57, 43, 0.12);
+}
+
+.surface-radio-grid.field-invalid .surface-radio-card .card-content,
+.palette-picker.field-invalid .palette-option {
+    border-color: #C0392B;
+    box-shadow: 0 0 0 2px rgba(192, 57, 43, 0.12);
+}
+
+.field-error-msg {
+    display: block;
+    color: #C0392B;
+    font-size: 0.78rem;
+    font-weight: 600;
+    margin-top: 8px;
+}
+
 /* Surface Radio Grid */
 .surface-radio-grid {
     display: grid;

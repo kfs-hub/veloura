@@ -55,13 +55,19 @@ async function initTables(client) {
             blurb          TEXT,
             spec           TEXT,
             surface_type   TEXT,
+            surface_size   TEXT,
             palette        TEXT,
+            budget_range   TEXT,
+            timeline_select TEXT,
             image_url      TEXT,
             image_urls     JSONB DEFAULT '[]'::jsonb,
             ready_to_ship  BOOLEAN DEFAULT true,
             created_at     TIMESTAMPTZ DEFAULT NOW()
         );
         ALTER TABLE products ADD COLUMN IF NOT EXISTS image_urls JSONB DEFAULT '[]'::jsonb;
+        ALTER TABLE products ADD COLUMN IF NOT EXISTS surface_size TEXT;
+        ALTER TABLE products ADD COLUMN IF NOT EXISTS budget_range TEXT;
+        ALTER TABLE products ADD COLUMN IF NOT EXISTS timeline_select TEXT;
         CREATE INDEX IF NOT EXISTS idx_commissions_ref_id ON commissions (ref_id);
         CREATE INDEX IF NOT EXISTS idx_commissions_status ON commissions (status);
         CREATE INDEX IF NOT EXISTS idx_products_category ON products (category);
@@ -71,20 +77,20 @@ async function initTables(client) {
     const countRes = await client.query('SELECT COUNT(*) FROM products');
     if (parseInt(countRes.rows[0].count, 10) === 0) {
         const seedProducts = [
-            { id: 'prod-1', title: 'Cosmic Sanctuary Mandala', category: 'canvas', categoryLabel: 'Canvases & Wall Art', blurb: 'Meditative focal points for modern spaces. Multi-layered acrylic dot mandalas painted on gallery-wrapped stretched canvas with liquid gold highlights.', spec: '12" x 12" Gallery Canvas', surfaceType: 'Canvas Art', palette: 'Veloura Classic', imageUrl: 'https://jehsldtdb400eyss.private.blob.vercel-storage.com/showcase/canvas.png', readyToShip: true },
-            { id: 'prod-2', title: 'Golden Solstice Coffee Mug', category: 'drinkware', categoryLabel: 'Mugs & Drinkware', blurb: 'Elevate your daily ritual. Custom hand-painted ceramic mugs featuring dense gold and ruby mandala dots, double-sealed with dishwasher-safe crystal gloss varnish.', spec: '15 oz Ceramic Drinkware', surfaceType: 'Ceramic Mug', palette: 'Veloura Classic', imageUrl: 'https://jehsldtdb400eyss.private.blob.vercel-storage.com/showcase/mug.png', readyToShip: true },
-            { id: 'prod-3', title: 'Ivory & Emerald Stainless Flask', category: 'drinkware', categoryLabel: 'Mugs & Drinkware', blurb: 'Tactile art on the go. Double-walled insulated stainless steel travel bottle adorned with high-precision vertical mandala dot columns.', spec: '750ml Vacuum Bottle', surfaceType: 'Stainless Bottle', palette: 'Emerald Sanctuary', imageUrl: 'https://jehsldtdb400eyss.private.blob.vercel-storage.com/showcase/flask.png', readyToShip: true },
-            { id: 'prod-4', title: 'Heirloom Jewelry Box', category: 'boxes', categoryLabel: 'Keepsake Boxes & Decor', blurb: "Treasured storage for life's sacred items. Hand-carved solid mahogany wooden box with a central multi-ring ruby and gold dot mandala lid design.", spec: '8" Wood Box with Velvet Lining', surfaceType: 'Wooden Box', palette: 'Veloura Classic', imageUrl: 'https://jehsldtdb400eyss.private.blob.vercel-storage.com/showcase/jewelry_box.jpeg', readyToShip: true },
-            { id: 'prod-5', title: 'Celestial Quartz Coaster Quad', category: 'boxes', categoryLabel: 'Keepsake Boxes & Decor', blurb: 'Functional table art. Set of 4 natural stone or acacia wood coasters painted with vibrant concentric metallic dot starbursts and heat-resistant resin topcoat.', spec: 'Set of 4 Stone/Wood Coasters', surfaceType: 'Coasters & Trays', palette: 'Celestial Moonlight', imageUrl: 'https://jehsldtdb400eyss.private.blob.vercel-storage.com/showcase/coasters.png', readyToShip: true },
-            { id: 'prod-6', title: 'Bespoke Client Objects', category: 'custom', categoryLabel: 'Custom Items', blurb: '"Have a specific object in mind? We can dot it." From acoustic guitars and leather journals to phone cases, candleholders, and keepsake decor.', spec: 'Client Provided Surface', surfaceType: 'Custom Object', palette: 'Custom Palette', imageUrl: 'https://jehsldtdb400eyss.private.blob.vercel-storage.com/showcase/custom_item.png', readyToShip: false }
+            { id: 'prod-1', title: 'Cosmic Sanctuary Mandala', category: 'canvas', categoryLabel: 'Canvases & Wall Art', blurb: 'Meditative focal points for modern spaces. Multi-layered acrylic dot mandalas painted on gallery-wrapped stretched canvas with liquid gold highlights.', spec: '12" x 12" Gallery Canvas', surfaceType: 'Canvas Art', surfaceSize: 'Medium (10x10 in / 16 oz)', palette: 'Veloura Classic', budgetRange: '$150 - $300', timelineSelect: 'Standard 3-4 Weeks', imageUrl: 'https://jehsldtdb400eyss.private.blob.vercel-storage.com/showcase/canvas.png', readyToShip: true },
+            { id: 'prod-2', title: 'Golden Solstice Coffee Mug', category: 'drinkware', categoryLabel: 'Mugs & Drinkware', blurb: 'Elevate your daily ritual. Custom hand-painted ceramic mugs featuring dense gold and ruby mandala dots, double-sealed with dishwasher-safe crystal gloss varnish.', spec: '15 oz Ceramic Drinkware', surfaceType: 'Ceramic Mug', surfaceSize: 'Small (6x6 in / 12 oz)', palette: 'Veloura Classic', budgetRange: '$75 - $150', timelineSelect: 'Standard 3-4 Weeks', imageUrl: 'https://jehsldtdb400eyss.private.blob.vercel-storage.com/showcase/mug.png', readyToShip: true },
+            { id: 'prod-3', title: 'Ivory & Emerald Stainless Flask', category: 'drinkware', categoryLabel: 'Mugs & Drinkware', blurb: 'Tactile art on the go. Double-walled insulated stainless steel travel bottle adorned with high-precision vertical mandala dot columns.', spec: '750ml Vacuum Bottle', surfaceType: 'Stainless Bottle', surfaceSize: 'Medium (10x10 in / 16 oz)', palette: 'Emerald Sanctuary', budgetRange: '$150 - $300', timelineSelect: 'Express Gift 2 Weeks', imageUrl: 'https://jehsldtdb400eyss.private.blob.vercel-storage.com/showcase/flask.png', readyToShip: true },
+            { id: 'prod-4', title: 'Heirloom Jewelry Box', category: 'boxes', categoryLabel: 'Keepsake Boxes & Decor', blurb: "Treasured storage for life's sacred items. Hand-carved solid mahogany wooden box with a central multi-ring ruby and gold dot mandala lid design.", spec: '8" Wood Box with Velvet Lining', surfaceType: 'Wooden Box', surfaceSize: 'Large (16x16 in / Large Box)', palette: 'Veloura Classic', budgetRange: '$300 - $500', timelineSelect: 'Standard 3-4 Weeks', imageUrl: 'https://jehsldtdb400eyss.private.blob.vercel-storage.com/showcase/jewelry_box.jpeg', readyToShip: true },
+            { id: 'prod-5', title: 'Celestial Quartz Coaster Quad', category: 'boxes', categoryLabel: 'Keepsake Boxes & Decor', blurb: 'Functional table art. Set of 4 natural stone or acacia wood coasters painted with vibrant concentric metallic dot starbursts and heat-resistant resin topcoat.', spec: 'Set of 4 Stone/Wood Coasters', surfaceType: 'MDF Board', surfaceSize: 'Small (6x6 in / 12 oz)', palette: 'Celestial Moonlight', budgetRange: '$75 - $150', timelineSelect: 'Standard 3-4 Weeks', imageUrl: 'https://jehsldtdb400eyss.private.blob.vercel-storage.com/showcase/coasters.png', readyToShip: true },
+            { id: 'prod-6', title: 'Bespoke Client Objects', category: 'custom', categoryLabel: 'Custom Items', blurb: '"Have a specific object in mind? We can dot it." From acoustic guitars and leather journals to phone cases, candleholders, and keepsake decor.', spec: 'Client Provided Surface', surfaceType: 'Custom Object', surfaceSize: 'Custom Dimensions', palette: 'Custom Palette', budgetRange: '$300 - $500', timelineSelect: 'Flexible Schedule', imageUrl: 'https://jehsldtdb400eyss.private.blob.vercel-storage.com/showcase/custom_item.png', readyToShip: false }
         ];
 
         for (const p of seedProducts) {
             await client.query(
-                `INSERT INTO products (id, title, category, category_label, blurb, spec, surface_type, palette, image_url, ready_to_ship)
-                 VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
+                `INSERT INTO products (id, title, category, category_label, blurb, spec, surface_type, surface_size, palette, budget_range, timeline_select, image_url, ready_to_ship)
+                 VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
                  ON CONFLICT (id) DO NOTHING`,
-                [p.id, p.title, p.category, p.categoryLabel, p.blurb, p.spec, p.surfaceType, p.palette, p.imageUrl, p.readyToShip]
+                [p.id, p.title, p.category, p.categoryLabel, p.blurb, p.spec, p.surfaceType, p.surfaceSize, p.palette, p.budgetRange, p.timelineSelect, p.imageUrl, p.readyToShip]
             );
         }
     }
@@ -155,7 +161,10 @@ function mapProduct(row) {
         blurb: row.blurb,
         spec: row.spec,
         surfaceType: row.surface_type,
+        surfaceSize: row.surface_size,
         palette: row.palette,
+        budgetRange: row.budget_range,
+        timelineSelect: row.timeline_select,
         imageUrl: row.image_url,
         imageUrls: Array.isArray(rawUrls) ? rawUrls : [],
         readyToShip: row.ready_to_ship,
@@ -262,8 +271,8 @@ const db = {
 
         const result = await pool.query(
             `INSERT INTO products
-             (id, title, category, category_label, blurb, spec, surface_type, palette, image_url, image_urls, ready_to_ship, created_at)
-             VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,NOW())
+             (id, title, category, category_label, blurb, spec, surface_type, surface_size, palette, budget_range, timeline_select, image_url, image_urls, ready_to_ship, created_at)
+             VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,NOW())
              RETURNING *`,
             [
                 id,
@@ -273,7 +282,10 @@ const db = {
                 prodData.blurb || '',
                 prodData.spec || '',
                 prodData.surfaceType || 'Canvas Art',
+                prodData.surfaceSize || 'Medium (10x10 in / 16 oz)',
                 prodData.palette || 'Veloura Classic',
+                prodData.budgetRange || '$150 - $300',
+                prodData.timelineSelect || 'Standard 3-4 Weeks',
                 prodData.imageUrl || 'showcase images/canvas.png',
                 JSON.stringify(imageUrls),
                 prodData.readyToShip === true || prodData.readyToShip === 'true'
@@ -314,8 +326,11 @@ const db = {
                  palette = COALESCE($7, palette),
                  image_url = COALESCE($8, image_url),
                  image_urls = COALESCE($9, image_urls),
-                 ready_to_ship = COALESCE($10, ready_to_ship)
-             WHERE id = $11
+                 ready_to_ship = COALESCE($10, ready_to_ship),
+                 surface_size = COALESCE($11, surface_size),
+                 budget_range = COALESCE($12, budget_range),
+                 timeline_select = COALESCE($13, timeline_select)
+             WHERE id = $14
              RETURNING *`,
             [
                 prodData.title ?? null,
@@ -328,6 +343,9 @@ const db = {
                 (prodData.imageUrl !== undefined && prodData.imageUrl !== '') ? prodData.imageUrl : null,
                 imageUrlsParam,
                 prodData.readyToShip ?? null,
+                prodData.surfaceSize ?? null,
+                prodData.budgetRange ?? null,
+                prodData.timelineSelect ?? null,
                 id
             ]
         );

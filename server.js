@@ -250,7 +250,7 @@ app.put('/api/admin/commissions/:id/status', verifyAdmin, async (req, res) => {
 // Add New Product Showcase Item (Admin) — supports multiple images
 app.post('/api/admin/products', verifyAdmin, uploadShowcase.array('productImages', 10), async (req, res) => {
     try {
-        const { title, category, categoryLabel, blurb, spec, surfaceType, palette, imageUrl, readyToShip } = req.body;
+        const { title, category, categoryLabel, blurb, spec, surfaceType, surfaceSize, palette, budgetRange, timelineSelect, imageUrl, readyToShip } = req.body;
 
         if (!title) {
             return res.status(400).json({ success: false, message: 'Product title is required.' });
@@ -275,7 +275,8 @@ app.post('/api/admin/products', verifyAdmin, uploadShowcase.array('productImages
         }
 
         const product = await db.addProduct({
-            title, category, categoryLabel, blurb, spec, surfaceType, palette,
+            title, category, categoryLabel, blurb, spec, surfaceType, surfaceSize, palette,
+            budgetRange, timelineSelect,
             imageUrl: finalImgUrl,
             imageUrls: allImageUrls,
             readyToShip
@@ -296,7 +297,7 @@ app.post('/api/admin/products', verifyAdmin, uploadShowcase.array('productImages
 app.put('/api/admin/products/:id', verifyAdmin, uploadShowcase.array('productImages', 10), async (req, res) => {
     try {
         const { id } = req.params;
-        const { title, category, categoryLabel, blurb, spec, surfaceType, palette, imageUrl, readyToShip, existingImageUrls } = req.body;
+        const { title, category, categoryLabel, blurb, spec, surfaceType, surfaceSize, palette, budgetRange, timelineSelect, imageUrl, readyToShip, existingImageUrls } = req.body;
 
         // Parse existing image URLs that the admin chose to keep
         let keptUrls = [];
@@ -323,7 +324,8 @@ app.put('/api/admin/products/:id', verifyAdmin, uploadShowcase.array('productIma
         let finalImgUrl = allImageUrls[0] || imageUrl || undefined;
 
         const updated = await db.updateProduct(id, {
-            title, category, categoryLabel, blurb, spec, surfaceType, palette,
+            title, category, categoryLabel, blurb, spec, surfaceType, surfaceSize, palette,
+            budgetRange, timelineSelect,
             imageUrl: finalImgUrl,
             imageUrls: allImageUrls.length > 0 ? allImageUrls : undefined,
             readyToShip: readyToShip !== undefined ? (readyToShip === true || readyToShip === 'true') : undefined

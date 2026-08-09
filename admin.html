@@ -181,13 +181,60 @@
                         </div>
 
                         <div class="admin-form-group">
-                            <label>Surface Type</label>
-                            <input type="text" id="prodSurface" placeholder="e.g. Canvas Art, Ceramic Mug">
+                            <label>Surface Type *</label>
+                            <select id="prodSurface">
+                                <option value="Canvas Art">Canvas Art</option>
+                                <option value="Ceramic Mug">Ceramic Mug</option>
+                                <option value="Stainless Bottle">Stainless Bottle (Travel Bottle)</option>
+                                <option value="Wooden Box">Wooden Box</option>
+                                <option value="MDF Board">MDF Board</option>
+                                <option value="Custom Object">Custom Object</option>
+                            </select>
                         </div>
 
                         <div class="admin-form-group">
-                            <label>Spec / Size</label>
+                            <label>Spec / Size (Display Text)</label>
                             <input type="text" id="prodSpec" placeholder="e.g. 12 x 12 Gallery Canvas">
+                        </div>
+
+                        <div class="admin-form-group">
+                            <label>Color Palette *</label>
+                            <select id="prodPalette">
+                                <option value="Veloura Classic">Veloura Classic (Gold/Ruby/Ivory)</option>
+                                <option value="Celestial Moonlight">Celestial Moonlight (Silver/Sapphire)</option>
+                                <option value="Emerald Sanctuary">Emerald Sanctuary (Gold/Emerald)</option>
+                                <option value="Custom Palette">Custom Palette (Client Described)</option>
+                            </select>
+                        </div>
+
+                        <div class="admin-form-group">
+                            <label>Surface Size / Dimensions *</label>
+                            <select id="prodSurfaceSize">
+                                <option value="Small (6x6 in / 12 oz)">Small (6x6" Canvas / 12 oz Mug)</option>
+                                <option value="Medium (10x10 in / 16 oz)">Medium (10x10" Canvas / 16 oz Mug / 750ml Bottle)</option>
+                                <option value="Large (16x16 in / Large Box)">Large (16x16" Canvas / Large Keepsake Chest)</option>
+                                <option value="Statement (24x24 in+)">Statement Wall Piece (24x24"+ Canvas)</option>
+                                <option value="Custom Dimensions">Custom Object Dimensions</option>
+                            </select>
+                        </div>
+
+                        <div class="admin-form-group">
+                            <label>Target Budget Range *</label>
+                            <select id="prodBudget">
+                                <option value="$75 - $150">$75 – $150 (Mugs / Coasters / Small Art)</option>
+                                <option value="$150 - $300">$150 – $300 (Medium Canvases / Flasks / Boxes)</option>
+                                <option value="$300 - $500">$300 – $500 (Large Statement Canvas / Complex Boxes)</option>
+                                <option value="$500+">$500+ (Masterpiece Multi-Piece Set)</option>
+                            </select>
+                        </div>
+
+                        <div class="admin-form-group">
+                            <label>Delivery Timeline *</label>
+                            <select id="prodTimeline">
+                                <option value="Standard 3-4 Weeks">Standard Creation (3–4 Weeks)</option>
+                                <option value="Express Gift 2 Weeks">Express Gift Priority (2 Weeks)</option>
+                                <option value="Flexible Schedule">Flexible / Future Date</option>
+                            </select>
                         </div>
 
                         <div class="admin-form-group col-span-2">
@@ -320,13 +367,60 @@
                     </div>
 
                     <div class="admin-form-group">
-                        <label>Surface Type</label>
-                        <input type="text" id="editProdSurface" placeholder="e.g. Canvas Art, Ceramic Mug">
+                        <label>Surface Type *</label>
+                        <select id="editProdSurface">
+                            <option value="Canvas Art">Canvas Art</option>
+                            <option value="Ceramic Mug">Ceramic Mug</option>
+                            <option value="Stainless Bottle">Stainless Bottle (Travel Bottle)</option>
+                            <option value="Wooden Box">Wooden Box</option>
+                            <option value="MDF Board">MDF Board</option>
+                            <option value="Custom Object">Custom Object</option>
+                        </select>
                     </div>
 
                     <div class="admin-form-group">
-                        <label>Spec / Size</label>
+                        <label>Spec / Size (Display Text)</label>
                         <input type="text" id="editProdSpec" placeholder="e.g. 12 x 12 Gallery Canvas">
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label>Color Palette *</label>
+                        <select id="editProdPalette">
+                            <option value="Veloura Classic">Veloura Classic (Gold/Ruby/Ivory)</option>
+                            <option value="Celestial Moonlight">Celestial Moonlight (Silver/Sapphire)</option>
+                            <option value="Emerald Sanctuary">Emerald Sanctuary (Gold/Emerald)</option>
+                            <option value="Custom Palette">Custom Palette (Client Described)</option>
+                        </select>
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label>Surface Size / Dimensions *</label>
+                        <select id="editProdSurfaceSize">
+                            <option value="Small (6x6 in / 12 oz)">Small (6x6" Canvas / 12 oz Mug)</option>
+                            <option value="Medium (10x10 in / 16 oz)">Medium (10x10" Canvas / 16 oz Mug / 750ml Bottle)</option>
+                            <option value="Large (16x16 in / Large Box)">Large (16x16" Canvas / Large Keepsake Chest)</option>
+                            <option value="Statement (24x24 in+)">Statement Wall Piece (24x24"+ Canvas)</option>
+                            <option value="Custom Dimensions">Custom Object Dimensions</option>
+                        </select>
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label>Target Budget Range *</label>
+                        <select id="editProdBudget">
+                            <option value="$75 - $150">$75 – $150 (Mugs / Coasters / Small Art)</option>
+                            <option value="$150 - $300">$150 – $300 (Medium Canvases / Flasks / Boxes)</option>
+                            <option value="$300 - $500">$300 – $500 (Large Statement Canvas / Complex Boxes)</option>
+                            <option value="$500+">$500+ (Masterpiece Multi-Piece Set)</option>
+                        </select>
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label>Delivery Timeline *</label>
+                        <select id="editProdTimeline">
+                            <option value="Standard 3-4 Weeks">Standard Creation (3–4 Weeks)</option>
+                            <option value="Express Gift 2 Weeks">Express Gift Priority (2 Weeks)</option>
+                            <option value="Flexible Schedule">Flexible / Future Date</option>
+                        </select>
                     </div>
 
                     <div class="admin-form-group col-span-2">

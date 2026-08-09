@@ -9,9 +9,11 @@ document.addEventListener('DOMContentLoaded', function () {
     // Elements
     const surfaceInputs = document.querySelectorAll('input[name="surfaceType"]');
     const surfaceCards = document.querySelectorAll('.surface-radio-card');
+    const surfaceRadioGrid = document.getElementById('surfaceRadioGrid');
     const sizeSelect = document.getElementById('surfaceSize');
     const paletteInputs = document.querySelectorAll('input[name="colorPalette"]');
     const paletteOptions = document.querySelectorAll('.palette-option');
+    const palettePicker = document.getElementById('palettePicker');
     const timelineSelect = document.getElementById('timelineSelect');
     const budgetSelect = document.getElementById('budgetRange');
 
@@ -115,21 +117,31 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Update Live Summary Text & Price
     function updateSummary() {
-        const selectedSurface = document.querySelector('input[name="surfaceType"]:checked')?.value || 'Canvas Art';
-        const selectedSize = sizeSelect.value;
-        const selectedPalette = document.querySelector('input[name="colorPalette"]:checked')?.value || 'Veloura Classic';
-        const selectedTimeline = timelineSelect.value;
+        const selectedSurface = document.querySelector('input[name="surfaceType"]:checked')?.value || '';
+        const selectedSize = sizeSelect.value || '';
+        const selectedPalette = document.querySelector('input[name="colorPalette"]:checked')?.value || '';
+        const selectedTimeline = timelineSelect.value || '';
 
-        summarySurface.textContent = selectedSurface;
-        summarySize.textContent = selectedSize.split('(')[0].trim();
-        summaryPalette.textContent = selectedPalette;
-        summaryTimeline.textContent = selectedTimeline;
+        summarySurface.textContent = selectedSurface || 'Not selected yet';
+        summarySize.textContent = selectedSize ? selectedSize.split('(')[0].trim() : 'Not selected yet';
+        summaryPalette.textContent = selectedPalette || 'Not selected yet';
+        summaryTimeline.textContent = selectedTimeline || 'Not selected yet';
 
-        // Calculate Price
-        const priceStr = priceMatrix[selectedSurface]?.[selectedSize] || '$150 – $300';
-        estimatedPrice.textContent = priceStr;
+        // Calculate Price — only once both surface & size are chosen
+        if (selectedSurface && selectedSize) {
+            const priceStr = priceMatrix[selectedSurface]?.[selectedSize] || '$150 – $300';
+            estimatedPrice.textContent = priceStr;
+        } else {
+            estimatedPrice.textContent = 'Select required options above';
+        }
 
-        renderPreviewImage(selectedPalette);
+        if (selectedPalette) {
+            renderPreviewImage(selectedPalette);
+        } else {
+            previewImage.removeAttribute('src');
+            previewImage.alt = 'Preview of the selected surface';
+            previewImage.style.opacity = '0';
+        }
     }
 
     // Event Listeners for Controls
@@ -139,6 +151,7 @@ document.addEventListener('DOMContentLoaded', function () {
             this.classList.add('active');
             const radio = this.querySelector('input');
             if (radio) radio.checked = true;
+            surfaceRadioGrid?.classList.remove('field-invalid');
             updateSummary();
         });
     });
@@ -149,15 +162,96 @@ document.addEventListener('DOMContentLoaded', function () {
             this.classList.add('active');
             const radio = this.querySelector('input');
             if (radio) radio.checked = true;
+            palettePicker?.classList.remove('field-invalid');
             updateSummary();
         });
     });
 
-    sizeSelect.addEventListener('change', updateSummary);
-    timelineSelect.addEventListener('change', updateSummary);
+    sizeSelect.addEventListener('change', function () {
+        sizeSelect.classList.remove('field-invalid');
+        updateSummary();
+    });
+    timelineSelect.addEventListener('change', function () {
+        timelineSelect.classList.remove('field-invalid');
+        updateSummary();
+    });
+    budgetSelect.addEventListener('change', function () {
+        budgetSelect.classList.remove('field-invalid');
+    });
 
-    // Initial render
+    const clientNameInput = document.getElementById('clientName');
+    const clientEmailInput = document.getElementById('clientEmail');
+    clientNameInput?.addEventListener('input', () => clientNameInput.classList.remove('field-invalid'));
+    clientEmailInput?.addEventListener('input', () => clientEmailInput.classList.remove('field-invalid'));
+
+    // Initial render — nothing is pre-selected, so the summary starts blank
     updateSummary();
+
+    // ----------------------------------------------------------------------
+    // Required Field Validation
+    // ----------------------------------------------------------------------
+    // Compulsory: Surface/Item Category, Surface Size, Color Palette,
+    // Budget Range, Delivery Timeline, Name, Email.
+    // Everything else (vision text, reference files, Instagram) is optional.
+    const requiredFieldDefs = [
+        {
+            groupEl: surfaceRadioGrid,
+            label: 'Choose a Surface / Item Category',
+            isValid: () => !!document.querySelector('input[name="surfaceType"]:checked')
+        },
+        {
+            groupEl: sizeSelect,
+            label: 'Select a Surface Size / Dimensions',
+            isValid: () => !!sizeSelect.value
+        },
+        {
+            groupEl: palettePicker,
+            label: 'Choose a Signature Color Palette',
+            isValid: () => !!document.querySelector('input[name="colorPalette"]:checked')
+        },
+        {
+            groupEl: budgetSelect,
+            label: 'Select a Target Budget Range',
+            isValid: () => !!budgetSelect.value
+        },
+        {
+            groupEl: timelineSelect,
+            label: 'Select a Delivery Timeline',
+            isValid: () => !!timelineSelect.value
+        },
+        {
+            groupEl: clientNameInput,
+            label: 'Enter Your Name',
+            isValid: () => !!clientNameInput?.value.trim()
+        },
+        {
+            groupEl: clientEmailInput,
+            label: 'Enter Your Email Address',
+            isValid: () => !!clientEmailInput?.value.trim()
+        }
+    ];
+
+    function clearFieldErrors() {
+        requiredFieldDefs.forEach(def => def.groupEl?.classList.remove('field-invalid'));
+    }
+
+    // Validates all compulsory fields, highlights any that are missing, and
+    // returns the list of missing field definitions (empty array = valid).
+    function validateRequiredFields() {
+        clearFieldErrors();
+        const missing = requiredFieldDefs.filter(def => !def.isValid());
+        missing.forEach(def => def.groupEl?.classList.add('field-invalid'));
+        return missing;
+    }
+
+    function focusFirstMissing(missing) {
+        const first = missing[0];
+        if (!first || !first.groupEl) return;
+        first.groupEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        if (typeof first.groupEl.focus === 'function') {
+            first.groupEl.focus({ preventScroll: true });
+        }
+    }
 
     // Drag and Drop File Uploader
     if (dropzone && fileInput) {
@@ -230,18 +324,13 @@ document.addEventListener('DOMContentLoaded', function () {
         const budgetRange = document.getElementById('budgetRange')?.value || '';
         const timelineSelect = document.getElementById('timelineSelect')?.value || '';
 
-        const activeSurface = document.querySelector('.surface-radio-card.active input')?.value || 'Canvas Art';
-        const activePalette = document.querySelector('.palette-option.active input')?.value || 'Veloura Classic';
+        const activeSurface = document.querySelector('input[name="surfaceType"]:checked')?.value || '';
+        const activePalette = document.querySelector('input[name="colorPalette"]:checked')?.value || '';
 
-        if (!name) {
-            alert('Please enter your name.');
-            if (nameInput) nameInput.focus();
-            return;
-        }
-
-        if (!email) {
-            alert('Please enter your email address.');
-            if (emailInput) emailInput.focus();
+        const missing = validateRequiredFields();
+        if (missing.length > 0) {
+            alert('Please fill in all required fields before submitting:\n\n' + missing.map(m => '• ' + m.label).join('\n'));
+            focusFirstMissing(missing);
             return;
         }
 
@@ -306,22 +395,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const proceedBtn = document.getElementById('proceedToSummary');
     if (proceedBtn) {
         proceedBtn.addEventListener('click', function () {
-            const nameInput = document.getElementById('clientName');
-            const emailInput = document.getElementById('clientEmail');
-
-            // Highlight missing required fields using native validation
-            if (form.checkValidity && !form.checkValidity()) {
-                form.reportValidity();
-                return;
-            }
-
-            // Extra JS guard in case browser validation is bypassed
-            if (!nameInput?.value.trim()) {
-                nameInput?.focus();
-                return;
-            }
-            if (!emailInput?.value.trim()) {
-                emailInput?.focus();
+            const missing = validateRequiredFields();
+            if (missing.length > 0) {
+                alert('Please fill in all required fields before continuing:\n\n' + missing.map(m => '• ' + m.label).join('\n'));
+                focusFirstMissing(missing);
                 return;
             }
 
@@ -352,6 +429,10 @@ document.addEventListener('DOMContentLoaded', function () {
         form.reset();
         uploadedFiles = [];
         renderFileChips();
+        // Reset visual selection state (radio "active" classes) & clear any error highlights
+        surfaceCards.forEach(c => c.classList.remove('active'));
+        paletteOptions.forEach(o => o.classList.remove('active'));
+        clearFieldErrors();
         updateSummary();
     }
 
@@ -363,23 +444,52 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Expose prefill function for Showcase "Order Similar" buttons
-    window.prefillCommissionForm = function (surface, palette) {
+    // Expose prefill function for Showcase "Order Similar" buttons.
+    // Accepts either the legacy two-string signature prefillCommissionForm(surface, palette)
+    // or a single options object: prefillCommissionForm({ surface, palette, size, budget, timeline })
+    // so admin-defined showcase items can autofill every required field on the form.
+    window.prefillCommissionForm = function (surfaceOrOptions, paletteArg) {
+        const options = (typeof surfaceOrOptions === 'object' && surfaceOrOptions !== null)
+            ? surfaceOrOptions
+            : { surface: surfaceOrOptions, palette: paletteArg };
+
+        const { surface, palette, size, budget, timeline } = options;
+
         // Find matching surface card
-        surfaceCards.forEach(card => {
-            const input = card.querySelector('input');
-            if (input && input.value === surface) {
-                card.click();
-            }
-        });
+        if (surface) {
+            surfaceCards.forEach(card => {
+                const input = card.querySelector('input');
+                if (input && input.value === surface) {
+                    card.click();
+                }
+            });
+        }
 
         // Find matching palette option
-        paletteOptions.forEach(opt => {
-            const paletteVal = opt.getAttribute('data-palette');
-            if (paletteVal === palette) {
-                opt.click();
-            }
-        });
+        if (palette) {
+            paletteOptions.forEach(opt => {
+                const paletteVal = opt.getAttribute('data-palette');
+                if (paletteVal === palette) {
+                    opt.click();
+                }
+            });
+        }
+
+        // Surface size, budget range & delivery timeline are plain <select> elements
+        if (size && sizeSelect.querySelector(`option[value="${CSS.escape(size)}"]`)) {
+            sizeSelect.value = size;
+            sizeSelect.classList.remove('field-invalid');
+        }
+        if (budget && budgetSelect.querySelector(`option[value="${CSS.escape(budget)}"]`)) {
+            budgetSelect.value = budget;
+            budgetSelect.classList.remove('field-invalid');
+        }
+        if (timeline && timelineSelect.querySelector(`option[value="${CSS.escape(timeline)}"]`)) {
+            timelineSelect.value = timeline;
+            timelineSelect.classList.remove('field-invalid');
+        }
+
+        updateSummary();
 
         // Scroll to form
         const section = document.getElementById('commission');
