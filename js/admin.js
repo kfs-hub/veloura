@@ -503,12 +503,16 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('editProdBudget').value = product.budgetRange || '$150 - $300';
         document.getElementById('editProdTimeline').value = product.timelineSelect || 'Standard 3-4 Weeks';
         document.getElementById('editProdBlurb').value = product.blurb || '';
-        document.getElementById('editProdImgUrl').value = product.imageUrl || '';
-        
+        // Never pre-fill the URL field with a Base64 string — it's too large to save
+        const safeImgUrl = (product.imageUrl && !product.imageUrl.startsWith('data:')) ? product.imageUrl : '';
+        document.getElementById('editProdImgUrl').value = safeImgUrl;
+
         const fileInput = document.getElementById('editProdImgFile');
         if (fileInput) fileInput.value = '';
 
-        existingEditUrls = (product.imageUrls && product.imageUrls.length > 0) ? [...product.imageUrls] : (product.imageUrl ? [product.imageUrl] : []);
+        // Strip any Base64 data URIs from existing URLs — only keep real Blob/https URLs
+        const allUrls = (product.imageUrls && product.imageUrls.length > 0) ? product.imageUrls : (product.imageUrl ? [product.imageUrl] : []);
+        existingEditUrls = allUrls.filter(u => u && !u.startsWith('data:'));
         selectedEditFiles = [];
 
         renderEditFilePreviews();
@@ -667,7 +671,7 @@ document.addEventListener('DOMContentLoaded', function () {
             formData.append('budgetRange', budgetRange);
             formData.append('timelineSelect', timelineSelect);
             formData.append('blurb', blurb);
-            if (imageUrl) formData.append('imageUrl', imageUrl);
+            if (imageUrl && !imageUrl.startsWith('data:')) formData.append('imageUrl', imageUrl);
             formData.append('existingImageUrls', JSON.stringify(existingEditUrls));
 
             for (const file of selectedEditFiles) {
