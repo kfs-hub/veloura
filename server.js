@@ -232,7 +232,13 @@ app.post('/api/admin/verify', (req, res) => {
 // Get All Commissions (Admin)
 app.get('/api/admin/commissions', verifyAdmin, async (req, res) => {
     try {
-        const commissions = await db.getAllCommissions();
+        const [commissions, surfacePrices] = await Promise.all([
+            db.getAllCommissions(),
+            db.getSurfacePrices()
+        ]);
+
+        const priceMap = {};
+        surfacePrices.forEach(p => { priceMap[p.surfaceType] = p; });
 
         const total = commissions.length;
         const pending = commissions.filter(c => c.status === 'PENDING_REVIEW').length;
@@ -242,7 +248,8 @@ app.get('/api/admin/commissions', verifyAdmin, async (req, res) => {
         res.json({
             success: true,
             metrics: { total, pending, inProgress, completed },
-            commissions
+            commissions,
+            priceMap
         });
     } catch (err) {
         console.error('Admin commissions error:', err);

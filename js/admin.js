@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const PASSCODE_KEY = 'veloura_admin_passcode';
     let currentPasscode = sessionStorage.getItem(PASSCODE_KEY) || '';
     let commissionsData = [];
+    let commissionPriceMap = {};
     let productsData = [];
     let activeCommissionId = null;
 
@@ -185,6 +186,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 lastKnownTotal = newTotal;
 
                 commissionsData = data.commissions;
+                commissionPriceMap = data.priceMap || {};
 
                 // Update Metrics
                 metricTotal.textContent = data.metrics.total;
@@ -254,6 +256,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 </td>
                 <td>${escapeHtml(c.surfaceType)} <br><span style="font-size:0.75rem; color: var(--text-muted);">${escapeHtml(c.surfaceSize)}</span></td>
                 <td>${escapeHtml(c.timelineSelect) || '—'}</td>
+                <td>${(() => { const p = commissionPriceMap[c.surfaceType]; return p ? `<strong>${p.priceDisplay || '₹' + p.priceInr.toLocaleString('en-IN')}</strong>` : '—'; })()}</td>
                 <td><span class="status-badge status-${c.status}">${c.status.replace('_', ' ')}</span></td>
                 <td>
                     <button class="btn-inspect" data-id="${c.id}">Inspect &rarr;</button>
@@ -322,6 +325,10 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('detailPhone').textContent = item.clientPhone || 'Not provided';
         document.getElementById('detailSurface').textContent = `${item.surfaceType} (${item.surfaceSize})`;
         document.getElementById('detailPalette').textContent = item.colorPalette;
+        const priceEntry = commissionPriceMap[item.surfaceType];
+        document.getElementById('detailPrice').textContent = priceEntry
+            ? (priceEntry.priceDisplay || '₹' + priceEntry.priceInr.toLocaleString('en-IN'))
+            : '—';
         document.getElementById('detailVision').textContent = item.visionText || 'No custom vision text provided.';
         modalStatusSelect.value = item.status;
 
