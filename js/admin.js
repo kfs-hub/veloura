@@ -871,11 +871,23 @@ document.addEventListener('DOMContentLoaded', function () {
             { surfaceType: 'MDF Board',         priceInr: 1499, priceDisplay: null },
             { surfaceType: 'Custom Object',     priceInr: 499,  priceDisplay: 'Price varies by object' },
         ];
+
+        // Show skeleton while loading
+        const container = document.getElementById('pricingRows');
+        if (container) {
+            container.innerHTML = Array.from({ length: 6 }).map(() => `
+                <div style="display:grid; grid-template-columns:1fr 160px 1fr; gap:12px; padding:14px 16px; background:var(--bg-card); border:1px solid var(--border-subtle); border-radius:10px;">
+                    <div class="skeleton-shimmer" style="height:22px; border-radius:6px;"></div>
+                    <div class="skeleton-shimmer" style="height:36px; border-radius:6px;"></div>
+                    <div class="skeleton-shimmer" style="height:36px; border-radius:6px;"></div>
+                </div>
+            `).join('');
+        }
+
         try {
             const res = await fetch('/api/surface-prices');
             const data = await res.json();
             if (data.success && data.prices.length > 0) {
-                // Merge: start with defaults, overwrite with what's in DB
                 const dbMap = {};
                 data.prices.forEach(p => { dbMap[p.surfaceType] = p; });
                 pricingData = defaults.map(d => dbMap[d.surfaceType] || d);
