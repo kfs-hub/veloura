@@ -195,7 +195,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     <p class="art-blurb">${escapeHtml(p.blurb)}</p>
                     <div class="art-card-footer">
                         <span class="art-spec">${escapeHtml(p.spec)}</span>
-                        ${p.priceInr || p.priceDisplay ? `<span class="art-price">${p.priceDisplay || '₹' + p.priceInr.toLocaleString('en-IN')}</span>` : ''}
                         <button class="btn-link open-commission-item" data-surface="${escapeHtml(p.surfaceType)}"
                             data-palette="${escapeHtml(p.palette)}" data-size="${escapeHtml(p.surfaceSize)}"
                             data-timeline="${escapeHtml(p.timelineSelect)}"
