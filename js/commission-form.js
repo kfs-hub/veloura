@@ -422,39 +422,62 @@ document.addEventListener('DOMContentLoaded', function () {
             ? surfaceOrOptions
             : { surface: surfaceOrOptions, palette: paletteArg };
 
-        const { surface, palette, size, budget, timeline, blurb } = options;
+        const { surface, palette, size, timeline, blurb } = options;
 
-        // Find matching surface card
-        if (surface) {
+        // Map product surface types to the closest form radio value
+        const surfaceMap = {
+            'Canvas Art':       'Canvas Art',
+            'Ceramic Mug':      'Ceramic Mug',
+            'Stainless Bottle': 'Stainless Bottle',
+            'Wooden Box':       'Wooden Box',
+            'MDF Board':        'MDF Board',
+            'Custom Object':    'Custom Object',
+            'Round Canvas Board': 'Canvas Art',
+            'Terracotta':       'Custom Object',
+            'Coconut Shell':    'Custom Object',
+            'Hard Shell Eyeglass / Sunglass Case': 'Custom Object',
+            'Clear Glass Mason Jar': 'Custom Object',
+            'Wooden / MDF Disc Keychains': 'Custom Object',
+        };
+        const mappedSurface = surface ? (surfaceMap[surface] || 'Custom Object') : null;
+
+        // Palette fallback — use Custom Palette if no match
+        const knownPalettes = ['Veloura Classic', 'Celestial Moonlight', 'Emerald Sanctuary', 'Custom Palette'];
+        const mappedPalette = palette && knownPalettes.includes(palette) ? palette : 'Custom Palette';
+
+        // Select matching surface card
+        if (mappedSurface) {
+            let matched = false;
             surfaceCards.forEach(card => {
                 const input = card.querySelector('input');
-                if (input && input.value === surface) {
+                if (input && input.value === mappedSurface) {
                     card.click();
+                    matched = true;
                 }
             });
         }
 
-        // Find matching palette option
-        if (palette) {
-            paletteOptions.forEach(opt => {
-                const paletteVal = opt.getAttribute('data-palette');
-                if (paletteVal === palette) {
-                    opt.click();
-                }
-            });
-        }
+        // Select matching palette option
+        paletteOptions.forEach(opt => {
+            const paletteVal = opt.getAttribute('data-palette');
+            if (paletteVal === mappedPalette) {
+                opt.click();
+            }
+        });
 
-        // Surface size & delivery timeline are plain <select> elements
+        // Surface size
         if (size && sizeSelect.querySelector(`option[value="${CSS.escape(size)}"]`)) {
             sizeSelect.value = size;
             sizeSelect.classList.remove('field-invalid');
         }
+
+        // Delivery timeline
         if (timeline && timelineSelect.querySelector(`option[value="${CSS.escape(timeline)}"]`)) {
             timelineSelect.value = timeline;
             timelineSelect.classList.remove('field-invalid');
         }
 
-        // Autofill the vision/description field with the product blurb
+        // Vision / description
         const visionTextEl = document.getElementById('visionText');
         if (blurb && visionTextEl) {
             visionTextEl.value = blurb;
@@ -463,7 +486,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         updateSummary();
 
-        // Scroll to commission section, then after scroll completes highlight the form
+        // Scroll to commission section
         const section = document.getElementById('commission');
         if (section) {
             section.scrollIntoView({ behavior: 'smooth', block: 'start' });
