@@ -81,8 +81,8 @@ async function initTables(client) {
             ('Ceramic Mug',      349,  NULL),
             ('Stainless Bottle', 399,  '₹399 + bottle price'),
             ('Wooden Box',       799,  NULL),
-            ('MDF Board',        1499, NULL),
-            ('Custom Object',    499,  'Price varies by object')
+            ('MDF Board',        1499, '₹1499 (Big Coasters)'),
+            ('Custom Object',    99,   '₹99+ (Keychains / Fridge Magnets / Dolls / Mud Cups)')
         ON CONFLICT (surface_type) DO NOTHING;
         CREATE INDEX IF NOT EXISTS idx_commissions_ref_id ON commissions (ref_id);
         CREATE INDEX IF NOT EXISTS idx_commissions_status ON commissions (status);

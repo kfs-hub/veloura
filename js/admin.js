@@ -868,8 +868,8 @@ document.addEventListener('DOMContentLoaded', function () {
             { surfaceType: 'Ceramic Mug',       priceInr: 349,  priceDisplay: null },
             { surfaceType: 'Stainless Bottle',  priceInr: 399,  priceDisplay: '₹399 + bottle price' },
             { surfaceType: 'Wooden Box',        priceInr: 799,  priceDisplay: null },
-            { surfaceType: 'MDF Board',         priceInr: 1499, priceDisplay: null },
-            { surfaceType: 'Custom Object',     priceInr: 499,  priceDisplay: 'Price varies by object' },
+            { surfaceType: 'MDF Board',         priceInr: 1499, priceDisplay: '₹1499 (Big Coasters)' },
+            { surfaceType: 'Custom Object',     priceInr: 99,   priceDisplay: '₹99+ (Keychains / Fridge Magnets / Dolls / Mud Cups)' },
         ];
 
         // Show skeleton while loading

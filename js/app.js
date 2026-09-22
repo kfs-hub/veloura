@@ -198,9 +198,10 @@ document.addEventListener('DOMContentLoaded', function () {
                         ${p.priceInr || p.priceDisplay ? `<span class="art-price">${p.priceDisplay || '₹' + p.priceInr.toLocaleString('en-IN')}</span>` : ''}
                         <button class="btn-link open-commission-item" data-surface="${escapeHtml(p.surfaceType)}"
                             data-palette="${escapeHtml(p.palette)}" data-size="${escapeHtml(p.surfaceSize)}"
-                            data-budget="${escapeHtml(p.budgetRange)}"
                             data-timeline="${escapeHtml(p.timelineSelect)}"
-                            data-blurb="${escapeHtml(p.blurb)}">${buttonText}</button>
+                            data-blurb="${escapeHtml(p.blurb)}"
+                            data-price="${p.priceInr || ''}"
+                            data-price-display="${escapeHtml(p.priceDisplay || '')}">${buttonText}</button>
                     </div>
                 </div>
             `;
@@ -399,9 +400,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 const size = this.getAttribute('data-size');
                 const timeline = this.getAttribute('data-timeline');
                 const blurb = this.getAttribute('data-blurb');
+                const price = this.getAttribute('data-price');
+                const priceDisplay = this.getAttribute('data-price-display');
 
                 const doFill = () => {
-                    window.prefillCommissionForm({ surface, palette, size, timeline, blurb });
+                    window.prefillCommissionForm({ surface, palette, size, timeline, blurb, price, priceDisplay });
                 };
 
                 if (typeof window.prefillCommissionForm === 'function') {

@@ -74,9 +74,13 @@ document.addEventListener('DOMContentLoaded', function () {
         'Ceramic Mug':      { base: 349,  note: null },
         'Stainless Bottle': { base: 399,  note: '₹399 + bottle price' },
         'Wooden Box':       { base: 799,  note: null },
-        'Custom Object':    { base: 499,  note: 'Price varies by object' },
-        'MDF Board':        { base: 1499, note: null },
+        'Custom Object':    { base: 99,   note: '₹99+ (Keychains / Fridge Magnets / Dolls / Mud Cups)' },
+        'MDF Board':        { base: 1499, note: '₹1499 (Big Coasters)' },
     };
+
+    // Per-product price override — set when "Order Similar" is clicked,
+    // cleared when the user manually picks a different surface type
+    let productPriceOverride = null;
 
     // Fetch live prices from the server and update the matrix
     fetch('/api/surface-prices')
@@ -106,9 +110,9 @@ document.addEventListener('DOMContentLoaded', function () {
         summaryPalette.textContent = selectedPalette || 'Not selected yet';
         summaryTimeline.textContent = selectedTimeline || 'Not selected yet';
 
-        // Calculate Price — once surface is chosen, show INR estimate
+        // Calculate Price — product override takes priority, then surface-type lookup
         if (selectedSurface) {
-            const entry = priceMatrix[selectedSurface];
+            const entry = productPriceOverride || priceMatrix[selectedSurface];
             if (entry) {
                 estimatedPrice.textContent = entry.note || '₹' + entry.base.toLocaleString('en-IN') + '/–';
             } else {
@@ -135,6 +139,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const radio = this.querySelector('input');
             if (radio) radio.checked = true;
             surfaceRadioGrid?.classList.remove('field-invalid');
+            productPriceOverride = null; // user picked manually — use surface-type price
             updateSummary();
         });
     });
@@ -428,7 +433,17 @@ document.addEventListener('DOMContentLoaded', function () {
             ? surfaceOrOptions
             : { surface: surfaceOrOptions, palette: paletteArg };
 
-        const { surface, palette, size, timeline, blurb } = options;
+        const { surface, palette, size, timeline, blurb, price, priceDisplay } = options;
+
+        // Set product-specific price override if provided
+        if (price || priceDisplay) {
+            productPriceOverride = {
+                base: parseInt(price, 10) || 0,
+                note: priceDisplay || null
+            };
+        } else {
+            productPriceOverride = null;
+        }
 
         // Map product surface types to the closest form radio value
         const surfaceMap = {
