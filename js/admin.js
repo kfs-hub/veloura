@@ -102,6 +102,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 authError.style.display = 'none';
                 loadCommissions();
                 loadProducts();
+                loadPricing();
                 startAutoPoll();
             } else {
                 authError.style.display = 'block';
@@ -854,3 +855,84 @@ document.addEventListener('DOMContentLoaded', function () {
             .replace(/"/g, '&quot;');
     }
 });
+
+    // =========================================================================
+    // PRICING MANAGER
+    // =========================================================================
+
+    let pricingData = [];
+
+    async function loadPricing() {
+        try {
+            const res = await fetch('/api/surface-prices');
+            const data = await res.json();
+            if (data.success) {
+                pricingData = data.prices;
+                renderPricingRows();
+            }
+        } catch (err) {
+            console.error('Error loading pricing:', err);
+        }
+    }
+
+    function renderPricingRows() {
+        const container = document.getElementById('pricingRows');
+        if (!container) return;
+        container.innerHTML = '';
+
+        pricingData.forEach((p, idx) => {
+            const row = document.createElement('div');
+            row.style.cssText = 'display:grid; grid-template-columns: 1fr 160px 1fr; gap:12px; align-items:end; padding:14px 16px; background:var(--bg-card); border:1px solid var(--border-subtle); border-radius:10px;';
+            row.innerHTML = `
+                <div style="font-weight:600; font-size:0.95rem; padding-bottom:4px;">${escapeHtml(p.surfaceType)}</div>
+                <div>
+                    <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:4px;">Price (₹)</label>
+                    <input type="number" min="0" value="${p.priceInr || 0}"
+                        data-idx="${idx}" data-field="priceInr"
+                        style="width:100%; padding:8px 10px; border:1px solid var(--border-subtle); border-radius:6px; font-size:0.9rem;">
+                </div>
+                <div>
+                    <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:4px;">Display Override <span style="font-weight:400;">(optional — e.g. ₹399 + bottle)</span></label>
+                    <input type="text" value="${escapeHtml(p.priceDisplay || '')}"
+                        placeholder="Leave blank to show ₹ amount"
+                        data-idx="${idx}" data-field="priceDisplay"
+                        style="width:100%; padding:8px 10px; border:1px solid var(--border-subtle); border-radius:6px; font-size:0.9rem;">
+                </div>
+            `;
+            container.appendChild(row);
+        });
+
+        container.querySelectorAll('input').forEach(input => {
+            input.addEventListener('input', function () {
+                const idx = parseInt(this.getAttribute('data-idx'));
+                const field = this.getAttribute('data-field');
+                pricingData[idx][field] = field === 'priceInr' ? (parseInt(this.value) || 0) : this.value;
+            });
+        });
+    }
+
+    const savePricingBtn = document.getElementById('savePricingBtn');
+    if (savePricingBtn) {
+        savePricingBtn.addEventListener('click', async function () {
+            savePricingBtn.disabled = true;
+            savePricingBtn.textContent = 'Saving...';
+            try {
+                const res = await fetch('/api/admin/surface-prices', {
+                    method: 'PUT',
+                    headers: { ...getAdminHeaders(), 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prices: pricingData })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('Prices updated successfully!', 'success');
+                } else {
+                    alert(data.message || 'Failed to save prices.');
+                }
+            } catch (err) {
+                alert('Network error saving prices.');
+            } finally {
+                savePricingBtn.disabled = false;
+                savePricingBtn.textContent = 'Save Prices';
+            }
+        });
+    }

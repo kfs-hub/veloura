@@ -394,6 +394,33 @@ app.delete('/api/admin/products/:id', verifyAdmin, async (req, res) => {
     }
 });
 
+// Get Surface Prices (public — used by commission form estimator)
+app.get('/api/surface-prices', async (req, res) => {
+    try {
+        const prices = await db.getSurfacePrices();
+        res.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
+        res.json({ success: true, prices });
+    } catch (err) {
+        res.status(500).json({ success: false, message: 'Database error.' });
+    }
+});
+
+// Update Surface Prices (admin)
+app.put('/api/admin/surface-prices', verifyAdmin, async (req, res) => {
+    try {
+        const { prices } = req.body; // array of { surfaceType, priceInr, priceDisplay }
+        if (!Array.isArray(prices)) {
+            return res.status(400).json({ success: false, message: 'prices must be an array.' });
+        }
+        for (const p of prices) {
+            await db.updateSurfacePrice(p.surfaceType, parseInt(p.priceInr, 10) || 0, p.priceDisplay || null);
+        }
+        res.json({ success: true, message: 'Surface prices updated.' });
+    } catch (err) {
+        res.status(500).json({ success: false, message: `Failed to update prices: ${err.message}` });
+    }
+});
+
 // Express Error Handling Middleware (Catches Multer errors & server errors cleanly for Vercel)
 app.use((err, req, res, next) => {
     console.error('Express App Error Handler:', err);

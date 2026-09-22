@@ -68,21 +68,31 @@ document.addEventListener('DOMContentLoaded', function () {
         previewImage.style.opacity = '0';
     });
 
-    // Estimated Pricing Table (INR)
-    const priceMatrix = {
+    // Pricing — fetched from API, falls back to hardcoded defaults
+    let priceMatrix = {
         'Canvas Art':       { base: 799,  note: null },
         'Ceramic Mug':      { base: 349,  note: null },
         'Stainless Bottle': { base: 399,  note: '₹399 + bottle price' },
         'Wooden Box':       { base: 799,  note: null },
         'Custom Object':    { base: 499,  note: 'Price varies by object' },
         'MDF Board':        { base: 1499, note: null },
-        'Terracotta':       { base: 249,  note: null },
-        'Coconut Shell':    { base: 349,  note: null },
-        'Hard Shell Eyeglass / Sunglass Case': { base: 299, note: null },
-        'Clear Glass Mason Jar':               { base: 249, note: null },
-        'Wooden / MDF Disc Keychains':         { base: 99,  note: '₹99 per keychain' },
-        'Round Canvas Board': { base: 799, note: null },
     };
+
+    // Fetch live prices from the server and update the matrix
+    fetch('/api/surface-prices')
+        .then(r => r.json())
+        .then(data => {
+            if (data.success && data.prices.length > 0) {
+                data.prices.forEach(p => {
+                    priceMatrix[p.surfaceType] = {
+                        base: p.priceInr || 0,
+                        note: p.priceDisplay || null
+                    };
+                });
+                updateSummary(); // re-render if surface already selected
+            }
+        })
+        .catch(() => { /* silently use defaults */ });
 
     // Update Live Summary Text & Price
     function updateSummary() {

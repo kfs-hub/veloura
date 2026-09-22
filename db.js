@@ -71,6 +71,19 @@ async function initTables(client) {
         ALTER TABLE products ADD COLUMN IF NOT EXISTS timeline_select TEXT;
         ALTER TABLE products ADD COLUMN IF NOT EXISTS price_inr INTEGER DEFAULT 0;
         ALTER TABLE products ADD COLUMN IF NOT EXISTS price_display TEXT;
+        CREATE TABLE IF NOT EXISTS surface_prices (
+            surface_type   TEXT PRIMARY KEY,
+            price_inr      INTEGER NOT NULL DEFAULT 0,
+            price_display  TEXT
+        );
+        INSERT INTO surface_prices (surface_type, price_inr, price_display) VALUES
+            ('Canvas Art',       799,  NULL),
+            ('Ceramic Mug',      349,  NULL),
+            ('Stainless Bottle', 399,  '₹399 + bottle price'),
+            ('Wooden Box',       799,  NULL),
+            ('MDF Board',        1499, NULL),
+            ('Custom Object',    499,  'Price varies by object')
+        ON CONFLICT (surface_type) DO NOTHING;
         CREATE INDEX IF NOT EXISTS idx_commissions_ref_id ON commissions (ref_id);
         CREATE INDEX IF NOT EXISTS idx_commissions_status ON commissions (status);
         ALTER TABLE commissions ADD COLUMN IF NOT EXISTS client_phone TEXT;
@@ -368,7 +381,28 @@ const db = {
 
     // Expose pool and connection state
     pool,
-    getIsConnected: () => isPgConnected
+    getIsConnected: () => isPgConnected,
+
+    async getSurfacePrices() {
+        await ensureInit();
+        const result = await pool.query('SELECT * FROM surface_prices ORDER BY surface_type ASC');
+        return result.rows.map(r => ({
+            surfaceType: r.surface_type,
+            priceInr: r.price_inr,
+            priceDisplay: r.price_display
+        }));
+    },
+
+    async updateSurfacePrice(surfaceType, priceInr, priceDisplay) {
+        await ensureInit();
+        await pool.query(
+            `INSERT INTO surface_prices (surface_type, price_inr, price_display)
+             VALUES ($1, $2, $3)
+             ON CONFLICT (surface_type) DO UPDATE
+             SET price_inr = $2, price_display = $3`,
+            [surfaceType, priceInr, priceDisplay || null]
+        );
+    }
 };
 
 module.exports = db;
