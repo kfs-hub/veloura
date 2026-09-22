@@ -863,16 +863,30 @@ document.addEventListener('DOMContentLoaded', function () {
     let pricingData = [];
 
     async function loadPricing() {
+        const defaults = [
+            { surfaceType: 'Canvas Art',       priceInr: 799,  priceDisplay: null },
+            { surfaceType: 'Ceramic Mug',       priceInr: 349,  priceDisplay: null },
+            { surfaceType: 'Stainless Bottle',  priceInr: 399,  priceDisplay: '₹399 + bottle price' },
+            { surfaceType: 'Wooden Box',        priceInr: 799,  priceDisplay: null },
+            { surfaceType: 'MDF Board',         priceInr: 1499, priceDisplay: null },
+            { surfaceType: 'Custom Object',     priceInr: 499,  priceDisplay: 'Price varies by object' },
+        ];
         try {
             const res = await fetch('/api/surface-prices');
             const data = await res.json();
-            if (data.success) {
-                pricingData = data.prices;
-                renderPricingRows();
+            if (data.success && data.prices.length > 0) {
+                // Merge: start with defaults, overwrite with what's in DB
+                const dbMap = {};
+                data.prices.forEach(p => { dbMap[p.surfaceType] = p; });
+                pricingData = defaults.map(d => dbMap[d.surfaceType] || d);
+            } else {
+                pricingData = defaults;
             }
         } catch (err) {
             console.error('Error loading pricing:', err);
+            pricingData = defaults;
         }
+        renderPricingRows();
     }
 
     function renderPricingRows() {
