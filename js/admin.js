@@ -253,7 +253,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     <div style="font-size: 0.78rem; color: var(--text-muted);">${escapeHtml(c.clientIg || 'No IG')}</div>
                 </td>
                 <td>${escapeHtml(c.surfaceType)} <br><span style="font-size:0.75rem; color: var(--text-muted);">${escapeHtml(c.surfaceSize)}</span></td>
-                <td>${escapeHtml(c.budgetRange)}</td>
+                <td>${escapeHtml(c.timelineSelect) || '—'}</td>
                 <td><span class="status-badge status-${c.status}">${c.status.replace('_', ' ')}</span></td>
                 <td>
                     <button class="btn-inspect" data-id="${c.id}">Inspect &rarr;</button>
@@ -321,7 +321,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('detailIg').textContent = item.clientIg || 'Not provided';
         document.getElementById('detailPhone').textContent = item.clientPhone || 'Not provided';
         document.getElementById('detailSurface').textContent = `${item.surfaceType} (${item.surfaceSize})`;
-        document.getElementById('detailPalette').textContent = `${item.colorPalette} (${item.budgetRange})`;
+        document.getElementById('detailPalette').textContent = item.colorPalette;
         document.getElementById('detailVision').textContent = item.visionText || 'No custom vision text provided.';
         modalStatusSelect.value = item.status;
 
