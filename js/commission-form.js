@@ -435,16 +435,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const { surface, palette, size, timeline, blurb, price, priceDisplay } = options;
 
-        // Set product-specific price override if provided
-        if (price || priceDisplay) {
-            productPriceOverride = {
-                base: parseInt(price, 10) || 0,
-                note: priceDisplay || null
-            };
-        } else {
-            productPriceOverride = null;
-        }
-
         // Map product surface types to the closest form radio value
         const surfaceMap = {
             'Canvas Art':       'Canvas Art',
@@ -466,14 +456,12 @@ document.addEventListener('DOMContentLoaded', function () {
         const knownPalettes = ['Veloura Classic', 'Celestial Moonlight', 'Emerald Sanctuary', 'Custom Palette'];
         const mappedPalette = palette && knownPalettes.includes(palette) ? palette : 'Custom Palette';
 
-        // Select matching surface card
+        // Select matching surface card — this clears productPriceOverride via the click handler
         if (mappedSurface) {
-            let matched = false;
             surfaceCards.forEach(card => {
                 const input = card.querySelector('input');
                 if (input && input.value === mappedSurface) {
                     card.click();
-                    matched = true;
                 }
             });
         }
@@ -485,6 +473,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 opt.click();
             }
         });
+
+        // Now set product-specific price override AFTER card clicks so it isn't cleared
+        if (price || priceDisplay) {
+            productPriceOverride = {
+                base: parseInt(price, 10) || 0,
+                note: priceDisplay || null
+            };
+        } else {
+            productPriceOverride = null;
+        }
 
         // Surface size
         if (size && sizeSelect.querySelector(`option[value="${CSS.escape(size)}"]`)) {
