@@ -397,12 +397,27 @@ document.addEventListener('DOMContentLoaded', function () {
                 const surface = this.getAttribute('data-surface');
                 const palette = this.getAttribute('data-palette');
                 const size = this.getAttribute('data-size');
-                const budget = this.getAttribute('data-budget');
                 const timeline = this.getAttribute('data-timeline');
                 const blurb = this.getAttribute('data-blurb');
 
-                if (window.prefillCommissionForm) {
-                    window.prefillCommissionForm({ surface, palette, size, budget, timeline, blurb });
+                const doFill = () => {
+                    window.prefillCommissionForm({ surface, palette, size, timeline, blurb });
+                };
+
+                if (typeof window.prefillCommissionForm === 'function') {
+                    doFill();
+                } else {
+                    // commission-form.js not ready yet — scroll first, then retry
+                    const section = document.getElementById('commission');
+                    if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    const interval = setInterval(() => {
+                        if (typeof window.prefillCommissionForm === 'function') {
+                            clearInterval(interval);
+                            doFill();
+                        }
+                    }, 50);
+                    // Give up after 3 seconds
+                    setTimeout(() => clearInterval(interval), 3000);
                 }
             });
         });
