@@ -395,6 +395,7 @@ document.addEventListener('DOMContentLoaded', function () {
             this.classList.add('active');
             const targetId = this.getAttribute('data-tab');
             document.getElementById(targetId).classList.add('active');
+            if (targetId === 'pricingTab') loadPricing();
         });
     });
 
@@ -854,7 +855,6 @@ document.addEventListener('DOMContentLoaded', function () {
             .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;');
     }
-});
 
     // =========================================================================
     // PRICING MANAGER
@@ -962,3 +962,4 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
+});
