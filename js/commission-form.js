@@ -15,7 +15,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const paletteOptions = document.querySelectorAll('.palette-option');
     const palettePicker = document.getElementById('palettePicker');
     const timelineSelect = document.getElementById('timelineSelect');
-    const budgetSelect = document.getElementById('budgetRange');
 
     // Live Summary Elements
     const summarySurface = document.getElementById('summarySurface');
@@ -148,9 +147,6 @@ document.addEventListener('DOMContentLoaded', function () {
     timelineSelect.addEventListener('change', function () {
         timelineSelect.classList.remove('field-invalid');
         updateSummary();
-    });
-    budgetSelect.addEventListener('change', function () {
-        budgetSelect.classList.remove('field-invalid');
     });
 
     const clientNameInput = document.getElementById('clientName');
