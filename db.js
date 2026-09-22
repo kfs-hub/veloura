@@ -69,6 +69,8 @@ async function initTables(client) {
         ALTER TABLE products ADD COLUMN IF NOT EXISTS surface_size TEXT;
         ALTER TABLE products ADD COLUMN IF NOT EXISTS budget_range TEXT;
         ALTER TABLE products ADD COLUMN IF NOT EXISTS timeline_select TEXT;
+        ALTER TABLE products ADD COLUMN IF NOT EXISTS price_inr INTEGER DEFAULT 0;
+        ALTER TABLE products ADD COLUMN IF NOT EXISTS price_display TEXT;
         CREATE INDEX IF NOT EXISTS idx_commissions_ref_id ON commissions (ref_id);
         CREATE INDEX IF NOT EXISTS idx_commissions_status ON commissions (status);
         ALTER TABLE commissions ADD COLUMN IF NOT EXISTS client_phone TEXT;
@@ -170,6 +172,8 @@ function mapProduct(row) {
         timelineSelect: row.timeline_select,
         imageUrl: row.image_url,
         imageUrls: Array.isArray(rawUrls) ? rawUrls : [],
+        priceInr: row.price_inr || 0,
+        priceDisplay: row.price_display || null,
         readyToShip: row.ready_to_ship,
         createdAt: row.created_at
     };
@@ -275,8 +279,8 @@ const db = {
 
         const result = await pool.query(
             `INSERT INTO products
-             (id, title, category, category_label, blurb, spec, surface_type, surface_size, palette, budget_range, timeline_select, image_url, image_urls, ready_to_ship, created_at)
-             VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,NOW())
+             (id, title, category, category_label, blurb, spec, surface_type, surface_size, palette, budget_range, timeline_select, image_url, image_urls, ready_to_ship, price_inr, price_display, created_at)
+             VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,NOW())
              RETURNING *`,
             [
                 id,
@@ -288,11 +292,13 @@ const db = {
                 prodData.surfaceType || 'Canvas Art',
                 prodData.surfaceSize || 'Medium (10x10 in / 16 oz)',
                 prodData.palette || 'Veloura Classic',
-                prodData.budgetRange || '$150 - $300',
+                prodData.budgetRange || '',
                 prodData.timelineSelect || 'Standard 3-4 Weeks',
                 prodData.imageUrl || 'showcase images/canvas.png',
                 JSON.stringify(imageUrls),
-                prodData.readyToShip === true || prodData.readyToShip === 'true'
+                prodData.readyToShip === true || prodData.readyToShip === 'true',
+                prodData.priceInr || 0,
+                prodData.priceDisplay || null
             ]
         );
         return mapProduct(result.rows[0]);
@@ -333,7 +339,9 @@ const db = {
                  ready_to_ship = COALESCE($10, ready_to_ship),
                  surface_size = COALESCE($11, surface_size),
                  budget_range = COALESCE($12, budget_range),
-                 timeline_select = COALESCE($13, timeline_select)
+                 timeline_select = COALESCE($13, timeline_select),
+                 price_inr = COALESCE($15, price_inr),
+                 price_display = COALESCE($16, price_display)
              WHERE id = $14
              RETURNING *`,
             [
@@ -350,7 +358,9 @@ const db = {
                 prodData.surfaceSize ?? null,
                 prodData.budgetRange ?? null,
                 prodData.timelineSelect ?? null,
-                id
+                id,
+                prodData.priceInr != null ? parseInt(prodData.priceInr, 10) : null,
+                prodData.priceDisplay !== undefined ? (prodData.priceDisplay || null) : undefined
             ]
         );
         return mapProduct(result.rows[0]);

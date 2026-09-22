@@ -621,11 +621,22 @@ textarea,
     justify-content: space-between;
     padding-top: 16px;
     border-top: 1px solid var(--border-subtle);
+    flex-wrap: wrap;
+    gap: 8px;
 }
 
 .art-spec {
     font-size: 0.82rem;
     color: var(--text-muted);
+}
+
+.art-price {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--gold-dark);
+    letter-spacing: 0.01em;
+    white-space: nowrap;
 }
 
 /* How It Works Section */

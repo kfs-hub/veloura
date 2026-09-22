@@ -69,50 +69,20 @@ document.addEventListener('DOMContentLoaded', function () {
         previewImage.style.opacity = '0';
     });
 
-    // Estimated Pricing Table
+    // Estimated Pricing Table (INR)
     const priceMatrix = {
-        'Canvas Art': {
-            'Small (6x6 in / 12 oz)': '$95 – $140',
-            'Medium (10x10 in / 16 oz)': '$185 – $240',
-            'Large (16x16 in / Large Box)': '$320 – $420',
-            'Statement (24x24 in+)': '$580 – $850',
-            'Custom Dimensions': 'Quote on Request'
-        },
-        'Ceramic Mug': {
-            'Small (6x6 in / 12 oz)': '$65 – $85',
-            'Medium (10x10 in / 16 oz)': '$85 – $110',
-            'Large (16x16 in / Large Box)': '$120 – $150',
-            'Statement (24x24 in+)': '$180 – $220',
-            'Custom Dimensions': 'Quote on Request'
-        },
-        'Stainless Bottle': {
-            'Small (6x6 in / 12 oz)': '$85 – $110',
-            'Medium (10x10 in / 16 oz)': '$110 – $145',
-            'Large (16x16 in / Large Box)': '$150 – $190',
-            'Statement (24x24 in+)': '$220 – $280',
-            'Custom Dimensions': 'Quote on Request'
-        },
-        'Wooden Box': {
-            'Small (6x6 in / 12 oz)': '$110 – $150',
-            'Medium (10x10 in / 16 oz)': '$175 – $230',
-            'Large (16x16 in / Large Box)': '$260 – $340',
-            'Statement (24x24 in+)': '$450 – $600',
-            'Custom Dimensions': 'Quote on Request'
-        },
-        'Custom Object': {
-            'Small (6x6 in / 12 oz)': '$80 – $120',
-            'Medium (10x10 in / 16 oz)': '$140 – $200',
-            'Large (16x16 in / Large Box)': '$250 – $380',
-            'Statement (24x24 in+)': '$480 – $750',
-            'Custom Dimensions': 'Quote on Request'
-        },
-        'MDF Board': {
-            'Small (6x6 in / 12 oz)': '$70 – $100',
-            'Medium (10x10 in / 16 oz)': '$130 – $175',
-            'Large (16x16 in / Large Box)': '$220 – $290',
-            'Statement (24x24 in+)': '$400 – $560',
-            'Custom Dimensions': 'Quote on Request'
-        }
+        'Canvas Art':       { base: 799,  note: null },
+        'Ceramic Mug':      { base: 349,  note: null },
+        'Stainless Bottle': { base: 399,  note: '₹399 + bottle price' },
+        'Wooden Box':       { base: 799,  note: null },
+        'Custom Object':    { base: 499,  note: 'Price varies by object' },
+        'MDF Board':        { base: 1499, note: null },
+        'Terracotta':       { base: 249,  note: null },
+        'Coconut Shell':    { base: 349,  note: null },
+        'Hard Shell Eyeglass / Sunglass Case': { base: 299, note: null },
+        'Clear Glass Mason Jar':               { base: 249, note: null },
+        'Wooden / MDF Disc Keychains':         { base: 99,  note: '₹99 per keychain' },
+        'Round Canvas Board': { base: 799, note: null },
     };
 
     // Update Live Summary Text & Price
@@ -127,12 +97,16 @@ document.addEventListener('DOMContentLoaded', function () {
         summaryPalette.textContent = selectedPalette || 'Not selected yet';
         summaryTimeline.textContent = selectedTimeline || 'Not selected yet';
 
-        // Calculate Price — only once both surface & size are chosen
-        if (selectedSurface && selectedSize) {
-            const priceStr = priceMatrix[selectedSurface]?.[selectedSize] || '$150 – $300';
-            estimatedPrice.textContent = priceStr;
+        // Calculate Price — once surface is chosen, show INR estimate
+        if (selectedSurface) {
+            const entry = priceMatrix[selectedSurface];
+            if (entry) {
+                estimatedPrice.textContent = entry.note || '₹' + entry.base.toLocaleString('en-IN') + '/–';
+            } else {
+                estimatedPrice.textContent = 'Quote on Request';
+            }
         } else {
-            estimatedPrice.textContent = 'Select required options above';
+            estimatedPrice.textContent = 'Select surface above';
         }
 
         if (selectedPalette) {
@@ -208,11 +182,6 @@ document.addEventListener('DOMContentLoaded', function () {
             groupEl: palettePicker,
             label: 'Choose a Signature Color Palette',
             isValid: () => !!document.querySelector('input[name="colorPalette"]:checked')
-        },
-        {
-            groupEl: budgetSelect,
-            label: 'Select a Target Budget Range',
-            isValid: () => !!budgetSelect.value
         },
         {
             groupEl: timelineSelect,
@@ -322,7 +291,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const phone = document.getElementById('clientPhone')?.value.trim() || '';
         const visionText = document.getElementById('visionText')?.value.trim() || '';
         const surfaceSize = document.getElementById('surfaceSize')?.value || '';
-        const budgetRange = document.getElementById('budgetRange')?.value || '';
         const timelineSelect = document.getElementById('timelineSelect')?.value || '';
 
         const activeSurface = document.querySelector('input[name="surfaceType"]:checked')?.value || '';
@@ -352,7 +320,6 @@ document.addEventListener('DOMContentLoaded', function () {
         formData.append('surfaceSize', surfaceSize);
         formData.append('colorPalette', activePalette);
         formData.append('visionText', visionText);
-        formData.append('budgetRange', budgetRange);
         formData.append('timelineSelect', timelineSelect);
 
         // Append files
@@ -477,14 +444,10 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
 
-        // Surface size, budget range & delivery timeline are plain <select> elements
+        // Surface size & delivery timeline are plain <select> elements
         if (size && sizeSelect.querySelector(`option[value="${CSS.escape(size)}"]`)) {
             sizeSelect.value = size;
             sizeSelect.classList.remove('field-invalid');
-        }
-        if (budget && budgetSelect.querySelector(`option[value="${CSS.escape(budget)}"]`)) {
-            budgetSelect.value = budget;
-            budgetSelect.classList.remove('field-invalid');
         }
         if (timeline && timelineSelect.querySelector(`option[value="${CSS.escape(timeline)}"]`)) {
             timelineSelect.value = timeline;

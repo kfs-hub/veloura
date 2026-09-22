@@ -219,13 +219,13 @@
                         </div>
 
                         <div class="admin-form-group">
-                            <label>Target Budget Range *</label>
-                            <select id="prodBudget">
-                                <option value="$75 - $150">$75 – $150 (Mugs / Coasters / Small Art)</option>
-                                <option value="$150 - $300">$150 – $300 (Medium Canvases / Flasks / Boxes)</option>
-                                <option value="$300 - $500">$300 – $500 (Large Statement Canvas / Complex Boxes)</option>
-                                <option value="$500+">$500+ (Masterpiece Multi-Piece Set)</option>
-                            </select>
+                            <label>Price (₹) *</label>
+                            <input type="number" id="prodPrice" min="0" placeholder="e.g. 349">
+                        </div>
+
+                        <div class="admin-form-group">
+                            <label>Price Display Override <span style="font-weight:400; color:var(--text-muted);">(optional — e.g. "₹399 + bottle price")</span></label>
+                            <input type="text" id="prodPriceDisplay" placeholder="Leave blank to auto-show ₹ amount">
                         </div>
 
                         <div class="admin-form-group">
@@ -409,13 +409,13 @@
                     </div>
 
                     <div class="admin-form-group">
-                        <label>Target Budget Range *</label>
-                        <select id="editProdBudget">
-                            <option value="$75 - $150">$75 – $150 (Mugs / Coasters / Small Art)</option>
-                            <option value="$150 - $300">$150 – $300 (Medium Canvases / Flasks / Boxes)</option>
-                            <option value="$300 - $500">$300 – $500 (Large Statement Canvas / Complex Boxes)</option>
-                            <option value="$500+">$500+ (Masterpiece Multi-Piece Set)</option>
-                        </select>
+                        <label>Price (₹) *</label>
+                        <input type="number" id="editProdPrice" min="0" placeholder="e.g. 349">
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label>Price Display Override <span style="font-weight:400; color:var(--text-muted);">(optional — e.g. "₹399 + bottle price")</span></label>
+                        <input type="text" id="editProdPriceDisplay" placeholder="Leave blank to auto-show ₹ amount">
                     </div>
 
                     <div class="admin-form-group">

@@ -441,7 +441,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 <div class="admin-prod-body">
                     <div class="admin-prod-title">${escapeHtml(p.title)}</div>
                     <div class="admin-prod-spec">${escapeHtml(p.surfaceType)} • ${escapeHtml(p.spec)}</div>
-                    <div class="admin-prod-spec" style="margin-top:2px; color: var(--text-muted);">${escapeHtml(p.palette)} • ${escapeHtml(p.surfaceSize ? p.surfaceSize.split('(')[0].trim() : '')} • ${escapeHtml(p.budgetRange)} • ${escapeHtml(p.timelineSelect)}</div>
+                    <div class="admin-prod-spec" style="margin-top:2px; color: var(--text-muted);">${escapeHtml(p.palette)} • ${escapeHtml(p.surfaceSize ? p.surfaceSize.split('(')[0].trim() : '')} • ${p.priceDisplay || (p.priceInr ? '₹' + p.priceInr.toLocaleString('en-IN') : '—')} • ${escapeHtml(p.timelineSelect)}</div>
                     <p style="font-size:0.85rem; color: var(--text-secondary); margin-bottom: 16px;">${escapeHtml(p.blurb)}</p>
                     <div class="admin-prod-actions">
                         <button class="btn-edit-prod" data-id="${p.id}"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-right:4px;" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>Edit</button>
@@ -509,7 +509,8 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('editProdSpec').value = product.spec || '';
         document.getElementById('editProdPalette').value = product.palette || 'Veloura Classic';
         document.getElementById('editProdSurfaceSize').value = product.surfaceSize || 'Medium (10x10 in / 16 oz)';
-        document.getElementById('editProdBudget').value = product.budgetRange || '$150 - $300';
+        document.getElementById('editProdPrice').value = product.priceInr || '';
+        document.getElementById('editProdPriceDisplay').value = product.priceDisplay || '';
         document.getElementById('editProdTimeline').value = product.timelineSelect || 'Standard 3-4 Weeks';
         document.getElementById('editProdBlurb').value = product.blurb || '';
         // Never pre-fill the URL field with a Base64 string — it's too large to save
@@ -654,7 +655,9 @@ document.addEventListener('DOMContentLoaded', function () {
         const spec = document.getElementById('editProdSpec').value.trim();
         const palette = document.getElementById('editProdPalette').value;
         const surfaceSize = document.getElementById('editProdSurfaceSize').value;
-        const budgetRange = document.getElementById('editProdBudget').value;
+        const budgetRange = '';
+        const priceInr = document.getElementById('editProdPrice').value;
+        const priceDisplay = document.getElementById('editProdPriceDisplay').value.trim();
         const timelineSelect = document.getElementById('editProdTimeline').value;
         const blurb = document.getElementById('editProdBlurb').value.trim();
         const imageUrl = document.getElementById('editProdImgUrl').value.trim();
@@ -677,9 +680,10 @@ document.addEventListener('DOMContentLoaded', function () {
             formData.append('spec', spec);
             formData.append('palette', palette);
             formData.append('surfaceSize', surfaceSize);
-            formData.append('budgetRange', budgetRange);
             formData.append('timelineSelect', timelineSelect);
             formData.append('blurb', blurb);
+            if (priceInr !== '') formData.append('priceInr', priceInr);
+            if (priceDisplay) formData.append('priceDisplay', priceDisplay);
             if (imageUrl && !imageUrl.startsWith('data:')) formData.append('imageUrl', imageUrl);
             formData.append('existingImageUrls', JSON.stringify(existingEditUrls));
 
@@ -773,7 +777,9 @@ document.addEventListener('DOMContentLoaded', function () {
         const spec = document.getElementById('prodSpec').value.trim() || 'Custom Spec';
         const palette = document.getElementById('prodPalette').value || 'Veloura Classic';
         const surfaceSize = document.getElementById('prodSurfaceSize').value || 'Medium (10x10 in / 16 oz)';
-        const budgetRange = document.getElementById('prodBudget').value || '$150 - $300';
+        const budgetRange = '';
+        const priceInr = document.getElementById('prodPrice').value;
+        const priceDisplay = document.getElementById('prodPriceDisplay').value.trim();
         const timelineSelect = document.getElementById('prodTimeline').value || 'Standard 3-4 Weeks';
         const blurb = document.getElementById('prodBlurb').value.trim();
         const imageUrl = document.getElementById('prodImgUrl').value.trim();
@@ -793,10 +799,11 @@ document.addEventListener('DOMContentLoaded', function () {
             formData.append('spec', spec);
             formData.append('palette', palette);
             formData.append('surfaceSize', surfaceSize);
-            formData.append('budgetRange', budgetRange);
             formData.append('timelineSelect', timelineSelect);
             formData.append('blurb', blurb);
-            if (imageUrl) formData.append('imageUrl', imageUrl);
+            if (priceInr !== '') formData.append('priceInr', priceInr);
+            if (priceDisplay) formData.append('priceDisplay', priceDisplay);
+            if (imageUrl && !imageUrl.startsWith('data:')) formData.append('imageUrl', imageUrl);
             formData.append('readyToShip', 'true');
 
             for (const file of selectedAddFiles) {

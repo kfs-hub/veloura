@@ -275,7 +275,7 @@ app.put('/api/admin/commissions/:id/status', verifyAdmin, async (req, res) => {
 // Add New Product Showcase Item (Admin) — supports multiple images
 app.post('/api/admin/products', verifyAdmin, uploadShowcase.array('productImages', 10), async (req, res) => {
     try {
-        const { title, category, categoryLabel, blurb, spec, surfaceType, surfaceSize, palette, budgetRange, timelineSelect, imageUrl, readyToShip } = req.body;
+        const { title, category, categoryLabel, blurb, spec, surfaceType, surfaceSize, palette, budgetRange, timelineSelect, imageUrl, readyToShip, priceInr, priceDisplay } = req.body;
 
         if (!title) {
             return res.status(400).json({ success: false, message: 'Product title is required.' });
@@ -304,7 +304,9 @@ app.post('/api/admin/products', verifyAdmin, uploadShowcase.array('productImages
             budgetRange, timelineSelect,
             imageUrl: finalImgUrl,
             imageUrls: allImageUrls,
-            readyToShip
+            readyToShip,
+            priceInr: priceInr ? parseInt(priceInr, 10) : 0,
+            priceDisplay: priceDisplay || null
         });
 
         res.status(201).json({
@@ -322,7 +324,7 @@ app.post('/api/admin/products', verifyAdmin, uploadShowcase.array('productImages
 app.put('/api/admin/products/:id', verifyAdmin, uploadShowcase.array('productImages', 10), async (req, res) => {
     try {
         const { id } = req.params;
-        const { title, category, categoryLabel, blurb, spec, surfaceType, surfaceSize, palette, budgetRange, timelineSelect, imageUrl, readyToShip, existingImageUrls } = req.body;
+        const { title, category, categoryLabel, blurb, spec, surfaceType, surfaceSize, palette, budgetRange, timelineSelect, imageUrl, readyToShip, existingImageUrls, priceInr, priceDisplay } = req.body;
 
         // Parse existing image URLs that the admin chose to keep
         // Strip any Base64 data URIs that may have been stored previously — they are
@@ -358,7 +360,9 @@ app.put('/api/admin/products/:id', verifyAdmin, uploadShowcase.array('productIma
             budgetRange, timelineSelect,
             imageUrl: finalImgUrl,
             imageUrls: allImageUrls.length > 0 ? allImageUrls : undefined,
-            readyToShip: readyToShip !== undefined ? (readyToShip === true || readyToShip === 'true') : undefined
+            readyToShip: readyToShip !== undefined ? (readyToShip === true || readyToShip === 'true') : undefined,
+            priceInr: priceInr != null && priceInr !== '' ? parseInt(priceInr, 10) : null,
+            priceDisplay: priceDisplay !== undefined ? (priceDisplay || null) : undefined
         });
 
         if (!updated) {
